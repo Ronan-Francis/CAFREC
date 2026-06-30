@@ -1,0 +1,86 @@
+"""Unified runner.
+
+run_experiment(key, dataset) builds a RecBole config from the shared base
+config + the model's contract, then runs the standard
+create_dataset -> data_preparation -> fit -> evaluate flow. The ONLY thing
+that differs between a built-in and your custom model is how the model class
+is resolved, and that branch is hidden in here.
+"""
+import time
+from pathlib import Path
+
+from recbole.config import Config
+from recbole.data import create_dataset, data_preparation
+from recbole.trainer import Trainer
+from recbole.utils import get_model, get_trainer, init_seed, init_logger
+
+from cafrec.registry import get_spec
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_BASE_CONFIG = REPO_ROOT / "configs" / "base.yaml"
+
+
+def _resolve_model_class(spec, config):
+    """Built-in name -> get_model(); custom class -> use directly."""
+    if isinstance(spec.model, str):
+        return get_model(config["model"])
+    return spec.model  # already a class
+
+
+def _resolve_trainer(spec, config, model):
+    """Custom trainer if given; built-ins get their type-specific trainer;
+    a bare custom class falls back to the base Trainer (per RecBole's
+    customize-models example)."""
+    if spec.trainer is not None:
+        return spec.trainer(config, model)
+    if isinstance(spec.model, str):
+        return get_trainer(config["MODEL_TYPE"], config["model"])(config, model)
+    return Trainer(config, model)
+
+
+def run_experiment(key, dataset="ml-100k", config_overrides=None,
+                   base_config=DEFAULT_BASE_CONFIG):
+    """Train + evaluate one model. Returns a flat metrics dict (also the thing
+    you persist). `key` is the registry key — the single variable to change."""
+    spec = get_spec(key)
+
+    # Merge order: model-specific config < training contract < caller overrides.
+    config_dict = {}
+    config_dict.update(spec.config)
+    config_dict.update(spec.contract)
+    if config_overrides:
+        config_dict.update(config_overrides)
+
+    config = Config(
+        model=spec.model,                       # str OR class — Config takes both
+        dataset=dataset,
+        config_file_list=[str(base_config)],
+        config_dict=config_dict,
+    )
+    init_seed(config["seed"], config["reproducibility"])
+    init_logger(config)
+
+    rb_dataset = create_dataset(config)
+    train_data, valid_data, test_data = data_preparation(config, rb_dataset)
+
+    model_cls = _resolve_model_class(spec, config)
+    model = model_cls(config, train_data.dataset).to(config["device"])
+
+    trainer = _resolve_trainer(spec, config, model)
+    best_valid_score, best_valid_result = trainer.fit(
+        train_data, valid_data, saved=True, show_progress=False, verbose=False
+    )
+    test_result = trainer.evaluate(
+        test_data, load_best_model=True, show_progress=False
+    )
+
+    return {
+        "model": key,
+        "dataset": dataset,
+        "seed": config["seed"],
+        "loss_type": config["loss_type"],
+        "n_params": sum(p.numel() for p in model.parameters()),
+        "timestamp": time.strftime("%Y%m%d-%H%M%S"),
+        "valid_best": dict(best_valid_result),
+        "test": dict(test_result),
+    }

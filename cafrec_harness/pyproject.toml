@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cafrec"
+version = "0.1.0"
+description = "Expandable RecBole harness for CAFREC and baselines"
+requires-python = ">=3.8"
+dependencies = [
+    "recbole==1.2.1",
+    "torch>=1.7",
+    "numpy<2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+wandb = ["wandb"]
+
+[tool.setuptools.packages.find]
+include = ["cafrec*"]

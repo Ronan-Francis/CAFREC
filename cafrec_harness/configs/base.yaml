@@ -1,0 +1,34 @@
+# Shared config for every model in the harness.
+# Model-specific keys (loss_type, neg sampling, hidden sizes) come from the
+# registry, so this file holds only what should be identical across models.
+
+# --- reproducibility ---
+seed: 2020
+reproducibility: True
+
+# --- atomic-file fields (ml-100k defaults; override per-dataset later) ---
+USER_ID_FIELD: user_id
+ITEM_ID_FIELD: item_id
+TIME_FIELD: timestamp
+load_col:
+  inter: [user_id, item_id, timestamp]
+
+# --- sequential settings ---
+MAX_ITEM_LIST_LENGTH: 50
+embedding_size: 64
+
+# --- evaluation: leave-one-out, time-ordered ---
+eval_args:
+  split: {LS: valid_and_test}   # leave-one-out (last=test, 2nd-last=valid)
+  order: TO                      # time order
+  mode: full                     # full ranking; switch to uni100 for ~99-neg
+  group_by: user
+metrics: [Recall, NDCG, MRR, Hit]   # Hit@10 == HR@10
+topk: 10
+valid_metric: NDCG@10
+
+# --- training (CPU-friendly sanity defaults) ---
+epochs: 10
+train_batch_size: 2048
+eval_batch_size: 4096
+stopping_step: 3
