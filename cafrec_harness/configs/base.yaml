@@ -17,11 +17,11 @@ load_col:
 MAX_ITEM_LIST_LENGTH: 50
 embedding_size: 64
 
-# --- evaluation: leave-one-out, time-ordered ---
+# --- evaluation: leave-oneeval_args-out, time-ordered ---
 eval_args:
   split: {LS: valid_and_test}   # leave-one-out (last=test, 2nd-last=valid)
   order: TO                      # time order
-  mode: full                     # full ranking; switch to uni100 for ~99-neg
+  mode: uni100                   # 1 positive + 99 uniform negatives
   group_by: user
 metrics: [Recall, NDCG, MRR, Hit]   # Hit@10 == HR@10
 topk: 10
@@ -32,3 +32,6 @@ epochs: 10
 train_batch_size: 2048
 eval_batch_size: 4096
 stopping_step: 3
+
+data_path: 'C:/Users/msc/Desktop/G00403092/data'
+# -> RecBole reads C:/Users/msc/Desktop/G00403092/data/kuairand/kuairand.inter
