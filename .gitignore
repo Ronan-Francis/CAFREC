@@ -6,6 +6,7 @@
 # Dataset: KuaiRand-Pure (raw + tarball)
 # Never commit raw data. Download via Zenodo (see T1.1 notebook).
 # -----------------------------------------------------------------------------
+data/*
 data/KuaiRand-Pure/
 data/KuaiRand-Pure.tar.gz
 
