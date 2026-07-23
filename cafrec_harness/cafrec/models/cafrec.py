@@ -88,7 +88,7 @@ class CAFREC(SequentialRecommender):
             raise NotImplementedError("loss_type must be 'CE' or 'BPR'")
 
         self.apply(self._init_weights)
-        self._maybe_load_profiles(config.get("llm_profile_path"))
+        self._maybe_load_profiles(config["llm_profile_path"])
 
     # ----------------------------------------------------------------------
     def _init_weights(self, module):

@@ -140,3 +140,97 @@ UPDATED OPEN ISSUES / RISKS
        above. Whichever is chosen, report it as a methodological decision
        in the dissertation with sensitivity rationale.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 7 Working Record
+Date   : 2026-07-23
+Block  : 1 Foundations / 2 Core Build
+Author : R. Francis
+------------------------------------------------------------
+
+SCOPE DECISIONS (this cycle)
+  * Modal cloud-GPU runs: approved. LLM inference: NOT run this cycle.
+  * Reasoning-model intent feature (RON-20/21/22): DEFERRED pending supervisor
+    approval. No Claude/GPT calls built or run.
+  * LLM profiler inference (RON-24): full run deferred; only the embedding
+    FORMAT + loader contract (RON-25) built and tested against a synthetic
+    cache.
+  * Dissertation writing tasks (RON-12/33/34/35/58/59): skipped this cycle.
+  * Target scales: features/profiler -> 27k (eventual); model runs -> 1k,
+    Pure as validation.
+
+DONE
+  RON-16/17/18  Context features implemented at the HARNESS level as a tested,
+                leakage-free (causal / prefix-only) module:
+                  cafrec/features/context.py       (session_len, dwell_entropy,
+                                                     cat_drift; 30-min sessions)
+                  cafrec/features/build_context_inter.py  -> emits
+                    data/recbole/kuairand_pure_ctx/kuairand_pure_ctx.inter
+                    (same 651,099 rows / 22,912 users as the base .inter, plus
+                     three :float context columns)
+                  tests/test_features.py           (16 tests incl. causality)
+                Row-alignment with the base atomic file confirmed.
+  RON-26/28/29  Gating MLP + element-wise fusion verified end-to-end: the three
+                context fields survive RecBole augmentation into the batch, the
+                gating MLP receives non-zero gradients (features drive the gate,
+                not the fallback).
+  RON-30        CAFREC forward+backward on a 10% Pure slice (2,292 users):
+                training loss decreases monotonically over 5 epochs
+                8.42 -> 7.89 -> 7.55 -> 7.49 -> 7.43.
+  RON-25        LLM profile-embedding format + loader (cafrec/features/profiles.py):
+                shape/dtype/NaN validation, sparse-user (zero-row) handling,
+                zero-fill of missing tail, and an end-to-end load into CAFREC
+                (frozen, row-aligned). tests/test_profiles.py (9 tests).
+  RON-14        Ranking metrics (HR/NDCG/MRR) + Wilcoxon + paired bootstrap were
+                already implemented; test coverage confirmed green.
+  RON-15        ILD + Coverage + category matrix already implemented; tests green.
+                (Diversity BASELINES still need a trained-model top-k dump.)
+  Baselines     Reference numbers locked from the existing Modal runs (uni100,
+                seed 2020), Pure test split:
+                  SASRec  HR@10 0.638  NDCG@10 0.375  MRR 0.295
+                  HGN     HR@10 0.528  NDCG@10 0.292  MRR 0.220
+                  CAFREC  HR@10 0.637  NDCG@10 0.372  MRR 0.291  (context_fields
+                          empty -> fallback; ~= SASRec, as expected pre-features)
+                  HGN(1k) HR@10 0.399  NDCG@10 0.262  MRR 0.219
+
+OPEN DECISIONS (need sign-off before they can be closed)
+  D1  x_ctx COMPOSITION IS INCONSISTENT ACROSS ARTIFACTS.
+        - submitted plan / registry default : 5  (4 classic + reasoning intent)
+        - T1.1 notebook context_features.parquet : 6
+              [prefix_session_len_log_z, prefix_dwell_entropy_z,
+               prefix_category_drift_z, inter_session_gap_log_z,
+               prefix_policy_flag, is_first_session]
+        - harness context.py (this cycle)   : 3  (session_len, dwell_entropy,
+                                                   cat_drift)
+      The T1.1 notebook is the richer, standardised, dissertation-facing
+      pipeline; the harness module is the simpler path that already runs inside
+      RecBole today. DECIDE the canonical x_ctx set, then align both. Note the
+      notebook computes features over the FULL behavioural sequence (incl.
+      non-click / random rows as context), whereas the .inter that CAFREC trains
+      on is organic clicks only -> a join to attach notebook features to the
+      .inter must reconcile that row-set difference.
+  D2  EVALUATION PROTOCOL: base.yaml still uses eval_args mode: uni100 (99
+      negatives). RON-60 specifies FLAG 3 = TO / LS:valid_and_test / mode:FULL,
+      and the uni100 sampler ticket RON-13 was CANCELLED as related to RON-60.
+      Switching to full ranking invalidates the uni100 reference numbers above
+      and requires re-running all baselines. NOT flipped unilaterally.
+  D3  BASELINE MODEL: RON-10 names HGRU4Rec/HRNN, which is not a RecBole
+      built-in; only HGN is registered (documented deviation in the dataset
+      builder notebook). Decide: register a RecBole RNN stand-in (e.g. GRU4Rec)
+      or drop HGRU4Rec.
+
+BLOCKED
+  * Modal runs (RON-10 SASRec-1k, any full-ranking re-runs): the Modal workspace
+    has EXCEEDED ITS SPEND LIMIT ("Resource exhausted"). No cloud runs can
+    execute until the budget is raised/reset. Existing results predate the limit.
+
+RON-60 STATUS (In Progress)
+  Split-integrity guarantees TESTED in the harness:
+    - last-interaction holdout per user      -> tests/test_leave_one_out.py
+    - no prefix leakage in context features   -> tests/test_features.py
+      (held-out target uses prefix only; mirrors the notebook's cell-21 assertion)
+  "no is_rand==1 test targets" holds by construction: the .inter is organic-only
+  (is_rand==1 dropped at build; the notebook splits LOO over organic rows only).
+  REMAINING: the mode:full switch (D2) and the SASRec full-ranking sanity check
+  (blocked on Modal budget).
+------------------------------------------------------------

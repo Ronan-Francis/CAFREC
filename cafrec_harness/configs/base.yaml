@@ -33,5 +33,6 @@ train_batch_size: 2048
 eval_batch_size: 4096
 stopping_step: 3
 
-data_path: 'C:/Users/msc/Desktop/G00403092/data'
-# -> RecBole reads C:/Users/msc/Desktop/G00403092/data/kuairand/kuairand.inter
+data_path: 'C:/Users/msc/Desktop/G00403092/CAFREC/data/recbole'
+# -> RecBole reads <data_path>/<dataset>/<dataset>.inter
+#    e.g. .../data/recbole/kuairand_pure/kuairand_pure.inter
