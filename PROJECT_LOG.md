@@ -323,3 +323,72 @@ REMAINING / STILL BLOCKED
     medium|heavy); the 27K feature pass needs an out-of-core implementation.
   * Faithful HGRU4Rec cross-session variant pending a session-index list field.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 8 Addendum — Linear backlog + thesis alignment
+Date   : 2026-08-04 (same day, later)
+Author : R. Francis
+------------------------------------------------------------
+
+LINEAR BACKLOG RECONCILED TO THE BUILD
+  Closed as Done (implementation + passing tests): RON-16/17/18 (context
+    features), RON-26 (gating MLP), RON-29 (element-wise fusion), RON-30
+    (end-to-end CAFREC), RON-25 (profile format/loader), RON-15 (ILD/Coverage).
+  Duplicates: RON-28 -> RON-26; RON-19 -> RON-7.
+  Rescoped to the six-feature build:
+    RON-26/35/59  x_ctx now stated as R^6 (was R^5 "four classic + reasoning
+                  intent"); Figure 4 = 6 inputs.
+    RON-40        ablation retitled -> classic-four x_ctx (R^4), dropping the two
+                  session-recency features (inter_session_gap_log, is_first_session).
+                  Runnable via config override (context_fields=<4>, n=4); no new
+                  model code.
+    RON-44        rescoped -> session-intent PROXY from category-drift / dwell-
+                  entropy strata (the reasoning-LLM label is not built).
+    RON-31        "HRNN" -> "HGRU4Rec"; RON-32 dropped the reasoning-intent tuning.
+  Moved out of Cycle 8: RON-20/21/22/33 (reasoning model), RON-24 (profiler
+    inference) -> Cycle 9.
+
+THESIS REVIEW (Thesis.pdf) — SCOPE DECISIONS
+  D4  REASONING-LLM SESSION-INTENT FEATURE -> DROPPED.
+      The thesis architecture (Sec 1.2), RQ3, H1-H4, and the contributions all
+      specify FOUR session-context features (session length, dwell-time entropy,
+      category drift rate, policy-transition flag) + the LLM temporal profiler +
+      the short-term encoder. The GPT-4o/Claude session-intent label appears ONLY
+      in the embedded Linear backlog table, never in the thesis's RQs/architecture
+      -> it was never a thesis commitment. Cancel/shelve RON-20/21/22/33.
+  D5  THE CORE LLM CLAIM IS THE TEMPORAL PROFILER, NOT THE REASONING FEATURE.
+      RQ2 / H2 ("offline LLM temporal profiling helps sparse-history users") is a
+      load-bearing question. In the current build z_long is a LEARNABLE STAND-IN
+      (llm_profile_path=None). RQ2/H2 CANNOT be answered with the stand-in, so the
+      real critical-path LLM task is RON-24 (run the profiler over all users and
+      load frozen embeddings), not any reasoning-intent work.
+
+THESIS <-> BUILD MISMATCHES TO FIX
+  M1  FEATURE COUNT. Thesis/RQ3 = FOUR context features; the build emits SIX
+      (added inter_session_gap_log + is_first_session). Resolution: keep the four
+      as the RQ3 signals; frame the two extras as AUXILIARY features whose value
+      is tested by the RON-40 ablation. Update RON-59 + the thesis text to say so.
+  M2  EVALUATION PROTOCOL. Thesis Sec 2.1 still reads "leave-one-out with 99
+      sampled negatives" (uni100) — this contradicts the mode:full switch (D2).
+      Update Sec 2.1 AND RON-36 to full ranking, with the sampled-negative-bias
+      rationale.
+  M3  TERMINOLOGY. Thesis "HRNN" == build "HGRU4Rec" (same hierarchical-RNN
+      family). Unify to one term across thesis + Linear.
+
+UPDATED TO-DO (priority order)
+  1. RON-24  Run the real LLM temporal profiler over all users; replace the
+             learnable z_long stand-in with frozen embeddings. REQUIRED for RQ2/H2.
+  2. Thesis edits: Sec 2.1 -> full ranking (M2); four-core + two-auxiliary feature
+     framing (M1); HRNN/HGRU4Rec terminology (M3).
+  3. Re-run baselines + CAFREC under mode:full on kuairand_1k (primary) +
+     kuairand_pure (validation) [RON-10/11]; 27K when Modal restored. BLOCKED: Modal.
+  4. Grid search RON-31/32 (shared + CAFREC-specific). BLOCKED: Modal.
+  5. SASRec full-ranking sanity check vs published KuaiRand numbers (RON-60).
+     BLOCKED: Modal.
+  6. Build kuairand_1k_ctx / kuairand_27k_ctx (--tier medium|heavy); 27K needs an
+     out-of-core feature pass.
+  7. Re-validate diversity/metric baselines (RON-14/15) after the full-ranking
+     baseline re-runs (their old uni100-based validation is void).
+  8. OPTIONAL: faithful HGRU4Rec cross-session variant (needs a session-index
+     field); cancel/shelve reasoning-model tickets RON-20/21/22/33 per D4.
+------------------------------------------------------------
