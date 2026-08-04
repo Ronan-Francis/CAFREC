@@ -42,12 +42,21 @@ def _build_registry():
     # Imported lazily so the registry module stays importable even if a model
     # file has a heavy/optional dependency.
     from cafrec.models.cafrec import CAFREC
+    from cafrec.models.hgru4rec import HGRU4Rec
 
     return {
         # --- Baselines (resolved by RecBole name) ---------------------------
         "SASRec": ModelSpec(model="SASRec", contract=CE),   # strong sequential anchor
         "HGN":    ModelSpec(model="HGN",    contract=BPR),  # long+short via gating
         # "SHAN":  ModelSpec(model="SHAN",  contract=BPR),  # uncomment to add a 3rd
+
+        # --- RNN baseline (custom class; not a RecBole built-in) -------------
+        # Hierarchical GRU (Quadrana et al. 2017). Registers like CAFREC.
+        "HGRU4Rec": ModelSpec(
+            model=HGRU4Rec,
+            contract=BPR,
+            config={"hidden_size": 64, "num_layers": 1, "dropout_prob": 0.3},
+        ),
 
         # --- Your model (resolved by CLASS) ---------------------------------
         # Note it registers identically to the baselines: same key->spec shape.
@@ -64,14 +73,29 @@ def _build_registry():
                 "initializer_range": 0.02,
                 # long-term LLM profile (path=None -> learnable stand-in for now)
                 "profile_dim": 64, "llm_profile_path": None,
-                # context-adaptive gating.
-                # context_fields=[] -> fallback (session length only) so it runs
-                # on ml-100k. Once T2.1 writes the columns, set e.g.
-                #   context_fields: [session_len, dwell_entropy, cat_drift,
-                #                    request_source, intent_label]
-                # and n_context_features to its length (4 in the submitted plan,
-                # 5 with the reasoning-intent label -- reconcile this with the doc).
-                "n_context_features": 5, "context_fields": [], "gating_hidden": 64,
+                # context-adaptive gating (D1: the canonical SIX-feature x_ctx).
+                # These are the columns emitted by build_context_inter into the
+                # <dataset>_ctx.inter; on a dataset that lacks them (e.g. ml-100k)
+                # the model's _build_context falls back to session length only.
+                "n_context_features": 6,
+                "context_fields": [
+                    "prefix_session_len_log_z", "prefix_dwell_entropy_z",
+                    "prefix_category_drift_z", "inter_session_gap_log_z",
+                    "prefix_policy_flag", "is_first_session",
+                ],
+                "gating_hidden": 64,
+                # RecBole must LOAD the six context columns for the _ctx dataset.
+                # This is promoted to `load_col` by the runner ONLY when the
+                # dataset name ends with "_ctx"; on a plain dataset (e.g. ml-100k
+                # smoke) it is dropped so base.yaml's 3-column load_col applies and
+                # the model falls back gracefully. Keeps baselines on the clean
+                # 3-column file while CAFREC reads the extra fields on _ctx.
+                "context_load_col": {"inter": [
+                    "user_id", "item_id", "timestamp",
+                    "prefix_session_len_log_z", "prefix_dwell_entropy_z",
+                    "prefix_category_drift_z", "inter_session_gap_log_z",
+                    "prefix_policy_flag", "is_first_session",
+                ]},
                 # ablation: none | no_profiler | static_gate | concat   (T3.1)
                 "ablation": "none",
             },

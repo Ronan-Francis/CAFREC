@@ -234,3 +234,92 @@ RON-60 STATUS (In Progress)
   REMAINING: the mode:full switch (D2) and the SASRec full-ranking sanity check
   (blocked on Modal budget).
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 8 Working Record
+Date   : 2026-08-04
+Block  : 2 — Core Build
+Author : R. Francis
+------------------------------------------------------------
+
+CYCLE 7 OPEN DECISIONS D1/D2/D3 — RESOLVED AND IMPLEMENTED
+
+D1  x_ctx COMPOSITION -> SIX features, full-log context, organic targets.
+    DECISION: standardise x_ctx on the notebook's six-feature set and align the
+    harness to it. Features are computed over the FULL behavioural log (organic
+    is_rand==0 AND random-policy is_rand==1 impressions kept as context); only
+    ORGANIC CLICKS are emitted as training/eval targets. This keeps
+    prefix_policy_flag (the is_rand -> search_to_rec structural replacement,
+    RQ3) non-degenerate while the model trains/evaluates on organic clicks only.
+    Had we computed features over organic-only rows, prefix_policy_flag would be
+    a constant 0 (no is_rand transitions among organic rows) — the reason this
+    decision was surfaced before implementing.
+
+    x_ctx (order): prefix_session_len_log_z, prefix_dwell_entropy_z,
+                   prefix_category_drift_z, inter_session_gap_log_z,
+                   prefix_policy_flag, is_first_session   (4 z-scored + 2 binary)
+
+    IMPLEMENTED (harness now at parity with T1.1 notebook cells 28/30):
+      cafrec/features/context.py         six prefix-causal features over the full
+                                         log; requires is_rand; standardize_context
+                                         fits mean/std on TRAIN rows only.
+      cafrec/features/build_context_inter.py  full-log compute -> organic-click
+                                         emit; 9-column .inter + ctx_scaler_params.json.
+      cafrec/registry.py (CAFREC)        n_context_features=6, context_fields=<6>,
+                                         context_load_col (promoted to load_col by
+                                         the runner ONLY for a *_ctx dataset).
+      cafrec/runner.py                   _ctx-only load_col promotion so baselines
+                                         and the ml-100k fallback are unaffected.
+
+    VERIFIED (KuaiRand-Pure, local):
+      kuairand_pure_ctx.inter  interactions = 651,099  (EXACT match to the base
+      kuairand_pure.inter row-set; users = 22,912). Features derived from
+      2,622,668 full-impression context rows. policy_flag_rate = 0.0098 (non-zero
+      -> feature is live, not degenerate). Scaler fit_rows = 605,275
+      = 651,099 - 2*22,912 (leave-two-out per user). A RecBole load of CAFREC on
+      kuairand_pure_ctx confirmed all six context fields arrive in the training
+      batch (the gate uses the real x_ctx branch, not the session-length fallback).
+
+D2  EVALUATION -> FULL RANKING; per-dataset workflow (NOT a cross-tier split).
+    configs/base.yaml eval_args.mode: uni100 -> full. The "1K test / 27K train /
+    Pure validation" intent is realised as a PER-DATASET workflow — each tier is
+    a self-contained dataset with its own leave-one-out train/valid/test split;
+    there is NO single cross-tier RecBole run (the tiers have disjoint user/item
+    id spaces, so a model trained on one tier cannot be evaluated on another).
+    Roles: kuairand_pure = fast dev/validation, kuairand_1k = PRIMARY reported
+    results, kuairand_27k = heavy-scale training. Documented in base.yaml.
+
+    CONSEQUENCE: mode:full INVALIDATES every uni100 baseline number from Cycle 7
+    (SASRec/HGN/CAFREC HR/NDCG/MRR). All baselines must be re-run under full
+    ranking before they are comparable. Full-ranking mechanics verified for all
+    four models via the ml-100k smoke suite; KuaiRand full-ranking re-runs at
+    scale remain BLOCKED on the Modal spend limit. 27K full-softmax CE over the
+    full catalogue needs the heavy-tier item floor (MIN_ITEM_INTER=10, k-core).
+
+D3  RNN BASELINE -> custom HGRU4Rec (Quadrana et al. 2017).
+    Confirmed HGRU4Rec/HRNN is NOT a RecBole built-in (installed sequential
+    models: gru4rec, hgn, hrm, sasrec, ...; hrm is a different model). Implemented
+    cafrec/models/hgru4rec.py as a custom SequentialRecommender (session-GRU over
+    the recent-item window + user-GRU; a learnable per-user state seeds the
+    session-GRU). Registered "HGRU4Rec" (BPR contract). DOCUMENTED DEVIATION:
+    RecBole's LOO loader hands one flattened item window per target with no
+    in-window session delimiters, so true cross-session hidden-state propagation
+    is approximated by the learnable per-user state; a per-interaction session
+    index would enable the faithful variant (out of scope this cycle).
+
+TESTS (all green: 56 passed, incl. full-ranking smoke for SASRec/HGN/HGRU4Rec/CAFREC)
+  tests/test_features.py   reworked to the six-feature semantics; leakage/
+                           prefix-causality guarantees preserved; adds
+                           policy_flag / inter_session_gap / is_first_session /
+                           train-only-scaler coverage.
+  tests/test_hgru4rec.py   new: BPR loss decreases on a fixed batch; CE backprops;
+                           full_sort/predict shapes.
+  tests/test_smoke.py      HGRU4Rec added to the end-to-end parametrize.
+
+REMAINING / STILL BLOCKED
+  * Re-run all baselines + CAFREC under mode:full on kuairand_1k (primary) and
+    kuairand_pure (validation); 27K when Modal budget is restored.
+  * Build kuairand_1k_ctx / kuairand_27k_ctx (build_context_inter --tier
+    medium|heavy); the 27K feature pass needs an out-of-core implementation.
+  * Faithful HGRU4Rec cross-session variant pending a session-index list field.
+------------------------------------------------------------

@@ -17,15 +17,18 @@ load_col:
 MAX_ITEM_LIST_LENGTH: 50
 embedding_size: 64
 
-# --- evaluation: leave-oneeval_args-out, time-ordered ---
+# --- evaluation: leave-one-out, time-ordered, FULL ranking ---
 eval_args:
   split: {LS: valid_and_test}   # leave-one-out (last=test, 2nd-last=valid)
   order: TO                      # time order
-  mode: uni100                   # 1 positive + 99 uniform negatives
+  mode: full                     # rank the held-out target against the WHOLE catalogue
   group_by: user
 metrics: [Recall, NDCG, MRR, Hit]   # Hit@10 == HR@10
 topk: 10
 valid_metric: NDCG@10
+# NOTE (D2): mode was uni100 (1 pos + 99 uniform negatives). Full ranking removes
+# the sampled-negative bias but INVALIDATES every uni100 baseline number — all
+# baselines must be re-run under mode:full before they are comparable again.
 
 # --- training (CPU-friendly sanity defaults) ---
 epochs: 10
@@ -33,6 +36,19 @@ train_batch_size: 2048
 eval_batch_size: 4096
 stopping_step: 3
 
-data_path: 'C:/Users/msc/Desktop/G00403092/CAFREC/data/recbole'
+data_path: '../data/recbole'   # relative to cafrec_harness/ (run.py's dir)
 # -> RecBole reads <data_path>/<dataset>/<dataset>.inter
-#    e.g. .../data/recbole/kuairand_pure/kuairand_pure.inter
+#    e.g. ../data/recbole/kuairand_pure/kuairand_pure.inter
+# NOTE: launch run.py from cafrec_harness/ so this resolves. Modal runs override
+#       data_path to /data/recbole (the mounted volume), so this line is local-only.
+
+# --- per-dataset workflow (D2) ----------------------------------------------
+# The three KuaiRand tiers are SEPARATE, self-contained datasets, each with its
+# own leave-one-out train/valid/test split above. There is no cross-tier split
+# (the tiers have disjoint user/item id spaces). Roles:
+#   kuairand_pure  -> fast dev / validation smoke  (184 MB; iterate here)
+#   kuairand_1k    -> PRIMARY reported results
+#   kuairand_27k   -> heavy-scale training run     (needs the heavy-tier item
+#                     floor; 27k full-softmax CE over the full catalogue is
+#                     GPU-heavy — see dataset builder MIN_ITEM_INTER/ k-core)
+# Select the tier per run via run_experiment(..., dataset="kuairand_1k").

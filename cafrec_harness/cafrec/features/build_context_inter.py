@@ -1,38 +1,54 @@
-"""Build a feature-augmented RecBole atomic file for CAFREC (RON-16/17/18).
+"""Build a feature-augmented RecBole atomic file for CAFREC (RON-16/17/18/19).
 
 The plain `<dataset>.inter` carries only (user_id, item_id, timestamp) — enough
-for the baselines. CAFREC's gating module additionally needs the causal
-session-context features, which depend on `play_time_ms` / `duration_ms` and the
-video `tag` — columns that live only in the raw KuaiRand logs.
+for the baselines. CAFREC's gating module additionally needs the six causal
+session-context features (see `cafrec.features.context`), which depend on
+`play_time_ms` / `duration_ms`, the video `tag`, and `is_rand` — columns that
+live only in the raw KuaiRand logs.
 
-This module reproduces the EXACT filtering of the dataset builder
-(`CAFREC_Dataset_Builder_KuaiRand_inter.ipynb`) so the augmented file has the
-same interaction rows, then appends three typed float columns:
+D1 contract — full-log context, organic-click targets
+-----------------------------------------------------
+The six features are computed over the FULL impression log (organic AND
+random-policy rows, clicked or not) so `prefix_policy_flag` (the is_rand ->
+search_to_rec structural replacement) is non-degenerate. Only ORGANIC CLICKS
+(`is_rand==0 & is_click==1`) are then emitted as interaction rows — exactly the
+row-set the baselines' `<dataset>.inter` contains, so the comparison stays fair.
+Each emitted row carries its six prefix-context columns.
 
-    session_len:float  dwell_entropy:float  cat_drift:float
+The four continuous features are z-scored with statistics fit on the TRAIN rows
+only (last-two-per-user held out, matching RecBole's leave-one-out split), and
+the transform is persisted to `ctx_scaler_params.json` beside the atomic file.
 
-Output goes to a sibling `<dataset>_ctx` dataset directory so the baselines keep
-using the clean 3-column file and CAFREC points at the `_ctx` variant. Same
-rows -> the comparison stays fair; the only difference is the extra columns
-CAFREC reads via `load_col`.
+Output goes to a sibling `<dataset>_ctx` directory; baselines keep using the
+clean 3-column file and CAFREC points at the `_ctx` variant.
 
 CLI
 ---
     python -m cafrec.features.build_context_inter --tier light   # kuairand_pure
     python -m cafrec.features.build_context_inter --tier medium  # kuairand_1k
 
-`light` fits in memory; `medium`/`heavy` stream the raw logs in chunks.
+`light` fits in memory; `medium`/`heavy` stream the raw logs in chunks on read.
+NOTE: the feature pass itself holds the full per-user impression log in memory
+(a pandas groupby); the `heavy` (27K) tier will need an out-of-core pass — out
+of scope for local runs (Modal-blocked).
 """
 from __future__ import annotations
 
 import argparse
+import json
 import time
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from cafrec.features.context import CTX_FIELDS, compute_context_features, dwell_ratio
+from cafrec.features.context import (
+    CONTINUOUS,
+    CTX_FIELDS,
+    compute_context_features,
+    dwell_ratio,
+    standardize_context,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT.parent / "data"
@@ -55,8 +71,10 @@ DTYPES = {"user_id": "int32", "video_id": "int32", "time_ms": "int64",
           "is_rand": "int8", "is_click": "int8",
           "play_time_ms": "int64", "duration_ms": "int64"}
 
-INTER_HEADER = ["user_id:token", "item_id:token", "timestamp:float",
-                "session_len:float", "dwell_entropy:float", "cat_drift:float"]
+# 3 base columns + the six context features (binary flags as :float so RecBole
+# loads them as numeric fields, consistent with how CAFREC reads interaction[f]).
+INTER_HEADER = (["user_id:token", "item_id:token", "timestamp:float"]
+                + [f"{f}:float" for f in CTX_FIELDS])
 
 
 def _find_logs(raw: Path, suffix: str):
@@ -77,29 +95,22 @@ def _find_logs(raw: Path, suffix: str):
     return paths
 
 
-def _load_filtered(paths):
-    """Stream raw logs; keep organic (is_rand==0) clicks (is_click==1).
-
-    Returns a frame with user_id, video_id, time_ms, dwell (in [0,1]).
+def _load_full(paths):
+    """Stream the raw logs and keep EVERY impression (organic + random, clicked
+    or not) — the full behavioural context. Returns a frame with user_id,
+    video_id, time_ms, is_rand, is_click, dwell (in [0,1]).
     """
     kept = []
     for p in paths:
         for chunk in pd.read_csv(p, usecols=USE_COLS, dtype=DTYPES, chunksize=CHUNKSIZE):
-            chunk = chunk[(chunk["is_rand"] == 0) & (chunk["is_click"] == 1)]
-            if len(chunk) == 0:
-                continue
             chunk = chunk.copy()
             chunk["dwell"] = dwell_ratio(chunk["play_time_ms"], chunk["duration_ms"])
-            kept.append(chunk[["user_id", "video_id", "time_ms", "dwell"]])
+            kept.append(chunk[["user_id", "video_id", "time_ms",
+                               "is_rand", "is_click", "dwell"]])
+    cols = ["user_id", "video_id", "time_ms", "is_rand", "is_click", "dwell"]
     if not kept:
-        return pd.DataFrame(columns=["user_id", "video_id", "time_ms", "dwell"])
+        return pd.DataFrame(columns=cols)
     return pd.concat(kept, ignore_index=True)
-
-
-def _k_core_user(df, min_user):
-    """Single-pass user floor (matches the builder for light/medium tiers)."""
-    uc = df["user_id"].value_counts()
-    return df[df["user_id"].isin(uc[uc >= min_user].index)].reset_index(drop=True)
 
 
 def _primary_tag_map(raw: Path, suffix: str):
@@ -119,20 +130,38 @@ def _primary_tag_map(raw: Path, suffix: str):
     return dict(zip(df["video_id"].to_numpy(), df["category"].to_numpy()))
 
 
+def _loo_split_mask(frame):
+    """Boolean train mask for a per-user time-ordered frame: everything except
+    each user's last two interactions (RecBole LS:valid_and_test, order TO).
+    Row order within the frame must already be (user_id, timestamp) ascending.
+    """
+    rank_desc = frame.groupby("user_id").cumcount(ascending=False)  # 0 = last
+    return (rank_desc >= 2).to_numpy()
+
+
 def build(tier: str, write: bool = True):
     meta = VERSIONS[tier]
     raw = DATA_DIR / meta["variant"] / "data"
     t0 = time.perf_counter()
 
-    df = _load_filtered(_find_logs(raw, meta["suffix"]))
-    df = _k_core_user(df, MIN_USER_INTER)
-
+    # 1) full impression log -> categories -> six causal features (over ALL rows)
+    full = _load_full(_find_logs(raw, meta["suffix"]))
     tag_map = _primary_tag_map(raw, meta["suffix"])
-    df["category"] = df["video_id"].map(tag_map).fillna(-1).astype(np.int64)
+    full["category"] = full["video_id"].map(tag_map).fillna(-1).astype(np.int64)
+    feats = compute_context_features(full)   # sorts by (user_id, time_ms)
 
-    feats = compute_context_features(df)   # sorts by (user_id, time_ms)
+    # 2) organic-click targets only (same row-set as the baseline .inter), with
+    #    the k-core user floor applied to the TARGET count.
+    tgt = feats[(feats["is_rand"] == 0) & (feats["is_click"] == 1)].copy()
+    uc = tgt["user_id"].value_counts()
+    tgt = tgt[tgt["user_id"].isin(uc[uc >= MIN_USER_INTER].index)]
+    tgt = tgt.sort_values(["user_id", "time_ms"], kind="mergesort").reset_index(drop=True)
 
-    out = feats.rename(columns={"video_id": "item_id", "time_ms": "timestamp"})
+    # 3) z-score the continuous features on TRAIN rows only; persist the scaler.
+    train_mask = _loo_split_mask(tgt)
+    tgt, scaler_params = standardize_context(tgt, train_mask)
+
+    out = tgt.rename(columns={"video_id": "item_id", "time_ms": "timestamp"})
     out = out[["user_id", "item_id", "timestamp", *CTX_FIELDS]]
 
     stats = {
@@ -140,10 +169,11 @@ def build(tier: str, write: bool = True):
         "users": int(out["user_id"].nunique()),
         "items": int(out["item_id"].nunique()),
         "interactions": int(len(out)),
+        "context_rows_total": int(len(feats)),
+        "train_rows": int(train_mask.sum()),
         "sessions": int(feats["session_id"].groupby(feats["user_id"]).nunique().sum()),
-        "mean_session_len": round(float(feats["session_len"].mean()) * 50, 2),
-        "mean_dwell_entropy": round(float(feats["dwell_entropy"].mean()), 4),
-        "mean_cat_drift": round(float(feats["cat_drift"].mean()), 4),
+        "policy_flag_rate": round(float(out["prefix_policy_flag"].mean()), 4),
+        "first_session_rate": round(float(out["is_first_session"].mean()), 4),
         "sec": round(time.perf_counter() - t0, 1),
     }
 
@@ -152,6 +182,8 @@ def build(tier: str, write: bool = True):
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / f"{meta['dataset']}_ctx.inter"
         out.to_csv(out_path, sep="\t", index=False, header=INTER_HEADER)
+        with open(out_dir / "ctx_scaler_params.json", "w") as f:
+            json.dump(scaler_params, f, indent=2)
         stats["path"] = str(out_path)
         stats["size_mb"] = round(out_path.stat().st_size / 1e6, 1)
     return stats

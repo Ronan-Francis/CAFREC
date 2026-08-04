@@ -9,7 +9,7 @@ import pytest
 from cafrec.runner import run_experiment
 
 
-@pytest.mark.parametrize("model_key", ["SASRec", "HGN", "CAFREC"])
+@pytest.mark.parametrize("model_key", ["SASRec", "HGN", "HGRU4Rec", "CAFREC"])
 def test_run_returns_metrics(model_key):
     metrics = run_experiment(
         model_key, dataset="ml-100k", config_overrides={"epochs": 1}

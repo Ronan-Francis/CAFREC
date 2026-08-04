@@ -66,6 +66,14 @@ def run_experiment(key, dataset="ml-100k", config_overrides=None,
     if config_overrides:
         config_dict.update(config_overrides)
 
+    # A model may declare `context_load_col` (extra atomic-file columns it needs,
+    # e.g. CAFREC's six context features). Promote it to RecBole's `load_col`
+    # only for a "_ctx" dataset that actually carries those columns; otherwise
+    # drop it so plain datasets load their base columns and the model falls back.
+    context_load_col = config_dict.pop("context_load_col", None)
+    if context_load_col is not None and str(dataset).endswith("_ctx"):
+        config_dict.setdefault("load_col", context_load_col)
+
     config = Config(
         model=spec.model,                       # str OR class — Config takes both
         dataset=dataset,
