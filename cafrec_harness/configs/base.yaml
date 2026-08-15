@@ -14,7 +14,12 @@ load_col:
   inter: [user_id, item_id, timestamp]
 
 # --- sequential settings ---
-MAX_ITEM_LIST_LENGTH: 50
+# NOTE (Cycle 9, 2026-08-12): reduced 50 -> 20 to make the CPU-only Pure runs
+# tractable (~6x less transformer-attention cost; seq-len^2). Applied uniformly
+# to all four sequential models so cross-model comparability is preserved.
+# KuaiRand sessions are short, so a 20-interaction history window is a reasonable
+# cap; documented as a compute-driven methodological choice in PROJECT_LOG.
+MAX_ITEM_LIST_LENGTH: 20
 embedding_size: 64
 
 # --- evaluation: leave-one-out, time-ordered, FULL ranking ---

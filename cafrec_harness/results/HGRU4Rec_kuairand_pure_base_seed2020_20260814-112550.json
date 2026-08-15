@@ -1,0 +1,27 @@
+{
+  "model": "HGRU4Rec",
+  "dataset": "kuairand_pure",
+  "seed": 2020,
+  "loss_type": "BPR",
+  "n_params": 1981248,
+  "timestamp": "20260814-112550",
+  "split_sizes": {
+    "n_users": 22913,
+    "n_items": 7211,
+    "n_train": 582363,
+    "n_valid": 22912,
+    "n_test": 22912
+  },
+  "valid_best": {
+    "recall@10": 0.0482,
+    "ndcg@10": 0.0244,
+    "mrr@10": 0.0173,
+    "hit@10": 0.0482
+  },
+  "test": {
+    "recall@10": 0.0479,
+    "ndcg@10": 0.0247,
+    "mrr@10": 0.0177,
+    "hit@10": 0.0479
+  }
+}

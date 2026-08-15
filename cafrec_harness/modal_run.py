@@ -59,7 +59,10 @@ REMOTE_BASE_CONFIG = "/root/configs/base.yaml"
     volumes={"/data": data_vol, "/results": results_vol},
 )
 def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
-          train_batch_size: int = None) -> dict:
+          train_batch_size: int = None, eval_batch_size: int = None,
+          llm_profile_path: str = None, profile_dim: int = None,
+          ablation: str = None, dump_ranks: bool = False,
+          dump_topk: bool = False, tag: str = None) -> dict:
     from cafrec.runner import run_experiment
 
     overrides = {"data_path": "/data/recbole"}
@@ -67,6 +70,23 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
         overrides["epochs"] = epochs
     if seed is not None:
         overrides["seed"] = seed
+    # CAFREC only: load the frozen LLM profile cache (built by modal_profiles.py)
+    # instead of the learnable z_long stand-in. profile_dim must match the cache.
+    if llm_profile_path is not None:
+        overrides["llm_profile_path"] = llm_profile_path
+    if profile_dim is not None:
+        overrides["profile_dim"] = profile_dim
+    # CAFREC ablations (T3.1): none | no_profiler | static_gate | concat.
+    if ablation is not None:
+        overrides["ablation"] = ablation
+    # Full-ranking eval materialises a [eval_batch_size x n_items] matrix. Pure's
+    # 7.2K items are fine at the base 4096, but 1k/27k's huge catalogues OOM the
+    # A10G there (13.5GB+ tensor) -> shrink the eval batch for those tiers.
+    if eval_batch_size is not None:
+        overrides["eval_batch_size"] = eval_batch_size
+    elif dataset != "kuairand_pure":
+        overrides["eval_batch_size"] = 256
+
     if train_batch_size is not None:
         overrides["train_batch_size"] = train_batch_size
     elif dataset != "kuairand_pure":
@@ -80,13 +100,23 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
         dataset=dataset,
         config_overrides=overrides,
         base_config=REMOTE_BASE_CONFIG,
+        return_ranks=dump_ranks,
+        dump_topk=dump_topk,
     )
 
-    out = f"/results/{model_key}_{dataset}_seed{metrics['seed']}_{metrics['timestamp']}.json"
+    # `tag` labels the run condition (e.g. prof7b / standin / no_profiler) so
+    # multiple CAFREC runs on the same dataset are distinguishable on the volume.
+    suffix = f"_{tag}" if tag else ""
+    out = (f"/results/{model_key}_{dataset}{suffix}_seed{metrics['seed']}"
+           f"_{metrics['timestamp']}.json")
     with open(out, "w") as fh:
         json.dump(metrics, fh, indent=2, default=str)
     results_vol.commit()
     metrics["results_file"] = out
+    # keep the returned dict lean over the wire; ranks/top-k are persisted in the JSON
+    for big in ("test_ranks", "test_user_ids",
+                "test_topk_items", "test_topk_user_ids"):
+        metrics.pop(big, None)
     return metrics
 
 
@@ -95,9 +125,15 @@ ALL_DATASETS = ["kuairand_pure", "kuairand_1k", "kuairand_27k"]
 
 @app.local_entrypoint()
 def main(models: str = "SASRec", dataset: str = "kuairand_pure",
-         epochs: int = None, seed: int = None, train_batch_size: int = None):
+         epochs: int = None, seed: int = None, train_batch_size: int = None,
+         eval_batch_size: int = None, llm_profile_path: str = None,
+         profile_dim: int = None, ablation: str = None, dump_ranks: bool = False,
+         dump_topk: bool = False, tag: str = None):
     """`models` and `dataset` are comma-separated; `--dataset all` sweeps
-    every dataset in the recbole folder (pure, 1k, 27k)."""
+    every dataset in the recbole folder (pure, 1k, 27k). `--llm-profile-path`
+    (+ `--profile-dim`) loads CAFREC's frozen profile cache from the volume.
+    `--dump-ranks` persists per-user held-out ranks (for significance tests);
+    `--tag` labels the result file with the run condition."""
     keys = [m.strip() for m in models.split(",") if m.strip()]
     datasets = (ALL_DATASETS if dataset.strip().lower() == "all"
                 else [d.strip() for d in dataset.split(",") if d.strip()])
@@ -105,7 +141,12 @@ def main(models: str = "SASRec", dataset: str = "kuairand_pure",
     for ds in datasets:
         for key in keys:
             metrics = train.remote(key, ds, epochs=epochs, seed=seed,
-                                   train_batch_size=train_batch_size)
+                                   train_batch_size=train_batch_size,
+                                   eval_batch_size=eval_batch_size,
+                                   llm_profile_path=llm_profile_path,
+                                   profile_dim=profile_dim, ablation=ablation,
+                                   dump_ranks=dump_ranks, dump_topk=dump_topk,
+                                   tag=tag)
             print(f"\n[{key} / {ds}] test: {metrics['test']}")
             print(f"  split_sizes: {metrics['split_sizes']}")
             print(f"  valid_best : {metrics['valid_best']}")

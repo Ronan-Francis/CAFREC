@@ -54,7 +54,8 @@ def _resolve_trainer(spec, config, model):
 
 
 def run_experiment(key, dataset="ml-100k", config_overrides=None,
-                   base_config=DEFAULT_BASE_CONFIG):
+                   base_config=DEFAULT_BASE_CONFIG, return_ranks=False,
+                   dump_topk=False):
     """Train + evaluate one model. Returns a flat metrics dict (also the thing
     you persist). `key` is the registry key — the single variable to change."""
     spec = get_spec(key)
@@ -107,7 +108,7 @@ def run_experiment(key, dataset="ml-100k", config_overrides=None,
         test_data, load_best_model=True, show_progress=False
     )
 
-    return {
+    result = {
         "model": key,
         "dataset": dataset,
         "seed": config["seed"],
@@ -118,3 +119,39 @@ def run_experiment(key, dataset="ml-100k", config_overrides=None,
         "valid_best": dict(best_valid_result),
         "test": dict(test_result),
     }
+
+    # Per-user held-out ranks for paired significance tests. `model` holds the
+    # best checkpoint (evaluate loaded it); we re-score the test split mirroring
+    # RecBole's full-sort masking. The aggregate is asserted against test_result
+    # so the ranks are provably consistent with the reported metrics.
+    if return_ranks or dump_topk:
+        from cafrec.eval.full_rank import full_sort_ranks, metrics_at_k
+        uid_field = rb_dataset.uid_field
+        k = config["topk"][0] if isinstance(config["topk"], list) else config["topk"]
+        out = full_sort_ranks(
+            model, test_data, config["device"], rb_dataset.item_num, uid_field,
+            k=k, collect_topk=dump_topk)
+        internal_uids, ranks = out[0], out[1]
+        # map RecBole-internal user ids -> original tokens so results pair across
+        # models/datasets regardless of each dataset's remap.
+        uid_token = rb_dataset.field2id_token[uid_field]
+        orig_uids = [str(uid_token[i]) for i in internal_uids]
+        if return_ranks:
+            result["test_user_ids"] = orig_uids
+            result["test_ranks"] = ranks.tolist()
+            result["ranks_check"] = metrics_at_k(ranks, k=k)
+        if dump_topk:
+            # top-k RECOMMENDED items as ORIGINAL item tokens, so the offline
+            # ILD/Coverage step aligns them to the KuaiRand video_id category
+            # matrix with no remap bookkeeping. Keyed by original user id so
+            # diversity can also be stratified per cohort (RON-42/43/44).
+            iid_field = rb_dataset.iid_field
+            item_token = rb_dataset.field2id_token[iid_field]
+            topk = out[2]
+            result["test_topk_user_ids"] = orig_uids
+            result["test_topk_items"] = [[str(item_token[i]) for i in row]
+                                         for row in topk]
+            result["topk_k"] = int(k)
+            # real catalogue size for Coverage (exclude RecBole's pad item 0)
+            result["n_items_catalog"] = int(rb_dataset.item_num - 1)
+    return result

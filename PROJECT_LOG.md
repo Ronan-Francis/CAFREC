@@ -392,3 +392,302 @@ UPDATED TO-DO (priority order)
   8. OPTIONAL: faithful HGRU4Rec cross-session variant (needs a session-index
      field); cancel/shelve reasoning-model tickets RON-20/21/22/33 per D4.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 Working Record — Primary reporting tier: 1K -> Pure
+Date   : 2026-08-12
+Block  : 2 — Core Build
+Author : R. Francis
+------------------------------------------------------------
+
+SUPERVISOR DECISION (Mike, 2026-08-12)
+  No Modal credits available; no departmental GPU resources available. Suggested
+  free-GPU alternatives: Beam ($30/mo free GPU credit, similar to Modal) and
+  Kaggle (free GPU, more setup). Explicitly approved moving the PRIMARY reporting
+  tier from kuairand_1k to kuairand_pure if compute remains a constraint, on the
+  grounds that a COMPLETE four-model result set on Pure is worth more than an
+  incomplete evaluation blocked on compute. Change + reason to be documented in
+  the write-up (this record + thesis edit M2).
+
+DECISION (D6): PRIMARY REPORTED TIER -> kuairand_pure.
+  This SUPERSEDES the Cycle 8 D2 tier-role assignment (which named kuairand_1k as
+  PRIMARY). New roles:
+    kuairand_pure -> PRIMARY reported results (all four models, mode:full)
+    kuairand_1k   -> SECONDARY / upside, only if free compute is secured
+    kuairand_27k  -> heavy-scale, deferred to paid/credit compute
+
+  WHY THIS ALSO UN-BLOCKS THE WORK (not just a scope cut):
+    The Modal spend-limit block was specific to 1K/27K, which carry the full
+    ~million-item video catalogue. Under mode:full the CE loss materialises a
+    (batch x n_items) logits tensor that OOMs anything below a 24 GB card (see
+    modal_run.py:72 rationale; A10G required). Pure's catalogue is only 7,551
+    items, so full-ranking CE fits comfortably in local CPU/RAM. Switching the
+    primary tier to Pure therefore removes the GPU dependency entirely — the
+    complete four-model result set can be produced locally with zero cloud spend.
+
+COMPUTE-OPTIONS SURVEY (for the 1K/27K upside; recorded for the write-up)
+  Kaggle    free, 30 hr/wk, P100/T4 16 GB, 12 hr/session. Handles Pure trivially;
+            1K workable at train_batch_size=512 (workaround already in modal_run.py);
+            27K RAM-tight. First choice for a free 1K run.
+  Modal     $30/mo Starter free tier RESETS MONTHLY — the "spend limit exceeded"
+            block may already be lifted at the start of a new month; check before
+            porting elsewhere. Existing modal_run.py already wired.
+  Beam      $30/mo free credit, A10G 24 GB (~$1.05/hr); serverless like Modal so
+            modal_run.py ports with modest rework. 24 GB covers 27K. Best full-
+            harness remote target if Modal stays blocked.
+  Colab     free tier unreliable/not guaranteed; Pro $11.99/mo for stable 16 GB.
+  Vast.ai / RunPod  pay-as-you-go A100 ~$0.67-1.49/hr; a few dollars runs the
+            entire matrix including 27K. Cheapest paid path.
+
+ACTION TAKEN
+  Launched LOCAL CPU full-ranking runs (configs/base.yaml: mode:full, epochs 10,
+  early-stop NDCG@10, stopping_step 3) for all four models:
+    SASRec, HGN, HGRU4Rec  -> kuairand_pure
+    CAFREC                 -> kuairand_pure_ctx  (six causal context features)
+  Results land in cafrec_harness/results/<model>_<dataset>_seed<seed>_<ts>.json
+  and append to results/summary.csv. These are the NEW mode:full numbers that
+  replace the void Cycle 7 uni100 baselines.
+
+THESIS EDIT (extends M2)
+  The tier-role text (Sec 2.1 / results framing) must state kuairand_pure as the
+  primary evaluation tier, with the compute-constraint rationale above and a note
+  that 1K/27K remain as scale-generalisation checks pending GPU access. Pair this
+  with the already-flagged M2 uni100 -> full-ranking edit.
+
+REMAINING
+  * Collect the four Pure result JSONs; rebuild the results table + diversity
+    metrics (RON-14/15) on the trained top-k dumps.
+  * 1K as upside: attempt on Kaggle (or Modal if the monthly free tier reset).
+  * 27K: defer to paid/credit compute.
+
+UPDATE (2026-08-12, later): CPU RUN TOO SLOW -> SEQUENCE-LENGTH SPEED-TUNE
+  The first local run under the full base.yaml config (MAX_ITEM_LIST_LENGTH=50)
+  was impractically slow on CPU (no local CUDA GPU): after ~2h10m it had not
+  completed even epoch 0 of SASRec (model 1 of 4), while pegging ~4 cores. Full
+  matrix projected at >1 day. Terminated and speed-tuned.
+
+  CONFIG CHANGE (methodological, to report in the write-up):
+    MAX_ITEM_LIST_LENGTH 50 -> 20 in configs/base.yaml. Cost of the sequential
+    models' self-attention scales with seq_len^2, so ~6x less compute per step.
+    Applied UNIFORMLY to all four models (SASRec, HGN, HGRU4Rec, CAFREC) so the
+    cross-model comparison stays fair. Rationale: KuaiRand sessions are short, so
+    a 20-interaction causal history window is an adequate cap for next-item
+    prediction; the truncation is a compute-driven choice, not a modelling
+    advantage for any one model. epochs unchanged (10, early-stop NDCG@10 pat 3).
+    NOTE for thesis: state the 20-item cap and this rationale where the sequence
+    encoder / training setup is described.
+  ENV: OMP/MKL threads set to 8 (all logical cores) for the relaunch.
+
+RESULTS — kuairand_pure, mode:full, seed 2020, seq_len=20 (2026-08-12, ~2h total)
+  Split: 22,913 users; 582,363 train / 22,912 valid / 22,912 test; 7,211 items.
+  Full ranking (true item vs all items). HR@10 == Recall@10 (LOO, 1 relevant/user).
+    Model      HR@10    NDCG@10   MRR@10    params
+    SASRec     0.0795   0.0397    0.0279    562,880   (CE)   <- best
+    CAFREC     0.0730   0.0364    0.0255    2,050,497 (CE)
+    HGRU4Rec   0.0449   0.0232    0.0166    1,981,248 (BPR)
+    HGN        0.0290   0.0131    0.0084    2,399,168 (BPR)
+  Result JSONs: results/{SASRec_...174721, HGN_...175100, HGRU4Rec_...181006,
+    CAFREC_kuairand_pure_ctx_...184720}.json (+ summary.csv).
+
+  READING:
+  * Numbers are ~10x below the void Cycle 7 uni100 figures (HR@10 ~0.64) purely
+    from the uni100 -> full-ranking protocol switch (D2). Do NOT cross-compare.
+  * CAFREC (0.0730) is marginally BELOW SASRec (0.0795), i.e. NOT yet beating the
+    strongest baseline. Consistent with build state: z_long is still the learnable
+    STAND-IN (llm_profile_path=None; RON-24 profiler not loaded -> RQ2/H2 mechanism
+    inert, per D5) and NO hyperparameter tuning yet (RON-31/32 pending). This is the
+    expected pre-profiler / pre-tuning parity point, not a refutation of H1-H4.
+  * Robustness: prior seq_len=50 SASRec (results ...160222) HR@10 0.0785 vs
+    seq_len=20 0.0795 -> near-identical; the seq_len=20 cap is defensible.
+
+  NEXT: (a) RON-24 real profiler embeddings -> re-run CAFREC to actually test
+  RQ2/H2; (b) grid search RON-31/32; (c) diversity/coverage (ILD/Coverage) on
+  top-k dumps; (d) 1K upside on free GPU; (e) build the thesis results table.
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — RON-24 LLM PROFILER BUILT + RQ2/H2 TESTED ON PURE
+Date   : 2026-08-14
+Author : R. Francis
+------------------------------------------------------------
+
+COMPUTE PIVOT
+  Modal bill PAID 2026-08-14 -> cloud GPU unblocked. Kaggle dropped. 1K attempted
+  on Modal but is EXPENSIVE: 1.82M-item catalogue, 4.43M interactions over 1000
+  dense users (~4,430 each) -> full-softmax CE caps batch ~1024 (7.5GB) and one
+  SASRec epoch ran >25 min on A10G (CPU-dataloader-bound). Est. ~$5-10 for the
+  four-model 1K set. DECISION (supervisor-cost tradeoff): test the profiler's
+  RQ2/H2 payoff on PURE (7.2K items, the approved primary tier) for <$2 first;
+  1K held as paid upside.
+
+RON-24 PROFILER PIPELINE (built + validated)
+  cafrec/features/build_profiles.py  causal, leakage-safe per-user temporal
+    profile (TRAINING rows only, i.e. all but each user's last two LOO holdouts),
+    row-aligned to RecBole's user remap, swappable offline backend:
+      HashingBackend  deterministic (crc32) bag-of-tokens; deps-free no-LLM control.
+      HFBackend       sentence-transformers embedder (the offline "LLM profiler").
+  modal_profiles.py  A10G function; renders+remaps FIRST then loads the model, so
+    a data bug fails before any multi-GB download; HF weights cached in hf-cache vol.
+  modal_run.py  now accepts --llm-profile-path/--profile-dim/--ablation for CAFREC.
+  Caches (bge-large-en-v1.5, d=1024) on cafrec-data volume:
+    profiles/kuairand_1k_ctx.profiles.hf.d1024.pt    (1000/1000 users, 118s)
+    profiles/kuairand_pure_ctx.profiles.hf.d1024.pt  (22912/22913 users, 118s)
+
+RESULTS — CAFREC on kuairand_pure_ctx, mode:full, seed 2020, seq_len 20
+    Condition                         HR@10    NDCG@10   MRR@10
+    SASRec (strongest baseline)       0.0795   0.0397    0.0279
+    CAFREC no_profiler ablation (0)   0.0791   0.0399    0.0281
+    CAFREC real bge-large profiler    0.0786   0.0400    0.0285   <- best NDCG/MRR
+    CAFREC learnable stand-in         0.0725   0.0354    0.0244
+
+  FINDINGS:
+  * CLEAR: real LLM profile >> learnable stand-in (+8% HR, +13% NDCG, +17% MRR).
+    The frozen offline profile carries signal a learned embedding of equal
+    capacity does not -> supports the RQ2/H2 premise; reframes the earlier
+    "CAFREC below SASRec" (stand-in) as a representation gap, not an arch failure.
+  * MARGINAL: profiler posts best-in-table NDCG@10 (0.0400) + MRR@10 (0.0285),
+    edging SASRec + its own ablation on rank quality, but HR@10 (0.0786) is a hair
+    below SASRec (0.0795)/ablation (0.0791). Top-3 gaps <1.5% -> NOT established
+    without the paired Wilcoxon/bootstrap (RON-14). Run significance before any
+    "CAFREC wins" claim.
+  * Modal stand-in (0.0725) reproduces the earlier local-CPU CAFREC (0.0730) ->
+    Modal-vs-CPU consistent; comparison is clean.
+
+  Windows gotchas logged to memory: PYTHONUTF8=1 for `modal run` (✓ charmap
+  crash); MSYS_NO_PATHCONV=1 so Git Bash does not mangle a /data/... CLI arg.
+
+NEXT: (1) paired significance tests (Wilcoxon/bootstrap) profiler vs SASRec vs
+  ablation on Pure; (2) OPTIONAL scale the profiler model up (7B embedder, "as big
+  as possible") to see if the margin widens; (3) 1K as paid upside; (4) diversity
+  metrics; (5) thesis results table + RQ2/H2 write-up.
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — 7B PROFILER + PAIRED SIGNIFICANCE TESTS (Pure)
+Date   : 2026-08-14
+Author : R. Francis
+------------------------------------------------------------
+
+NEW INFRA
+  cafrec/eval/full_rank.py  per-user held-out ranks under FULL ranking, mirroring
+    RecBole's _full_sort_batch_eval masking (pad+history -> -inf); keyed by
+    ORIGINAL user id so models on different datasets (SASRec on pure, CAFREC on
+    pure_ctx) pair correctly. runner return_ranks=; modal_run --dump-ranks/--tag.
+    VALIDATED: aggregate-from-ranks == RecBole reported metrics for all 5 conds.
+  build_profiles HFBackend now supports fp16 (dtype=) so a 7B embedder fits A10G.
+  Profile caches on cafrec-data: pure_ctx d1024 (bge-large) + d4096 (e5-mistral-7b).
+
+RESULTS — CAFREC on kuairand_pure_ctx, Modal A10G, mode:full, seed 2020, seq_len 20
+  (all 5 rows this batch are same-environment -> directly comparable)
+    Condition                       HR@10    NDCG@10   MRR@10
+    CAFREC 7B profiler (e5-mistral) 0.0805   0.0403    0.0282
+    CAFREC no_profiler ablation     0.0791   0.0399    0.0281
+    CAFREC bge-large profiler       0.0786   0.0400    0.0285
+    SASRec                          0.0776   0.0389    0.0274
+    CAFREC learnable stand-in       0.0725   0.0354    0.0244
+
+  PAIRED TESTS (Wilcoxon signed-rank + 95% paired bootstrap CI, n=22,912 users):
+    profiler (7B & bge) vs STAND-IN : SIGNIFICANT on HR/NDCG/MRR, p<1e-6, CIs
+      exclude 0 (e.g. 7B-standin NDCG Δ=+0.0048 [+0.0031,+0.0064]). => the real
+      offline LLM profile is a materially better long-term representation than a
+      learnable embedding of equal capacity. Core RQ2/H2 support.
+    profiler vs NO_PROFILER ablation: NOT significant (NDCG p=0.44/0.76; HR ns).
+    profiler vs SASRec              : NOT significant (7B NDCG p=0.11, HR p=0.057).
+    7B vs bge-large                 : NOT significant (all p>=0.10). "As big as
+      possible" gave NO significant lift over the 1024-d model -> bge-large suffices.
+
+  HONEST READ: the profile clears the noise only against the stand-in. Against the
+  strong short-term encoder (SASRec / the z_long=0 ablation) CAFREC-with-profiler
+  is statistically TIED on Pure — it no longer HURTS (as the stand-in did) but adds
+  no significant gain. Note SASRec here (0.0776) vs the earlier local-CPU SASRec
+  (0.0795): ~0.002 HR of train nondeterminism across hardware, comparable to the
+  between-condition gaps -> single-seed aggregate diffs are unreliable; the paired
+  per-user tests are the trustworthy comparison. Multi-seed runs would tighten this.
+
+NEXT: HGN/HGRU4Rec re-run on Modal for a same-env thesis table; then diversity
+  metrics; 1K paid upside; multi-seed for a publishable significance claim.
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — SEED-403092 MULTI-SEED BATCH + RESULT CONSOLIDATION + 1K LAUNCH
+Date   : 2026-08-15
+Author : R. Francis
+------------------------------------------------------------
+
+COMPUTE
+  Modal (paid tier, unblocked since 2026-08-14). All runs A10G, mode:full,
+  seq_len 20, epochs 10 (early-stop NDCG@10, patience 3). Ranks dumped for every
+  condition (--dump-ranks) so the paired per-user tests can be recomputed offline.
+
+WHAT WAS RUN (seed 403092 = project/student seed; second seed alongside 2020)
+  PURE head-to-head (kuairand_pure / kuairand_pure_ctx), completed this session:
+    SASRec              tag seed403092    (~3 min wall)
+    CAFREC no_profiler  tag noprof_s403092
+    CAFREC bge-profiler tag bge_s403092   (profiles/kuairand_pure_ctx...d1024.pt)
+  1K tier (kuairand_1k / kuairand_1k_ctx), LAUNCHED as background/over-time
+  compute (results pending, folded in on completion):
+    SASRec, HGN, HGRU4Rec  tag base1k_s403092
+    CAFREC bge-profiler     tag bge1k_s403092 (profiles/kuairand_1k_ctx...d1024.pt)
+  Note: kuairand_1k_ctx.inter was already rendered + uploaded (Cycle 8 listed it as
+  "remaining"; volume check 2026-08-15 confirms it present), so the 1K CAFREC leg
+  is NOT blocked.
+
+CONSOLIDATION (data hygiene)
+  The 2026-08-14 same-env Modal batch (SASRec, CAFREC noprof/standin/prof_bge/
+  prof_7b, HGN base, HGRU4Rec base) previously lived only on the cafrec-results
+  volume and in this log's prose. Pulled to local results/ and consolidated with
+  all prior JSONs into results/thesis_table.csv (condition tag derived per file),
+  16 rows. This is now the single on-disk source for the results chapter.
+
+RESULTS — PURE, same-env Modal, mode:full, seq_len 20, two seeds (2020 / 403092)
+    Condition            HR@10  (2020 / 403092 -> mean)   NDCG@10 -> mean   MRR@10 -> mean
+    SASRec               0.0776 / 0.0793 -> 0.0785        0.0395           0.0279
+    CAFREC no_profiler   0.0791 / 0.0807 -> 0.0799        0.0406           0.0287
+    CAFREC bge-profiler  0.0786 / 0.0795 -> 0.0790        0.0404           0.0289
+  (learnable stand-in remains 0.0725 HR at seed 2020; not re-run at 403092.)
+
+  READING:
+  * On the 2-seed MEAN, both CAFREC variants now edge SASRec on all three metrics.
+    The single-seed-2020 picture (SASRec HR 0.0776 ABOVE CAFREC) was seed noise:
+    per-condition HR moved 0.0776->0.0793 (SASRec) and 0.0791->0.0807 (noprof)
+    between seeds, a ~0.0016 swing comparable to the between-condition gaps. This
+    re-frames the earlier "CAFREC below SASRec" line as single-seed noise, not an
+    architecture deficit.
+  * bge-profiler vs no_profiler stays TIED (noprof slightly higher HR/NDCG, bge
+    slightly higher MRR; direction flips across seeds). No evidence on Pure that the
+    frozen profile beats the z_long=0 ablation, consistent with the 08-14 paired
+    tests (profiler vs no_profiler not significant).
+  * The one ROBUST effect remains profiler >> stand-in (0.0725): the load-bearing
+    RQ2/H2 evidence.
+
+  CAVEAT: 2-seed means are NOT significance. The trustworthy comparison is the
+  per-user paired Wilcoxon/bootstrap recomputed PER SEED from the dumped ranks
+  (all six seed-403092 + seed-2020 rank files are on cafrec-results). A 3rd/4th
+  seed would tighten the aggregate further.
+
+DIVERSITY (ILD / Coverage) — STILL BLOCKED, WRONG DUMP TYPE
+  RON-15 code is implemented + tested (cafrec/eval/diversity.py: coverage,
+  intra_list_diversity, topk_from_scores; category_matrix.py). BUT ILD/Coverage
+  need per-user TOP-K RECOMMENDED ITEM-ID LISTS ([n_users, k]); the current
+  --dump-ranks path (full_rank.py) emits only each user's RANK OF THE HELD-OUT
+  TARGET (the paired unit for significance), not the top-k lists. So diversity
+  cannot be computed from any existing dump. FIX: extend full_sort_ranks to also
+  capture topk_from_scores(masked_scores, k) keyed by user id, then a cheap Pure
+  re-run (or fold into the next seed batch) produces the top-k dumps; ILD needs the
+  RecBole-remap-aligned category_matrix and Coverage needs n_items (Pure = 7,211).
+
+ARTIFACTS
+  results/thesis_table.csv                  16-row consolidated table (this session)
+  results/*_seed2020_2026081[24]*.json      08-12 local + 08-14 Modal same-env
+  results/*_seed403092_20260815*.json       this session's Pure seed-403092 runs
+  cafrec-results volume                     rank dumps for all conditions; 1K JSONs
+                                            land here as those jobs finish
+
+NEXT
+  1. Recompute paired Wilcoxon/bootstrap PER SEED (2020 + 403092) from the rank
+     dumps -> turn the 2-seed means into a defensible significance statement.
+  2. Extend full_rank.py with a top-k dump; produce ILD/Coverage baselines (RON-15).
+  3. Collect the 1K JSONs; add the 1K tier to thesis_table.csv as a scale check.
+  4. Optional 3rd/4th seed on Pure for a publishable multi-seed claim.
+  5. Draft the results chapter table + RQ2/H2 write-up off thesis_table.csv.
+------------------------------------------------------------
