@@ -798,3 +798,33 @@ These give the thesis a clean T3.1 ablation table: both architectural claims
 (context-adaptive gating; gated fusion) are individually validated with paired
 significance, and the profiler capacity ladder (standin << bge ~= 7B) is complete.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — H2 SPARSE/DENSE COHORT TEST -> HYPOTHESIS REVERSED
+Date   : 2026-08-25
+Author : R. Francis
+------------------------------------------------------------
+
+Direct test of H2 (LLM profiler helps SHORT-history users most): CAFREC_bge vs
+CAFREC_noprof (profile on/off, identical arch), users split sparse(<20)/dense(>=20)
+interactions (Sparse 10,345 / Dense 12,567; median history 22). Per-user metrics
+from dumped ranks, 3-seed, paired Wilcoxon within cohort. h2_sparse_strata.py +
+analysis_h2_sparse.md (free, no compute).
+
+FINDING — H2 IS REVERSED, with significance:
+  * Sparse users: profiler is a NET NEGATIVE (NDCG bge-noprof -0.003/-0.002,
+    sig s2020/s2021; null s403092). noprof posts the BEST sparse NDCG (0.0543 >
+    SASRec 0.0525 > bge 0.0526).
+  * Dense users: profiler is the intended NET POSITIVE (NDCG +0.0015, sig
+    s2021/s403092).
+  * Mechanism: an LLM profile built from a THIN history is noisy and displaces the
+    already-good short-term signal; a profile from a RICH history carries real
+    long-term taste. The profiler needs history to help -- opposite of H2.
+  * Explains the aggregate tie: sparse loss + dense gain cancel to ~0. The cohort
+    split is what makes the real behaviour visible.
+  * Future work motivated: gate the profile on history sufficiency (down-weight
+    z_long when history too thin), which the current context gate does not do.
+
+This is a PRIMARY RQ2/H2 result for the write-up (honest hypothesis refutation),
+stronger and cleaner than the RON-44 intent stratification.
+------------------------------------------------------------
