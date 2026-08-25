@@ -691,3 +691,77 @@ NEXT
   4. Optional 3rd/4th seed on Pure for a publishable multi-seed claim.
   5. Draft the results chapter table + RQ2/H2 write-up off thesis_table.csv.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — 1K COLLECTION + OPTIONAL TASKS (RON-40 / RON-44 / multi-seed)
+Date   : 2026-08-20
+Author : R. Francis
+------------------------------------------------------------
+
+1K TIER COLLECTION -> ONLY ONE JOB LANDED, AND IT IS DEGENERATE
+  The 08-15 background 1K batch left exactly ONE JSON on cafrec-results:
+  HGRU4Rec_kuairand_1k_topk1k_s403092 -> test HR@10 = NDCG = MRR = 0.0 (valid
+  HR@10 0.001; independent ranks_check agrees). Root cause VERIFIED 2026-08-20 by
+  inspecting kuairand_1k.inter: a DATA-PREPROCESSING gap, not a code bug (same
+  harness is fine on Pure) and not mystical scale. The 1K .inter has NO item floor
+  -> 1,819,489 items over 1,000 users (2.43 mean appearances/item; 65.6% of items
+  appear once), and **33.5% of held-out test targets appear only once in the whole
+  file -> never in training -> unrankable by ANY model**. HR is thus capped near
+  zero by construction. The BPR + one-negative contract is a secondary compounding
+  factor. The Cycle-8 MIN_ITEM_INTER=10/k-core floor was planned for 27K but never
+  applied to the 1K build. FIX = rebuild kuairand_1k with a k-core item floor, then
+  re-run (data-build change, not model). The SASRec/HGN/CAFREC legs produced no
+  JSON (did not complete). Documented in results/analysis_1k_status.md. DECISION: do NOT fold the 1K zero into the
+  Pure thesis_table; the degenerate BPR result confirms D6's rationale for making
+  Pure the primary tier. A single cheap SASRec-1K full-softmax CE diagnostic was
+  launched to test whether CE escapes the zero floor (result appended below when
+  the run finishes).
+
+RON-40  R^4 CLASSIC-FOUR x_ctx ABLATION -> AUXILIARY FEATURES ADD NOTHING.
+  Added a --context-fields override to modal_run.py (comma-separated subset of the
+  six ctx columns; n_context_features derived from the count; no model change --
+  CAFREC._build_context already selects columns by name). Ran CAFREC bge-large
+  profiler with the four CORE features only (dropping inter_session_gap_log_z and
+  is_first_session), 3 seeds, mode:full, seq_len 20. Gate MLP is 128 params
+  smaller (2 features x 64 units), confirming the narrower input.
+    R^4 (classic-four) 3-seed mean: HR@10 0.0788, NDCG@10 0.0404, MRR 0.0289
+    R^6 (full)         3-seed mean: HR@10 0.0790, NDCG@10 0.0405, MRR 0.0289
+  Paired per-user Wilcoxon + bootstrap (R^6 - R^4), every seed x metric: mean Δ
+  tiny, 95% CI straddles 0, p in [0.51, 0.97]. The two auxiliary recency features
+  give NO significant lift over the four core RQ3 features -> supports the M1
+  framing (four CORE + two AUXILIARY, marginal value tested and negligible).
+  results/analysis_ron40_r4_ablation.md (+ ron40_r4_ablation.py).
+
+RON-44  SESSION-INTENT PROXY STRATIFICATION -> NUANCED / AGAINST H3.
+  Proxy from the test-row prefix context features (causal). Both behavioural
+  features are ~85-90% concentrated at their floor on Pure (short/single-category
+  histories), so each proxy is a BINARY split: category-drift Focused (85%) vs
+  Exploratory (15%); dwell-entropy Low (89%) vs High (11%). Per-user HR/NDCG
+  reconstructed from dumped ranks (asserted == RecBole aggregate), 3-seed means.
+  FINDING: the Exploratory / high-dwell minority -- the cohort H3 says context
+  gating should help MOST -- is where SASRec WINS (CAFREC NDCG Δ vs SASRec is
+  negative there: drift -0.0015/-0.0018, dwell -0.0007/-0.0008). CAFREC's small
+  edge is carried by the Focused/Low majority instead. Report as a nuanced RQ3/H3
+  limitation, not support. Magnitudes <0.002 NDCG; pair with paired tests before
+  any directional claim. results/analysis_intent_strata.md (+ ron44_intent_strata.py).
+
+MULTI-SEED BASELINES (HGN, HGRU4Rec) on Pure, seeds 2021 + 403092 (had only 2020),
+  with rank+topk dumps -> 3-seed symmetry and diversity availability for the two
+  weak baselines. Non-degenerate and consistent with seed 2020:
+    HGN      HR@10 ~0.019-0.029 across seeds (weak, variable)
+    HGRU4Rec HR@10 ~0.042-0.049 across seeds
+  All 7 new runs (3 RON-40 + 4 baselines) appended to thesis_table.csv (now 32 rows).
+
+REASONING-LLM SESSION-INTENT TICKETS -> FORMALLY SHELVED (per D4).
+  RON-20/21/22/33 (GPT-4o/Claude reasoning session-intent label) are CANCELLED:
+  they never appear in the thesis RQs/architecture/H1-H4 (only in the embedded
+  Linear backlog), and RON-44 above delivers the intended session-intent analysis
+  via a behavioural PROXY instead. No reasoning-model inference will be built.
+
+STILL OPEN (thesis-writing, no compute)
+  * Thesis edits M1 (four core + two auxiliary; cite RON-40), M2 (uni100 -> full
+    ranking; Pure primary tier per D6), M3 (HRNN -> HGRU4Rec).
+  * Results chapter table + RQ2/H2 + RQ3 write-up off thesis_table.csv and the
+    analysis_*.md files (3-seed significance, diversity, RON-40, RON-44).
+  * 27k tier: deferred to paid/credit compute (heavy).
+------------------------------------------------------------
