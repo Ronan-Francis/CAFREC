@@ -65,3 +65,24 @@ model change.
   floor. If it does not, the 1K tier is not viable under `mode:full` without an
   eval-protocol change, and Pure stands as the sole reported tier — consistent
   with D6.
+
+## Diagnostic RESULT (2026-08-25) — CE does NOT escape the floor
+
+Ran the SASRec-1K full-softmax CE diagnostic (2 epochs, seed 403092, mode:full,
+detached on Modal; ~1h wall, ~$1). Result (independent `ranks_check` agrees):
+
+| model | loss | test HR@10 | NDCG@10 | valid HR@10 |
+|---|---|---|---|---|
+| SASRec | CE | **0.0020** | 0.0008 | 0.0000 |
+| HGRU4Rec (prior) | BPR | 0.0000 | 0.0000 | 0.0010 |
+
+SASRec-CE reaches HR@10 = 0.002 (2 of 1,000 test users) — marginally above the
+BPR zero, but ~40× below Pure's ~0.078 and effectively still on the floor. So
+**full-softmax CE does not rescue the 1K tier**: the cause is structural (33.5% of
+test targets never appear in training → unrankable by any model/loss), not the
+BPR + one-negative contract. CONCLUSION: 1K is non-viable under `mode:full`
+without a k-core / item-floor rebuild; the loss function is not the lever. **Pure
+stands as the sole reported tier (D6 confirmed).** The 1K result is NOT folded
+into `thesis_table.csv`; it is a methodology/limitations point only. A genuine 1K
+tier would require rebuilding `kuairand_1k.inter` with MIN_ITEM_INTER≥10 (k-core)
+and re-running — a data-build change deferred to future work.

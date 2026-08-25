@@ -828,3 +828,31 @@ FINDING — H2 IS REVERSED, with significance:
 This is a PRIMARY RQ2/H2 result for the write-up (honest hypothesis refutation),
 stronger and cleaner than the RON-44 intent stratification.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — 1K CE DIAGNOSTIC + SEQ-LENGTH SENSITIVITY
+Date   : 2026-08-25
+Author : R. Francis
+------------------------------------------------------------
+
+1K DIAGNOSTIC (detached SASRec-1K full-softmax CE, 2 epochs, s403092, ~1h, ~$1):
+  test HR@10 = 0.0020 (ranks_check agrees), valid 0.0. Marginally above the
+  HGRU4Rec BPR 0.0 but ~40x below Pure -> CE does NOT escape the floor. Cause is
+  STRUCTURAL (33.5% of test targets never in training), not the BPR/one-negative
+  contract. 1K non-viable under mode:full without a k-core rebuild; loss is not the
+  lever. Pure remains the sole reported tier (D6 confirmed). NOT folded into
+  thesis_table. analysis_1k_status.md updated.
+
+SEQ-LENGTH SENSITIVITY (SASRec/bge/noprof x seq_len{10,20,50} x 3 seeds; new
+--max-seq-len flag; run_seqlen_sweep.py; +18 rows -> thesis_table 60 rows):
+  KEY FINDING: the SASRec tie is SPECIFIC to seq_len 20. CAFREC-noprof beats
+  SASRec with paired significance on ALL 3 seeds at BOTH seq_len 10 (p 1e-3/7.6e-3/
+  3e-2) and seq_len 50 (p 4.4e-2/9.1e-4/3.8e-2), dNDCG ~+0.002 (~+5% rel); at
+  seq_len 20 it is the known ns tie. Short window: the gate compensates for a
+  starved encoder (SASRec drops, CAFREC holds). Long window: noprof posts the
+  project-best Pure accuracy (NDCG 0.0414, HR 0.0819) and beats SASRec; bge trails
+  noprof (profiler adds noise, per H2). The edge is the CONTEXT GATING (bge<=noprof
+  everywhere), not the LLM profiler. analysis_pure_seqlen.md + pure_seqlen_sig.py.
+  -> First clean CAFREC>SASRec evidence with significance; report with the caveat
+  that seq_len 20 (tuned default) stays a tie and magnitudes are small.
+------------------------------------------------------------

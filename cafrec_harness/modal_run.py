@@ -63,7 +63,7 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
           llm_profile_path: str = None, profile_dim: int = None,
           ablation: str = None, dump_ranks: bool = False,
           dump_topk: bool = False, tag: str = None,
-          context_fields: str = None) -> dict:
+          context_fields: str = None, max_seq_len: int = None) -> dict:
     from cafrec.runner import run_experiment
 
     overrides = {"data_path": "/data/recbole"}
@@ -89,6 +89,10 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
         fields = [f.strip() for f in context_fields.split(",") if f.strip()]
         overrides["context_fields"] = fields
         overrides["n_context_features"] = len(fields)
+    # Sequence-length sensitivity: override the short-term encoder window (also
+    # sizes the position-embedding table). Default lives in base.yaml (=20).
+    if max_seq_len is not None:
+        overrides["MAX_ITEM_LIST_LENGTH"] = max_seq_len
     # Full-ranking eval materialises a [eval_batch_size x n_items] matrix. Pure's
     # 7.2K items are fine at the base 4096, but 1k/27k's huge catalogues OOM the
     # A10G there (13.5GB+ tensor) -> shrink the eval batch for those tiers.
@@ -138,7 +142,8 @@ def main(models: str = "SASRec", dataset: str = "kuairand_pure",
          epochs: int = None, seed: int = None, train_batch_size: int = None,
          eval_batch_size: int = None, llm_profile_path: str = None,
          profile_dim: int = None, ablation: str = None, dump_ranks: bool = False,
-         dump_topk: bool = False, tag: str = None, context_fields: str = None):
+         dump_topk: bool = False, tag: str = None, context_fields: str = None,
+         max_seq_len: int = None):
     """`models` and `dataset` are comma-separated; `--dataset all` sweeps
     every dataset in the recbole folder (pure, 1k, 27k). `--llm-profile-path`
     (+ `--profile-dim`) loads CAFREC's frozen profile cache from the volume.
@@ -156,7 +161,8 @@ def main(models: str = "SASRec", dataset: str = "kuairand_pure",
                                    llm_profile_path=llm_profile_path,
                                    profile_dim=profile_dim, ablation=ablation,
                                    dump_ranks=dump_ranks, dump_topk=dump_topk,
-                                   tag=tag, context_fields=context_fields)
+                                   tag=tag, context_fields=context_fields,
+                                   max_seq_len=max_seq_len)
             print(f"\n[{key} / {ds}] test: {metrics['test']}")
             print(f"  split_sizes: {metrics['split_sizes']}")
             print(f"  valid_best : {metrics['valid_best']}")
