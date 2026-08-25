@@ -25,6 +25,12 @@ The only robust profile effect remains profiler ≫ learnable stand-in (establis
 Wilcoxon p<1e-6): the frozen offline profile beats a learned embedding of equal capacity,
 but does not beat a strong short-term encoder on this tier.
 
+Update (2026-08-25): profiler ≫ stand-in is now confirmed on the added seeds (p 2.9e-9…5.6e-11),
+and profiler CAPACITY saturates at bge-large — the 7B profile is statistically tied with bge
+(prof_7b NS vs bge, one cell marginally favouring bge). The two structural ablations (static_gate,
+concat) further show CAFREC's context-adaptive gating and gated fusion each carry significant
+weight. See analysis_pure_ablations.md.
+
 ## 3. Diversity (ILD multihot tags; Coverage vs 7,210-item catalogue) — 3-seed means
 
 | Condition | ILD@10 | Coverage@10 |

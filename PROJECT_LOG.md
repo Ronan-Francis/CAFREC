@@ -765,3 +765,36 @@ STILL OPEN (thesis-writing, no compute)
     analysis_*.md files (3-seed significance, diversity, RON-40, RON-44).
   * 27k tier: deferred to paid/credit compute (heavy).
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — T3.1 STRUCTURAL ABLATIONS + CAPACITY LADDER (Pure)
+Date   : 2026-08-25
+Author : R. Francis
+------------------------------------------------------------
+
+Launched 10 parallel Pure legs on Modal (run_parallel_pure.py, train.spawn):
+static_gate x3 seeds, concat x3, prof_7b x{2021,403092}, standin x{2021,403092};
+default 10-epoch schedule (comparable to reported bge), dump-ranks + dump-topk.
+Appended to thesis_table.csv (now 42 rows). Paired per-user Wilcoxon + bootstrap
+vs reported CAFREC-bge in results/pure_ablations_sig.py + analysis_pure_ablations.md.
+
+FINDINGS (bge - condition, per-user, 3 seeds unless noted):
+  T3.1 static_gate  -> context-adaptive gate BEATS a constant gate. +NDCG all 3
+        seeds, SIGNIFICANT on 2/3 (s2021 p=3.7e-4, s403092 p=3.3e-4; s2020 ns).
+        ~+0.002 NDCG. Positive RQ3 support; reconciles with RON-44 (helps the
+        focused majority in aggregate, not the exploratory minority specifically).
+  T3.1 concat       -> gated fusion >> concatenation. SIGNIFICANT every seedxmetric
+        (p 1.8e-8 .. 4.6e-20), ~+0.005 NDCG. Validates the element-wise gated
+        fusion design (RON-29/M-fusion).
+  standin (RQ2)     -> frozen profiler >> learnable z_long, now robust across the
+        added seeds (p 2.9e-9 .. 5.6e-11), ~+0.006 NDCG / +0.009 HIT.
+  prof_7b           -> NO gain over bge-large (NS 3/4 cells; one marginally favours
+        bge). Profiler capacity SATURATES at bge-large -> reported operating point.
+  CAVEAT: all gaps are vs CAFREC-bge (internal ref); bge itself is TIED with SASRec
+  on aggregate accuracy. Ablations show the components matter relative to each
+  other, not that CAFREC beats the short-term baseline on this tier.
+
+These give the thesis a clean T3.1 ablation table: both architectural claims
+(context-adaptive gating; gated fusion) are individually validated with paired
+significance, and the profiler capacity ladder (standin << bge ~= 7B) is complete.
+------------------------------------------------------------
