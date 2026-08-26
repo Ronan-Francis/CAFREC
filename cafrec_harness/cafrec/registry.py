@@ -98,6 +98,9 @@ def _build_registry():
                 ]},
                 # ablation: none | no_profiler | static_gate | concat   (T3.1)
                 "ablation": "none",
+                # history-gated profiler (RON-45): append history length to the
+                # gate inputs so it can suppress z_long for thin histories (H2 fix).
+                "history_gate": False,
             },
         ),
     }

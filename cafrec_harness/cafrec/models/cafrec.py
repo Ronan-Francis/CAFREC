@@ -69,9 +69,17 @@ class CAFREC(SequentialRecommender):
         # --- context-adaptive gating (Figure 4) ----------------------------
         self.context_fields = config["context_fields"]      # [] -> fallback path
         self.n_context_features = config["n_context_features"]
+        # history-gated profiler (RON-45): append the user's history length
+        # (item_seq_len / max_seq_length, capped at 1) as an extra gate input so
+        # the gate can learn to SUPPRESS z_long when the history is too thin to
+        # profile. Motivated by the H2 finding (the frozen profile helps dense
+        # but hurts sparse users, and the session-intent gate never saw history
+        # sufficiency). Off by default -> existing results are unchanged.
+        self.history_gate = bool(config["history_gate"])
+        gate_in = self.n_context_features + (1 if self.history_gate else 0)
         gh = config["gating_hidden"]
         self.gating_mlp = nn.Sequential(
-            nn.Linear(self.n_context_features, gh), nn.ReLU(),
+            nn.Linear(gate_in, gh), nn.ReLU(),
             nn.Linear(gh, gh), nn.ReLU(),
             nn.Linear(gh, self.hidden_size), nn.Sigmoid(),   # g in [0,1]^H
         )
@@ -129,14 +137,19 @@ class CAFREC(SequentialRecommender):
         return self.profile_proj(self.user_profile(user))    # z_long  [B, H]
 
     def _build_context(self, interaction, item_seq_len):
-        """Per-request context vector x_ctx [B, n_context_features]."""
+        """Per-request context vector x_ctx [B, n_context_features(+1)]."""
         if self.context_fields and all(f in interaction for f in self.context_fields):
             cols = [interaction[f].float().unsqueeze(-1) for f in self.context_fields]
-            return torch.cat(cols, dim=-1)
-        # fallback: only session length is always available
-        b = item_seq_len.size(0)
-        ctx = torch.zeros(b, self.n_context_features, device=item_seq_len.device)
-        ctx[:, 0] = item_seq_len.float() / self.max_seq_length
+            ctx = torch.cat(cols, dim=-1)
+        else:
+            # fallback: only session length is always available
+            b = item_seq_len.size(0)
+            ctx = torch.zeros(b, self.n_context_features, device=item_seq_len.device)
+            ctx[:, 0] = item_seq_len.float() / self.max_seq_length
+        if self.history_gate:
+            # history-sufficiency signal: normalised, saturates at the seq cap
+            hist = (item_seq_len.float() / self.max_seq_length).clamp(max=1.0)
+            ctx = torch.cat([ctx, hist.unsqueeze(-1)], dim=-1)
         return ctx
 
     def _gate(self, context, ref):

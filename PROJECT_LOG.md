@@ -883,3 +883,32 @@ Empirical phase now closed: accuracy (3-seed sig), ablations (T3.1 + capacity),
 H2 cohort, seq-length sensitivity, diversity, 1K diagnostic all complete on Pure.
 Remaining work is the write-up (gated on the external thesis draft).
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 10 — RON-45 HISTORY-GATED PROFILER (the H2 fix)
+Date   : 2026-08-26
+Author : R. Francis
+------------------------------------------------------------
+
+Built the fix the H2 diagnosis pointed to: the context gate never saw history
+LENGTH, so it could not suppress the profile for thin histories. Added
+history_gate flag (cafrec.py + registry + modal_run --history-gate; +64 params):
+appends item_seq_len/max_seq_length to the gate inputs. Validated locally on
+ml-100k (both paths). Ran CAFREC-bge + history_gate x3 seeds on Pure (ranks+topk).
+histgate_analysis.py + analysis_histgate.md. thesis_table -> 63 rows.
+
+RESULT — the fix works as designed (modest but real):
+  * BEST overall config on Pure: NDCG 0.0408 / HR 0.0805 (> SASRec 0.0396/0.0787,
+    > bge 0.0405, > noprof 0.0406). Only +64 params over bge.
+  * Sparse recovery: bge hurt sparse (0.0526 vs noprof 0.0543); histgate lifts to
+    0.0534 (~47% of the gap recovered), positive vs bge on ALL 3 seeds.
+  * Dense retention: histgate 0.0304 ~= bge 0.0305 (keeps profiler gain), > noprof
+    (sig s403092 p=3e-4). The ONLY config strong on BOTH cohorts.
+  * CAVEATS: small magnitudes; histgate>SASRec sig only 1/3 seeds; noprof still
+    narrowly best on sparse alone. Report as VALIDATED MECHANISM + best single
+    config, not a decisive win. Next iteration: unsaturated sufficiency signal
+    (log total-history) or explicit multiplicative z_long suppression.
+
+Completes the research arc: hypothesis -> rigorous test -> negative result ->
+diagnosis (H2) -> targeted fix (RON-45) -> fix behaves as predicted, best model.
+------------------------------------------------------------
