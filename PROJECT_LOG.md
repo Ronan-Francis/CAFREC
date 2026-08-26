@@ -933,3 +933,24 @@ RESULT — the clean win:
     seed-count correction plainly (more power, same direction).
   Est. spend to date ~$5-6 of ~$12.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 10 (cont.) — 1K GENERALISATION PROBE (honest negative)
+Date   : 2026-08-26
+Author : R. Francis
+------------------------------------------------------------
+
+Built kuairand_1k_kcore_ctx (build_1k_kcore_ctx.py) + rebuilt bge profiles for
+the 998 floored users. Ran SASRec/noprof/logfull, 5 epochs, seed 2020, matched
+interactions. run_1k_generalization.py + analysis_1k_generalization.md.
+
+RESULT — the Pure win does NOT cleanly generalise:
+  SASRec HR 0.0200 NDCG 0.0086 > logfull 0.0130/0.0061 > noprof 0.0130/0.0052.
+  logfull > noprof holds (mechanism carries); CAFREC-vs-SASRec flips.
+  Confounds: 1 seed, 5 epochs (CAFREC 24M params vs SASRec 0.56M -> under-
+  converged), 998 test users (gap = handful of users), valid DISAGREES (logfull
+  0.0112 > SASRec 0.0108). Coherent read: 1K users ultra-dense (~1340 inter each)
+  -> short-term encoder best-fed, profile least needed (fits history-dependence).
+  INCONCLUSIVE-to-NEGATIVE probe; clean verdict needs 10-epoch multi-seed.
+  Est. budget ~$1-2 left.
+------------------------------------------------------------
