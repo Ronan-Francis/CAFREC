@@ -30,9 +30,32 @@ NOTE: this is a BUDGET PROBE — 1 seed, 5 epochs — not a full multi-seed stud
   history-dependence story (RON-45/H2): the profile helps when short-term signal
   is thin; on 1K it is abundant, so SASRec alone is hard to beat. Report as a
   BOUNDARY CONDITION, not a contradiction.
-- **Status.** Generalisation is INCONCLUSIVE-to-NEGATIVE under this budget probe.
-  A clean verdict would need 10-epoch, multi-seed runs (removes the convergence +
-  noise confounds). The honest thesis statement: the Pure result (logfull > SASRec,
-  10/10 seeds) is robust ON PURE; a single-seed 5-epoch probe on the denser 1K tier
-  did not reproduce it on test, plausibly because 1K's extreme density favours the
-  short-term encoder and because CAFREC was under-trained at matched short epochs.
+## 10-epoch rerun (confound resolved) — the negative HOLDS
+
+To rule out under-convergence (CAFREC 24M params vs SASRec 0.56M at only 5 epochs),
+both were re-run at 10 epochs, seed 2020:
+
+| Model | HR@10 | NDCG@10 | valid NDCG |
+|---|---|---|---|
+| SASRec | 0.0291 | 0.0143 | 0.0157 |
+| CAFREC logfull | 0.0210 | 0.0093 | 0.0125 |
+
+More training helped BOTH, but SASRec more: the NDCG gap WIDENED from +0.0025 (5ep)
+to +0.0050 (10ep), and validation now AGREES with test (SASRec 0.0157 > logfull
+0.0125). So the 5-epoch valid/test disagreement was undertraining noise; the
+under-convergence hypothesis is REFUTED. **SASRec beats CAFREC-logfull on 1K
+decisively, and the gap grows with training.**
+
+## Final status — an honest, clean boundary condition
+
+The Pure result (logfull > SASRec, 10/10 seeds) does NOT generalise to the
+ultra-dense 1K tier — there SASRec wins on both valid and test at 5 and 10 epochs.
+This is not a failure of the study; it is a well-characterised BOUNDARY: CAFREC's
+context-adaptive LLM-profile fusion helps in the moderate-density regime (Pure,
+shorter/mixed histories) where the short-term encoder is under-fed, and does not
+help on a tier whose users each have ~1,340 interactions, where self-attention is
+already saturated with signal and the added long-term machinery only dilutes it.
+Remaining caveat: 1K is single-seed (budget floor); report the direction as clear
+and consistent (5ep + 10ep, valid + test) but not multi-seed significance-tested.
+The thesis contribution is the CONDITIONAL finding: LLM temporal profiling helps a
+strong sequential baseline only when short-term history is limited.

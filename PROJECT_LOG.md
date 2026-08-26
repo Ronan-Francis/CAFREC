@@ -954,3 +954,16 @@ RESULT — the Pure win does NOT cleanly generalise:
   INCONCLUSIVE-to-NEGATIVE probe; clean verdict needs 10-epoch multi-seed.
   Est. budget ~$1-2 left.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 10 (cont.) — 1K GEN 10-EPOCH: negative HOLDS (confound resolved)
+Date   : 2026-08-26
+------------------------------------------------------------
+Re-ran logfull vs SASRec at 10 epochs (kcore-1k, seed 2020) to rule out CAFREC
+under-convergence. SASRec HR 0.0291 NDCG 0.0143 (valid 0.0157) > logfull HR 0.0210
+NDCG 0.0093 (valid 0.0125). Gap WIDENED vs 5ep (+0.0025 -> +0.0050); valid now
+AGREES with test. Under-convergence REFUTED -> the 1K negative is real. Honest
+boundary condition: LLM-profile fusion helps only when short-term history is
+limited (Pure); on ultra-dense 1K (~1340 inter/user) the short-term encoder
+dominates. 1K single-seed (budget floor). EMPIRICAL PHASE DONE.
+------------------------------------------------------------
