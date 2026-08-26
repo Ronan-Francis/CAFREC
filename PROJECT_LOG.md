@@ -856,3 +856,30 @@ SEQ-LENGTH SENSITIVITY (SASRec/bge/noprof x seq_len{10,20,50} x 3 seeds; new
   -> First clean CAFREC>SASRec evidence with significance; report with the caveat
   that seq_len 20 (tuned default) stays a tie and magnitudes are small.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 9 (cont.) — DIVERSITY ACROSS ALL CONDITIONS (offline, no GPU)
+Date   : 2026-08-26
+Author : R. Francis
+------------------------------------------------------------
+
+ILD + Coverage for the ablation + seq-length conditions, computed offline from the
+dumped top-k lists (original video_id tokens) joined to the local video-tag matrix
+(7,583 x 46). NO Modal needed -- runner already emits topk as original tokens.
+Method validated: reproduces the reported pure_3seed diversity exactly.
+pure_diversity.py + analysis_pure_diversity.md.
+
+FINDINGS:
+  * ILD flat (~0.78-0.81) everywhere -- not discriminative (as before).
+  * CAFREC coverage advantage is ROBUST to seq length: bge/noprof ~0.23-0.24 vs
+    SASRec ~0.185-0.189 at seq 10/20/50 (~+22% rel, stable).
+  * Coverage advantage is ARCHITECTURAL: concat collapses it to 0.186 (~=SASRec
+    0.189), static_gate reduces it to 0.201; full gated models keep ~0.23. So the
+    context-adaptive gated fusion drives the catalogue spread, NOT the LLM profile
+    (bge~=noprof; prof7b~=bge). Ties the diversity win to the same mechanism the
+    accuracy ablations validate.
+
+Empirical phase now closed: accuracy (3-seed sig), ablations (T3.1 + capacity),
+H2 cohort, seq-length sensitivity, diversity, 1K diagnostic all complete on Pure.
+Remaining work is the write-up (gated on the external thesis draft).
+------------------------------------------------------------
