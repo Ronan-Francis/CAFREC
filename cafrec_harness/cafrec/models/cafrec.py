@@ -69,20 +69,37 @@ class CAFREC(SequentialRecommender):
         # --- context-adaptive gating (Figure 4) ----------------------------
         self.context_fields = config["context_fields"]      # [] -> fallback path
         self.n_context_features = config["n_context_features"]
-        # history-gated profiler (RON-45): append the user's history length
-        # (item_seq_len / max_seq_length, capped at 1) as an extra gate input so
-        # the gate can learn to SUPPRESS z_long when the history is too thin to
-        # profile. Motivated by the H2 finding (the frozen profile helps dense
-        # but hurts sparse users, and the session-intent gate never saw history
-        # sufficiency). Off by default -> existing results are unchanged.
+        # history-gated profiler (RON-45): give the gate a HISTORY-SUFFICIENCY
+        # signal so it can suppress z_long when the history is too thin to profile
+        # (H2 fix — the session-intent gate never saw history length). Modes:
+        #   seqlen   append item_seq_len/max_seq_length  (saturates at the cap)
+        #   logfull  append log1p(user total interactions)/norm  (unsaturated)
+        #   suppress explicit z_long *= sigmoid((h_log - tau)/beta), tau/beta learnt
+        # `history_gate=True` == seqlen (back-compat). Off by default -> unchanged.
         self.history_gate = bool(config["history_gate"])
-        gate_in = self.n_context_features + (1 if self.history_gate else 0)
+        self.hg_mode = config["history_gate_mode"] or (
+            "seqlen" if self.history_gate else None)
+        self._append_hist = self.hg_mode in ("seqlen", "logfull")
+        self._suppress = self.hg_mode == "suppress"
+        gate_in = self.n_context_features + (1 if self._append_hist else 0)
         gh = config["gating_hidden"]
         self.gating_mlp = nn.Sequential(
             nn.Linear(gate_in, gh), nn.ReLU(),
             nn.Linear(gh, gh), nn.ReLU(),
             nn.Linear(gh, self.hidden_size), nn.Sigmoid(),   # g in [0,1]^H
         )
+        # per-user activity level (total interactions) for logfull/suppress. This
+        # is a user-level feature (history length), not target-dependent, so it
+        # does not leak the held-out item. Built once from the dataset.
+        if self.hg_mode in ("logfull", "suppress"):
+            counts = torch.bincount(dataset.inter_feat[dataset.uid_field],
+                                    minlength=self.n_users).float()
+            self.register_buffer("user_hist_len", counts)
+            self.register_buffer("log_hist_norm",
+                                 torch.log1p(counts.max()).clamp(min=1.0))
+        if self._suppress:                                   # thin-history damper
+            self.hg_tau = nn.Parameter(torch.tensor(0.3))    # ~ threshold on h_log
+            self.hg_beta = nn.Parameter(torch.tensor(0.15))  # softness
         # ablation helpers (cheap; created always, used only when selected)
         self.static_gate = nn.Parameter(torch.zeros(1))      # sigmoid(0)=0.5
         self.concat_proj = nn.Linear(2 * self.hidden_size, self.hidden_size)
@@ -146,11 +163,18 @@ class CAFREC(SequentialRecommender):
             b = item_seq_len.size(0)
             ctx = torch.zeros(b, self.n_context_features, device=item_seq_len.device)
             ctx[:, 0] = item_seq_len.float() / self.max_seq_length
-        if self.history_gate:
-            # history-sufficiency signal: normalised, saturates at the seq cap
-            hist = (item_seq_len.float() / self.max_seq_length).clamp(max=1.0)
-            ctx = torch.cat([ctx, hist.unsqueeze(-1)], dim=-1)
+        if self._append_hist:
+            if self.hg_mode == "seqlen":
+                # saturates at the seq cap
+                h = (item_seq_len.float() / self.max_seq_length).clamp(max=1.0)
+            else:  # logfull: unsaturated total-history signal in [0, 1]
+                h = self._hist_log(interaction[self.USER_ID])
+            ctx = torch.cat([ctx, h.unsqueeze(-1)], dim=-1)
         return ctx
+
+    def _hist_log(self, user):
+        """Normalised log user-activity level in [0, 1] (logfull/suppress)."""
+        return torch.log1p(self.user_hist_len[user]) / self.log_hist_norm
 
     def _gate(self, context, ref):
         if self.ablation == "static_gate":
@@ -165,6 +189,11 @@ class CAFREC(SequentialRecommender):
         z_long = self._long_term(interaction[self.USER_ID])
         if self.ablation == "no_profiler":
             z_long = torch.zeros_like(z_long)
+        if self._suppress:
+            # damp the profile for thin histories (learnt threshold tau/softness beta)
+            h = self._hist_log(interaction[self.USER_ID])
+            s = torch.sigmoid((h - self.hg_tau) / self.hg_beta.abs().clamp(min=1e-3))
+            z_long = z_long * s.unsqueeze(-1)
         if self.ablation == "concat":
             return self.concat_proj(torch.cat([z_long, z_short], dim=-1))
         g = self._gate(self._build_context(interaction, item_seq_len), z_short)
