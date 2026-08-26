@@ -912,3 +912,24 @@ RESULT — the fix works as designed (modest but real):
 Completes the research arc: hypothesis -> rigorous test -> negative result ->
 diagnosis (H2) -> targeted fix (RON-45) -> fix behaves as predicted, best model.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 10 (cont.) — 10-SEED SIGNIFICANCE: logfull > SASRec
+Date   : 2026-08-26
+Author : R. Francis
+------------------------------------------------------------
+
+Stage 4: ran SASRec/noprof/bge/logfull at 7 new seeds (-> 10 total). thesis_table
+-> 97 rows. manyseed_sig.py + analysis_manyseed.md.
+
+RESULT — the clean win:
+  * 10-seed mean NDCG: SASRec 0.0397, noprof 0.0413, bge 0.0412, logfull 0.0422.
+  * logfull vs SASRec: meanD +0.00254 (+6.4%), WINS 10/10 seeds, t-test p=5e-5,
+    Wilcoxon p=2e-3 (n=10 floor); per-user sig 8/10 seeds. Decisive, robust.
+  * CORRECTION: the earlier 3-seed "SASRec tie" was under-powered. At 10 seeds
+    bge AND noprof also significantly beat SASRec (10/10, 9/10; p<0.01). Honest
+    update: CAFREC context fusion gives a small-but-significant lift; logfull
+    (history-gated profile) enlarges it. Magnitudes small; Pure-only. Report the
+    seed-count correction plainly (more power, same direction).
+  Est. spend to date ~$5-6 of ~$12.
+------------------------------------------------------------
