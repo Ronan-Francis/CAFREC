@@ -50,6 +50,26 @@ MIN_ITEM_INTER item floor so every retained item (and every test target) is seen
 enough times to be trainable, then re-run. This is a data-build change, not a
 model change.
 
+## UPDATE 2026-08-26 — k-core rebuild DONE, tier is viable
+
+Rebuilt with an iterative k-core (item>=10, user>=5): build_1k_kcore.py ->
+kuairand_1k_kcore.inter. The floor transforms the tier:
+
+| | items | appear once | test-target trainable |
+|---|---|---|---|
+| original (no floor) | 1,819,489 | 65.6% | 66.7% |
+| k-core floored | 69,388 | 0.0% | **100.0%** |
+
+999 users / 1.34M interactions retained. **Every test target is now trainable**
+(vs 66.7%). Empirical confirmation: SASRec (2 epochs, seed 2020) -> test HR@10
+**0.0080** / valid 0.0120 (ranks_check agrees), vs the original degenerate
+0.000-0.002. Non-degenerate and still climbing (undertrained at 2 epochs).
+Absolute HR is ~10x below Pure because 1K is a harder task (69K items, 999 users)
+-- but it is a REAL ranking problem now, not structural zero. So D6's "1K
+non-viable" is corrected to: "non-viable AS BUILT; a standard k-core floor fixes
+it." (Epochs are ~2 min each; an earlier 10-epoch run HUNG on a bad container and
+was stopped -- not a fundamental slowness.)
+
 ## Recommendation (cost-aware)
 
 - **Do not** treat the 1K zero as a comparative result, and do not fold it into
