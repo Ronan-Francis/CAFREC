@@ -1,0 +1,20 @@
+{
+  "model": "SASRec",
+  "dataset": "kuairand_pure",
+  "seed": 2020,
+  "loss_type": "CE",
+  "n_params": 564800,
+  "timestamp": "20260718-125559",
+  "valid_best": {
+    "recall@10": 0.6587,
+    "ndcg@10": 0.3881,
+    "mrr@10": 0.305,
+    "hit@10": 0.6587
+  },
+  "test": {
+    "recall@10": 0.6384,
+    "ndcg@10": 0.3753,
+    "mrr@10": 0.2948,
+    "hit@10": 0.6384
+  }
+}

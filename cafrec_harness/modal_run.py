@@ -62,7 +62,10 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
           train_batch_size: int = None, eval_batch_size: int = None,
           llm_profile_path: str = None, profile_dim: int = None,
           ablation: str = None, dump_ranks: bool = False,
-          dump_topk: bool = False, tag: str = None) -> dict:
+          dump_topk: bool = False, tag: str = None,
+          context_fields: str = None, max_seq_len: int = None,
+          history_gate: bool = False, history_gate_mode: str = None,
+          extra_overrides: dict = None) -> dict:
     from cafrec.runner import run_experiment
 
     overrides = {"data_path": "/data/recbole"}
@@ -79,6 +82,24 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
     # CAFREC ablations (T3.1): none | no_profiler | static_gate | concat.
     if ablation is not None:
         overrides["ablation"] = ablation
+    # RON-40 x_ctx-set ablation: override the gate's input feature set. Pass a
+    # comma-separated subset of the six context columns (e.g. the classic-four
+    # R^4 set, dropping inter_session_gap_log_z + is_first_session); the gate MLP
+    # input width n_context_features is derived from the count. The _ctx load_col
+    # still loads all six columns; the model just selects these by name.
+    if context_fields is not None:
+        fields = [f.strip() for f in context_fields.split(",") if f.strip()]
+        overrides["context_fields"] = fields
+        overrides["n_context_features"] = len(fields)
+    # Sequence-length sensitivity: override the short-term encoder window (also
+    # sizes the position-embedding table). Default lives in base.yaml (=20).
+    if max_seq_len is not None:
+        overrides["MAX_ITEM_LIST_LENGTH"] = max_seq_len
+    # RON-45 history-gated profiler: gate also sees history length (H2 fix).
+    if history_gate:
+        overrides["history_gate"] = True
+    if history_gate_mode is not None:
+        overrides["history_gate_mode"] = history_gate_mode
     # Full-ranking eval materialises a [eval_batch_size x n_items] matrix. Pure's
     # 7.2K items are fine at the base 4096, but 1k/27k's huge catalogues OOM the
     # A10G there (13.5GB+ tensor) -> shrink the eval batch for those tiers.
@@ -94,6 +115,12 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
         # items are fine at batch 2048, but 1k/27k have million-item catalogues
         # -> 2048 OOMs a 16GB T4. 512 keeps the tensor under ~4GB.
         overrides["train_batch_size"] = 512
+
+    # RON-31 grid search: arbitrary RecBole keys (learning_rate, weight_decay,
+    # hidden_size, n_layers, n_heads, dropout probs, pooling_type, ...). Applied
+    # LAST so a sweep config wins over every convenience flag above.
+    if extra_overrides:
+        overrides.update(extra_overrides)
 
     metrics = run_experiment(
         model_key,
@@ -115,9 +142,34 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
     metrics["results_file"] = out
     # keep the returned dict lean over the wire; ranks/top-k are persisted in the JSON
     for big in ("test_ranks", "test_user_ids",
-                "test_topk_items", "test_topk_user_ids"):
+                "test_topk_items", "test_topk_user_ids",
+                "fusion_lambda", "fusion_lambda_user_tokens"):
         metrics.pop(big, None)
     return metrics
+
+
+@app.function(
+    image=image,
+    gpu="A10G",
+    # RON-31 cost fix (2026-09-10): the `train` reservations above (8 CPU /
+    # 64 GiB) are sized for the 27k tier's million-item catalogue, and Modal
+    # bills reserved CPU+memory ON TOP of GPU time. Pure has ~7.2K items and
+    # never comes close to that footprint, so a Pure-only sweep was paying a
+    # large multiple of its GPU cost for idle reservation. CPU stays at 4 (the
+    # RecBole dataloader is CPU-bound; starving it would idle the GPU and cost
+    # MORE), memory drops 64 GiB -> 16 GiB.
+    cpu=4.0,
+    memory=16384,
+    timeout=2 * 60 * 60,
+    volumes={"/data": data_vol, "/results": results_vol},
+)
+def train_pure(**kwargs) -> dict:
+    """Pure-tier trainer: identical body to `train`, trimmed reservations.
+
+    `.local()` invokes the undecorated function in this container, so the two
+    entry points can never drift apart.
+    """
+    return train.local(**kwargs)
 
 
 ALL_DATASETS = ["kuairand_pure", "kuairand_1k", "kuairand_27k"]
@@ -128,7 +180,9 @@ def main(models: str = "SASRec", dataset: str = "kuairand_pure",
          epochs: int = None, seed: int = None, train_batch_size: int = None,
          eval_batch_size: int = None, llm_profile_path: str = None,
          profile_dim: int = None, ablation: str = None, dump_ranks: bool = False,
-         dump_topk: bool = False, tag: str = None):
+         dump_topk: bool = False, tag: str = None, context_fields: str = None,
+         max_seq_len: int = None, history_gate: bool = False,
+         history_gate_mode: str = None):
     """`models` and `dataset` are comma-separated; `--dataset all` sweeps
     every dataset in the recbole folder (pure, 1k, 27k). `--llm-profile-path`
     (+ `--profile-dim`) loads CAFREC's frozen profile cache from the volume.
@@ -146,7 +200,9 @@ def main(models: str = "SASRec", dataset: str = "kuairand_pure",
                                    llm_profile_path=llm_profile_path,
                                    profile_dim=profile_dim, ablation=ablation,
                                    dump_ranks=dump_ranks, dump_topk=dump_topk,
-                                   tag=tag)
+                                   tag=tag, context_fields=context_fields,
+                                   max_seq_len=max_seq_len, history_gate=history_gate,
+                                   history_gate_mode=history_gate_mode)
             print(f"\n[{key} / {ds}] test: {metrics['test']}")
             print(f"  split_sizes: {metrics['split_sizes']}")
             print(f"  valid_best : {metrics['valid_best']}")

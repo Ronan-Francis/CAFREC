@@ -98,6 +98,22 @@ def _build_registry():
                 ]},
                 # ablation: none | no_profiler | static_gate | concat   (T3.1)
                 "ablation": "none",
+                # history-gated profiler (RON-45): give the gate a history-length
+                # signal so it can suppress z_long for thin histories (H2 fix).
+                # history_gate=True == mode "seqlen". history_gate_mode overrides:
+                # seqlen | logfull | suppress (None -> off unless history_gate).
+                "history_gate": False,
+                "history_gate_mode": None,
+                # fusion FORM (RON-61). The convex and additive fusions differ
+                # by exactly one term:
+                #   convex   z_short + g*(z_long - z_short)   == g*z_long+(1-g)*z_short
+                #   additive z_short + g*z_long
+                # so both are  z_short + g*(z_long - (1-lambda)*z_short)  with
+                # lambda 0 -> convex (incumbent), 1 -> additive.
+                #   None/"convex"  incumbent, unchanged
+                #   "additive"     lambda fixed at 1
+                #   "per_user"     lambda = sigmoid(free scalar per user id)
+                "fusion_mode": None,
             },
         ),
     }

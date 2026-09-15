@@ -1,0 +1,27 @@
+{
+  "model": "SASRec",
+  "dataset": "kuairand_pure",
+  "seed": 403092,
+  "loss_type": "CE",
+  "n_params": 1322368,
+  "timestamp": "20260910-142720",
+  "split_sizes": {
+    "n_users": 22913,
+    "n_items": 7211,
+    "n_train": 582363,
+    "n_valid": 22912,
+    "n_test": 22912
+  },
+  "valid_best": {
+    "recall@10": 0.0912,
+    "ndcg@10": 0.0462,
+    "mrr@10": 0.0328,
+    "hit@10": 0.0912
+  },
+  "test": {
+    "recall@10": 0.0814,
+    "ndcg@10": 0.0421,
+    "mrr@10": 0.0303,
+    "hit@10": 0.0814
+  }
+}
