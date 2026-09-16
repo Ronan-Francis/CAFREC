@@ -826,3 +826,119 @@ NEXT
   5. Point modal_run.py::main at train_pure for Pure-tier work.
   6. Retrospective log entry for the 08-26 and 09-10 batches (see LOG GAP).
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 10 (cont.) — BATCH-SIZE CONFOUND INVALIDATES THE H1 HEADLINE
+Date   : 2026-09-16
+Block  : 3 — Evaluation
+Author : R. Francis
+------------------------------------------------------------
+
+FINDING
+  The paper's headline result -- context-gated SASRec (CAFREC-NP) improves on
+  SASRec by 3.7% HR@10 / 4.8% NDCG@10 -- is a TRAIN_BATCH_SIZE ARTIFACT.
+  SASRec was trained at batch 2048 and CAFREC-NP at batch 512. At matched batch
+  size the gate produces no significant improvement on HR@10 or NDCG@10.
+
+HOW IT AROSE
+  modal_run.py sizes batches with `if dataset != "kuairand_pure"`. SASRec runs
+  on dataset "kuairand_pure" -> falls through to base.yaml (train 2048 /
+  eval 4096). CAFREC runs on "kuairand_pure_ctx" -> fails the string test, is
+  treated as a big-catalogue tier, and gets train 512 / eval 256. The two
+  datasets are otherwise identical (n_users 22,913; n_items 7,211; n_train
+  582,363; identical leave-one-out splits). The branch was present in the
+  2026-08-15 file and modal_run.py was not touched again until 09-15, so every
+  run in the paper went through it. Result JSONs record no hyperparameters and
+  the launch commands were never logged, so this was invisible on disk.
+
+DESIGN
+  2 x 2, seven headline seeds {42,77,123,256,512,1024,2048}, kuairand_pure(_ctx),
+  leave-one-out, full-catalog ranking, per-user rank dumps.
+  New runs: SASRec at train_batch_size 512 (tag bs512_sasrec) and CAFREC-NP at
+  train_batch_size 2048 (tag bs2048_noprof). Existing runs supply the other two
+  cells. modal_run.py::bsweep, 14 jobs parallel on train_pure, 545s total.
+
+RESULTS (mean +- sd over seven seeds)
+    Condition          HR@10             NDCG@10           MRR@10
+    SASRec    @2048    0.0787 +- 0.0015  0.0397 +- 0.0008  0.0281 +- 0.0006
+    SASRec    @512     0.0810 +- 0.0015  0.0411 +- 0.0009  0.0291 +- 0.0007
+    CAFREC-NP @2048    0.0788 +- 0.0018  0.0399 +- 0.0010  0.0283 +- 0.0009
+    CAFREC-NP @512     0.0816 +- 0.0014  0.0416 +- 0.0006  0.0297 +- 0.0006
+
+  Paired per-user (22,912 users; Wilcoxon + 2,000-resample paired bootstrap;
+  per-user metric averaged over the seven shared seeds):
+
+    GATE EFFECT AT MATCHED BATCH 2048   (CAFREC-NP @2048 vs SASRec @2048)
+      HR@10   +0.00018 (+0.2%)  CI [-0.00074,+0.00107]  p=0.85   sig 1/7 sign 3/7
+      NDCG@10 +0.00020 (+0.5%)  CI [-0.00023,+0.00060]  p=0.40   sig 2/7 sign 4/7
+      MRR@10  +0.00020 (+0.7%)  CI [-0.00018,+0.00057]  p=0.39   sig 2/7 sign 3/7
+
+    GATE EFFECT AT MATCHED BATCH 512    (CAFREC-NP @512 vs SASRec @512)
+      HR@10   +0.00060 (+0.7%)  CI [-0.00061,+0.00180]  p=0.45   sig 0/7 sign 4/7
+      NDCG@10 +0.00059 (+1.4%)  CI [-0.00003,+0.00122]  p=0.11   sig 0/7 sign 6/7
+      MRR@10  +0.00056 (+1.9%)  CI [-0.00000,+0.00111]  p=0.045  sig 2/7 sign 6/7
+
+    THE PAPER'S COMPARISON              (CAFREC-NP @512 vs SASRec @2048)
+      HR@10   +0.00293 (+3.7%)  CI [+0.00151,+0.00436]  p=4.5e-4  sig 3/7 sign 7/7
+      NDCG@10 +0.00188 (+4.7%)  CI [+0.00118,+0.00262]  p=2.2e-10 sig 6/7 sign 7/7
+      MRR@10  +0.00154 (+5.5%)  CI [+0.00093,+0.00217]  p=8.2e-13 sig 5/7 sign 7/7
+
+    BATCH SIZE ALONE                    (SASRec @512 vs SASRec @2048)
+      HR@10   +0.00233 (+3.0%)  CI [+0.00124,+0.00347]  p=2.2e-3  sig 1/7 sign 7/7
+      NDCG@10 +0.00129 (+3.2%)  CI [+0.00076,+0.00182]  p=1.5e-9  sig 2/7 sign 7/7
+      MRR@10  +0.00098 (+3.5%)  CI [+0.00051,+0.00146]  p=4.5e-12 sig 4/7 sign 7/7
+
+  READING:
+  * The paper's +3.7% HR@10 decomposes into a +3.0% batch-size effect and a
+    +0.2--0.7% gate effect that is not significant at either batch size.
+  * Row 3 reproduces the paper's published margin to within 0.1pp (+3.7% HR,
+    +4.7% vs the paper's +4.8% NDCG), which confirms the baseline files and the
+    test procedure are the ones behind Table IV. The confound is not an artifact
+    of this re-analysis.
+  * Sign counts are the tell. The confounded comparison is 7/7; both matched
+    comparisons fall to 3/7 and 4/7 on HR@10 -- i.e. the gate's direction is not
+    even consistent across seeds once the batch sizes agree.
+  * This is COHERENT WITH the gate controls earlier in this cycle. If the gate
+    contributes ~nothing, shuffling its input should cost ~nothing, which is what
+    np_shuffled_ctx showed. And np_vector_gate (a FIXED gate) being significantly
+    WORSE than CAFREC-NP now reads as: the gate can only do harm, and letting it
+    vary with its input is what keeps the harm near zero. The three results
+    together tell one story rather than three.
+
+  CAVEAT: the two cells added here are single runs per seed, like the originals.
+  Batch 512 vs 2048 changes the number of optimizer steps per epoch by 4x under
+  a fixed ten-epoch budget with early stopping, so "batch size" here means the
+  whole optimization schedule it implies, not the batch dimension alone.
+
+CONSEQUENCES FOR THE PAPER (not yet actioned -- needs an author decision)
+  * H1's primary claim ("CAFREC outperforms the loss-matched SASRec") does not
+    survive at matched batch size. Abstract, contributions, Section V-A,
+    Table IV/V, the H1 row of Table XIV, and the conclusion all assert it.
+  * The title and framing ("When Session Context Matters More Than Long-Term
+    Profiles") rest on it. The PROFILE null (H2) is unaffected -- it was always
+    an internal comparison between CAFREC variants at the same batch size.
+  * H3's fusion ablations (static_gate, concat) are internal CAFREC-vs-CAFREC
+    comparisons at a common batch size and are NOT confounded. Same for the
+    cohort analysis and the coverage numbers.
+  * Every cross-model comparison IS confounded: SASRec, HGN and HGRU4Rec all run
+    on non-_ctx dataset names. HGN/HGRU4Rec additionally differ by loss.
+
+ARTIFACTS
+  results/modal/SASRec_kuairand_pure_bs512_sasrec_seed*_*.json          (7 new)
+  results/modal/CAFREC_kuairand_pure_ctx_bs2048_noprof_seed*_*.json     (7 new)
+  cafrec_harness/analyze_batch_confound.py   reproduces every number above
+  cafrec_harness/modal_run.py::bsweep + BSWEEP_JOBS
+
+NEXT
+  1. AUTHOR DECISION: re-frame the paper around the matched-batch result, or
+     re-baseline everything at one batch size and re-run the full comparison.
+  2. If re-baselining: re-run SASRec, HGN, HGRU4Rec and all CAFREC variants at a
+     single declared train_batch_size, seven seeds. Cheap (the 14-job sweep took
+     545s); the cost is rewriting, not compute.
+  3. Fix the `dataset != "kuairand_pure"` test to key off catalogue size rather
+     than dataset name, so _ctx variants stop being misclassified.
+  4. Persist the resolved config into every result JSON (already NEXT item 2 of
+     the previous entry; this cycle is the argument for why it matters).
+  5. Re-check the tuned/ff_* configs, whose "tuned" label was inferred from a
+     batch size of 512 that may simply be this branch.
+------------------------------------------------------------

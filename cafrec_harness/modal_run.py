@@ -218,6 +218,43 @@ def rerun(dataset: str = "kuairand_pure_ctx"):
             print(f"[{job['tag']} seed{job['seed']}] FAILED: {e}", flush=True)
     print(f"\nTotal wall: {time.time() - t0:.0f}s")
 
+# RON-?? 2026-09-16: batch-size confound check for the H1 headline.
+# SASRec runs on dataset "kuairand_pure" and CAFREC on "kuairand_pure_ctx".
+# The `dataset != "kuairand_pure"` branch above therefore gives SASRec
+# train_batch_size 2048 (base.yaml) and CAFREC 512 -- so "matched default
+# hyperparameters" and "identical training schedule" may not hold for the
+# paper's primary comparison. The result JSONs record no hyperparameters and
+# the launch commands were never logged, so this can only be settled by
+# experiment. Cross the two settings and see whether the margin survives.
+HEADLINE_SEEDS = [42, 77, 123, 256, 512, 1024, 2048]
+BSWEEP_JOBS = (
+    [dict(model_key="SASRec", dataset="kuairand_pure", seed=s,
+          train_batch_size=512, tag="bs512_sasrec") for s in HEADLINE_SEEDS]
+    + [dict(model_key="CAFREC", dataset="kuairand_pure_ctx", ablation="no_profiler",
+            seed=s, train_batch_size=2048, tag="bs2048_noprof") for s in HEADLINE_SEEDS]
+)
+
+
+@app.local_entrypoint()
+def bsweep():
+    """Cross SASRec and CAFREC-NP over the two train_batch_size settings."""
+    t0 = time.time()
+    fn = train_pure.with_options(timeout=45 * 60)
+    calls = []
+    for job in BSWEEP_JOBS:
+        calls.append((job, fn.spawn(dump_ranks=True, dump_topk=True, **job)))
+        print("  spawned " + job["tag"] + " seed" + str(job["seed"]), flush=True)
+    print(str(len(calls)) + " jobs in flight", flush=True)
+    for job, c in calls:
+        try:
+            m = c.get()
+            print("[" + job["tag"] + " seed" + str(job["seed"]) + "] "
+                  + str(m["test"]) + "  -> " + m["results_file"], flush=True)
+        except Exception as e:
+            print("[" + job["tag"] + " seed" + str(job["seed"]) + "] FAILED: " + str(e), flush=True)
+    print("Total wall: %.0fs" % (time.time() - t0))
+
+
 ALL_DATASETS = ["kuairand_pure", "kuairand_1k", "kuairand_27k"]
 
 
