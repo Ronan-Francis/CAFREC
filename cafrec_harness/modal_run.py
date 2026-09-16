@@ -64,7 +64,8 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
           ablation: str = None, dump_ranks: bool = False,
           dump_topk: bool = False, tag: str = None,
           context_fields: str = None, max_seq_len: int = None,
-          history_gate: bool = False, history_gate_mode: str = None) -> dict:
+          history_gate: bool = False, history_gate_mode: str = None,
+          extra_overrides: dict = None) -> dict:
     from cafrec.runner import run_experiment
 
     overrides = {"data_path": "/data/recbole"}
@@ -78,7 +79,9 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
         overrides["llm_profile_path"] = llm_profile_path
     if profile_dim is not None:
         overrides["profile_dim"] = profile_dim
-    # CAFREC ablations (T3.1): none | no_profiler | static_gate | concat.
+    # CAFREC ablations: none | no_profiler | static_gate | concat, plus the
+    # CAFREC-NP gate controls np_vector_gate | np_shuffled_ctx (see
+    # cafrec/models/cafrec.py). Passed straight through as an override.
     if ablation is not None:
         overrides["ablation"] = ablation
     # RON-40 x_ctx-set ablation: override the gate's input feature set. Pass a
@@ -115,6 +118,12 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
         # -> 2048 OOMs a 16GB T4. 512 keeps the tensor under ~4GB.
         overrides["train_batch_size"] = 512
 
+    # RON-31 grid search: arbitrary RecBole keys (learning_rate, weight_decay,
+    # hidden_size, n_layers, n_heads, dropout probs, pooling_type, ...). Applied
+    # LAST so a sweep config wins over every convenience flag above.
+    if extra_overrides:
+        overrides.update(extra_overrides)
+
     metrics = run_experiment(
         model_key,
         dataset=dataset,
@@ -135,10 +144,79 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
     metrics["results_file"] = out
     # keep the returned dict lean over the wire; ranks/top-k are persisted in the JSON
     for big in ("test_ranks", "test_user_ids",
-                "test_topk_items", "test_topk_user_ids"):
+                "test_topk_items", "test_topk_user_ids",
+                "fusion_lambda", "fusion_lambda_user_tokens"):
         metrics.pop(big, None)
     return metrics
 
+
+@app.function(
+    image=image,
+    gpu="A10G",
+    # RON-31 cost fix (2026-09-10): the `train` reservations above (8 CPU /
+    # 64 GiB) are sized for the 27k tier's million-item catalogue, and Modal
+    # bills reserved CPU+memory ON TOP of GPU time. Pure has ~7.2K items and
+    # never comes close to that footprint, so a Pure-only sweep was paying a
+    # large multiple of its GPU cost for idle reservation. CPU stays at 4 (the
+    # RecBole dataloader is CPU-bound; starving it would idle the GPU and cost
+    # MORE), memory drops 64 GiB -> 16 GiB.
+    cpu=4.0,
+    memory=16384,
+    timeout=2 * 60 * 60,
+    volumes={"/data": data_vol, "/results": results_vol},
+)
+def train_pure(**kwargs) -> dict:
+    """Pure-tier trainer: identical body to `train`, trimmed reservations.
+
+    `.local()` invokes the undecorated function in this container, so the two
+    entry points can never drift apart.
+    """
+    return train.local(**kwargs)
+
+
+# RON-?? 2026-09-16: GPU re-run of the 2026-09-15 overnight local CPU queue.
+# Those seven ran via local_run.py on base.yaml defaults (train_batch_size=2048)
+# and so pair with NOTHING in results/modal/, which reaches this file's
+# `dataset != "kuairand_pure"` branch and trains at 512. Re-run here on the
+# identical code path as noprof_ms/ff_*/tuned so the rank dumps pair user-for-user.
+# Deliberately no train_batch_size/eval_batch_size override: the defaults ARE the
+# thing being matched.
+RERUN_JOBS = [
+    dict(ablation="no_profiler",     seed=42,  tag="gpu_noprof"),
+    dict(ablation="np_vector_gate",  seed=42,  tag="gpu_vector_gate"),
+    dict(ablation="np_vector_gate",  seed=77,  tag="gpu_vector_gate"),
+    dict(ablation="np_vector_gate",  seed=123, tag="gpu_vector_gate"),
+    dict(ablation="np_shuffled_ctx", seed=42,  tag="gpu_shuffled_ctx"),
+    dict(ablation="np_shuffled_ctx", seed=77,  tag="gpu_shuffled_ctx"),
+    dict(ablation="np_shuffled_ctx", seed=123, tag="gpu_shuffled_ctx"),
+]
+
+
+@app.local_entrypoint()
+def rerun(dataset: str = "kuairand_pure_ctx"):
+    """Fan the seven overnight conditions out in parallel on train_pure.
+
+    train_pure (4 CPU / 16 GiB), not train (8 CPU / 64 GiB): this is the Pure
+    tier, and `main` never got switched over after the RON-31 cost fix.
+    """
+    t0 = time.time()
+    # Budget guard: train_pure's decorator allows 2h, and seven of those running
+    # in parallel on A10G would cost more than the account holds. Pure-tier runs
+    # land in ~10 min, so 45 min is generous while capping the worst case.
+    fn = train_pure.with_options(timeout=45 * 60)
+    calls = []
+    for job in RERUN_JOBS:
+        calls.append((job, fn.spawn(model_key="CAFREC", dataset=dataset,
+                                    dump_ranks=True, dump_topk=True, **job)))
+        print(f"  spawned {job['tag']} seed{job['seed']}", flush=True)
+    print(f"\n{len(calls)} jobs in flight\n", flush=True)
+    for job, c in calls:
+        try:
+            m = c.get()
+            print(f"[{job['tag']} seed{job['seed']}] {m['test']}  -> {m['results_file']}", flush=True)
+        except Exception as e:
+            print(f"[{job['tag']} seed{job['seed']}] FAILED: {e}", flush=True)
+    print(f"\nTotal wall: {time.time() - t0:.0f}s")
 
 ALL_DATASETS = ["kuairand_pure", "kuairand_1k", "kuairand_27k"]
 

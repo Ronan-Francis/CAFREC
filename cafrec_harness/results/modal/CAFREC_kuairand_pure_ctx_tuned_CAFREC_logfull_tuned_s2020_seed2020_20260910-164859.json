@@ -1,0 +1,27 @@
+{
+  "model": "CAFREC",
+  "dataset": "kuairand_pure_ctx",
+  "seed": 2020,
+  "loss_type": "CE",
+  "n_params": 24108481,
+  "timestamp": "20260910-164859",
+  "split_sizes": {
+    "n_users": 22913,
+    "n_items": 7211,
+    "n_train": 582363,
+    "n_valid": 22912,
+    "n_test": 22912
+  },
+  "valid_best": {
+    "recall@10": 0.0972,
+    "ndcg@10": 0.0505,
+    "mrr@10": 0.0366,
+    "hit@10": 0.0972
+  },
+  "test": {
+    "recall@10": 0.0893,
+    "ndcg@10": 0.0465,
+    "mrr@10": 0.0337,
+    "hit@10": 0.0893
+  }
+}

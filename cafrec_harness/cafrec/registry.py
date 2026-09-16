@@ -104,6 +104,16 @@ def _build_registry():
                 # seqlen | logfull | suppress (None -> off unless history_gate).
                 "history_gate": False,
                 "history_gate_mode": None,
+                # fusion FORM (RON-61). The convex and additive fusions differ
+                # by exactly one term:
+                #   convex   z_short + g*(z_long - z_short)   == g*z_long+(1-g)*z_short
+                #   additive z_short + g*z_long
+                # so both are  z_short + g*(z_long - (1-lambda)*z_short)  with
+                # lambda 0 -> convex (incumbent), 1 -> additive.
+                #   None/"convex"  incumbent, unchanged
+                #   "additive"     lambda fixed at 1
+                #   "per_user"     lambda = sigmoid(free scalar per user id)
+                "fusion_mode": None,
             },
         ),
     }

@@ -120,6 +120,28 @@ def run_experiment(key, dataset="ml-100k", config_overrides=None,
         "test": dict(test_result),
     }
 
+    # RON-61: export the learned per-user fusion-form selector so "did sparse
+    # users drift toward additive fusion?" can be answered offline, without
+    # paying for a second run. One scalar per user; keyed by ORIGINAL user
+    # token so it joins to the cohort definitions used elsewhere.
+    # For `hybrid` this is the USER-BIAS component only, sigmoid(b_u): the full
+    # lambda also carries a context term that varies per request, so a single
+    # per-user number is only well defined for the bias. Exported under the same
+    # key (with fusion_mode recorded) so the cohort join is unchanged.
+    if getattr(model, "fusion_mode", None) in ("per_user", "hybrid"):
+        with torch.no_grad():
+            lam = torch.sigmoid(model.fusion_lambda.weight.squeeze(-1)).cpu()
+        uid_tok = rb_dataset.field2id_token[rb_dataset.uid_field]
+        result["fusion_mode"] = model.fusion_mode
+        result["fusion_lambda"] = lam.tolist()
+        result["fusion_lambda_user_tokens"] = [str(t) for t in uid_tok]
+        if model.fusion_mode == "hybrid":
+            # the context head's weights say WHICH features push lambda around
+            result["fusion_lambda_ctx_weights"] = \
+                model.fusion_lambda_ctx.weight.detach().squeeze(0).cpu().tolist()
+            result["fusion_lambda_ctx_bias"] = \
+                float(model.fusion_lambda_ctx.bias.detach().cpu())
+
     # Per-user held-out ranks for paired significance tests. `model` holds the
     # best checkpoint (evaluate loaded it); we re-score the test split mirroring
     # RecBole's full-sort masking. The aggregate is asserted against test_result

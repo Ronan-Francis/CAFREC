@@ -26,6 +26,13 @@ Ablations (config `ablation`, for T3.1)
   no_profiler  z_long := 0   (isolates the LLM profiler)
   static_gate  g := sigmoid(scalar), context-independent  (isolates conditioning)
   concat       z := W[z_long ; z_short]   (isolates gated vs concat fusion)
+
+Controls for the context-gated SASRec claim (both force z_long := 0, so each is
+paired against no_profiler, i.e. CAFREC-NP):
+  np_vector_gate   g := sigmoid(theta), theta in R^H, no context input
+                   (is the gain just a learned per-dimension rescaling of z_short?)
+  np_shuffled_ctx  x_ctx rows permuted within each batch, train AND eval
+                   (does pairing the context with its own session matter?)
 """
 import torch
 from torch import nn
@@ -100,9 +107,39 @@ class CAFREC(SequentialRecommender):
         if self._suppress:                                   # thin-history damper
             self.hg_tau = nn.Parameter(torch.tensor(0.3))    # ~ threshold on h_log
             self.hg_beta = nn.Parameter(torch.tensor(0.15))  # softness
+        # --- fusion FORM (RON-61) -----------------------------------------
+        # z = z_short + g * (z_long - (1 - lambda) * z_short)
+        #   lambda 0 -> convex   (incumbent: g*z_long + (1-g)*z_short)
+        #   lambda 1 -> additive (profile enters as a pure correction, so g=0
+        #                         recovers z_short exactly and the model can
+        #                         keep the FULL session while adding profile —
+        #                         a region the convex form cannot reach)
+        self.fusion_mode = config["fusion_mode"] or "convex"
+        if self.fusion_mode == "per_user":
+            # free scalar per user; NOT context-conditioned, so a win here is
+            # per-user personalisation of the fusion FORM, not context
+            # adaptivity. No cold-start path for unseen users (fine under
+            # leave-one-out, where every test user has train rows).
+            self.fusion_lambda = nn.Embedding(self.n_users, 1)
+        elif self.fusion_mode == "hybrid":
+            # lambda_u = sigmoid( f(x_ctx) + b_u ): a context-conditioned
+            # prediction PLUS a free per-user offset (a random-effects model).
+            # Unlike per_user this says WHY a user got its value — the feature
+            # head generalises, the bias absorbs what the features miss — which
+            # is what makes the cohort analysis interpretable rather than
+            # merely descriptive. Costs one Linear(gate_in, 1) over per_user.
+            self.fusion_lambda = nn.Embedding(self.n_users, 1)
+            self.fusion_lambda_ctx = nn.Linear(gate_in, 1)
+        elif self.fusion_mode not in ("convex", "additive"):
+            raise NotImplementedError(
+                "fusion_mode must be convex | additive | per_user | hybrid")
+
         # ablation helpers (cheap; created always, used only when selected)
         self.static_gate = nn.Parameter(torch.zeros(1))      # sigmoid(0)=0.5
         self.concat_proj = nn.Linear(2 * self.hidden_size, self.hidden_size)
+        if self.ablation == "np_vector_gate":
+            # zeros init consumes no RNG, so every other condition is unchanged
+            self.vector_gate = nn.Parameter(torch.zeros(self.hidden_size))
 
         self.initializer_range = config["initializer_range"]
         if self.loss_type == "CE":
@@ -179,6 +216,10 @@ class CAFREC(SequentialRecommender):
     def _gate(self, context, ref):
         if self.ablation == "static_gate":
             return torch.sigmoid(self.static_gate).expand(ref.size(0), self.hidden_size)
+        if self.ablation == "np_vector_gate":
+            return torch.sigmoid(self.vector_gate).expand(ref.size(0), self.hidden_size)
+        if self.ablation == "np_shuffled_ctx":
+            context = context[torch.randperm(context.size(0), device=context.device)]
         return self.gating_mlp(context)                      # g [B, H]
 
     # ----- fused representation -------------------------------------------
@@ -187,7 +228,7 @@ class CAFREC(SequentialRecommender):
         item_seq_len = interaction[self.ITEM_SEQ_LEN]
         z_short = self._short_term(item_seq, item_seq_len)
         z_long = self._long_term(interaction[self.USER_ID])
-        if self.ablation == "no_profiler":
+        if self.ablation in ("no_profiler", "np_vector_gate", "np_shuffled_ctx"):
             z_long = torch.zeros_like(z_long)
         if self._suppress:
             # damp the profile for thin histories (learnt threshold tau/softness beta)
@@ -196,8 +237,23 @@ class CAFREC(SequentialRecommender):
             z_long = z_long * s.unsqueeze(-1)
         if self.ablation == "concat":
             return self.concat_proj(torch.cat([z_long, z_short], dim=-1))
-        g = self._gate(self._build_context(interaction, item_seq_len), z_short)
-        return g * z_long + (1.0 - g) * z_short              # z [B, H]
+        ctx = self._build_context(interaction, item_seq_len)
+        g = self._gate(ctx, z_short)
+        lam = self._fusion_lambda(interaction[self.USER_ID], ctx)  # [B,1] or scalar
+        # lam 0 -> g*z_long + (1-g)*z_short (identical to the incumbent);
+        # lam 1 -> z_short + g*z_long
+        return z_short + g * (z_long - (1.0 - lam) * z_short)  # z [B, H]
+
+    def _fusion_lambda(self, user, ctx=None):
+        """Fusion-form selector in [0,1]; broadcasts against [B, H]."""
+        if self.fusion_mode == "convex":
+            return 0.0
+        if self.fusion_mode == "additive":
+            return 1.0
+        if self.fusion_mode == "hybrid":
+            return torch.sigmoid(
+                self.fusion_lambda_ctx(ctx) + self.fusion_lambda(user))
+        return torch.sigmoid(self.fusion_lambda(user))       # [B, 1]
 
     # ----- RecBole interface ----------------------------------------------
     def calculate_loss(self, interaction):
