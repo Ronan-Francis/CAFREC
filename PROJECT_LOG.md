@@ -942,3 +942,30 @@ NEXT
   5. Re-check the tuned/ff_* configs, whose "tuned" label was inferred from a
      batch size of 512 that may simply be this branch.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 10 (cont. 2) — BATCH-SIZE FIX (code only, no runs)
+Date   : 2026-09-16
+------------------------------------------------------------
+Actions Cycle 10 (cont.) NEXT items 3 and 4, and Cycle 10 NEXT item 5.
+
+  * cafrec/tiers.py: batch defaults key off CATALOGUE TIER (dataset-name prefix
+    kuairand_pure | kuairand_1k | kuairand_27k), not exact name. Pure variants
+    (incl. _ctx) -> base.yaml 2048/4096; 1K/27K -> 512/256; unknown -> ValueError.
+    modal_run.py::train uses it; explicit train/eval_batch_size still win.
+  * BEHAVIOUR CHANGE: CAFREC on kuairand_pure_ctx now defaults to 2048, not 512.
+    Every existing CAFREC Pure result is at 512. Runs meant to pair with that
+    corpus must pass train_batch_size=512. RERUN_JOBS now pins it; BSWEEP_JOBS
+    was already explicit.
+  * runner.run_experiment writes a `config` block of RESOLVED hyperparameters
+    (RESOLVED_CONFIG_KEYS) into every result; results.py adds cfg_* columns to
+    summary.csv. Checked against real Config objects: SASRec and CAFREC-NP on
+    Pure resolve to identical batch / lr / architecture.
+  * modal_run.py::main dispatches Pure-tier datasets to train_pure (RON-31).
+  * tests/test_tiers.py (12 cases). Suite: 66 passed (ml-100k smoke deselected).
+
+Budget note (Modal, 18:20): $62.48 metered of a $100 usage limit; $30 credits
+exhausted; $32.48 billed; measured ~$0.42-0.61 per Pure A10G job. See TODO.md.
+
+NEXT (still open): ff_*/tuned provenance for the pre-fix corpus (no config block).
+------------------------------------------------------------

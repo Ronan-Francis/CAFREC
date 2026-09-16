@@ -16,6 +16,11 @@ def _flatten(metrics):
     row = {k: v for k, v in metrics.items() if not isinstance(v, dict)}
     for k, v in metrics.get("test", {}).items():
         row[f"test_{k}"] = v
+    # scalar hyperparameters get their own columns so batch size etc. are
+    # visible when diffing runs in summary.csv
+    for k, v in metrics.get("config", {}).items():
+        if not isinstance(v, (dict, list)):
+            row[f"cfg_{k}"] = v
     return row
 
 

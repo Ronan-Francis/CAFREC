@@ -102,21 +102,17 @@ def train(model_key: str, dataset: str, epochs: int = None, seed: int = None,
         overrides["history_gate"] = True
     if history_gate_mode is not None:
         overrides["history_gate_mode"] = history_gate_mode
-    # Full-ranking eval materialises a [eval_batch_size x n_items] matrix. Pure's
-    # 7.2K items are fine at the base 4096, but 1k/27k's huge catalogues OOM the
-    # A10G there (13.5GB+ tensor) -> shrink the eval batch for those tiers.
-    if eval_batch_size is not None:
-        overrides["eval_batch_size"] = eval_batch_size
-    elif dataset != "kuairand_pure":
-        overrides["eval_batch_size"] = 256
-
+    # Batch sizes default per catalogue TIER, never per dataset name: the old
+    # `dataset != "kuairand_pure"` test put kuairand_pure_ctx in the large-
+    # catalogue branch and caused the H1 batch-size confound. See cafrec/tiers.py.
+    # Every Pure variant now trains at base.yaml's 2048 unless told otherwise;
+    # to pair with the pre-fix CAFREC corpus (512), pass train_batch_size=512.
+    from cafrec.tiers import batch_size_overrides
+    overrides.update(batch_size_overrides(dataset))
     if train_batch_size is not None:
         overrides["train_batch_size"] = train_batch_size
-    elif dataset != "kuairand_pure":
-        # CE loss materialises a (batch x n_items) logits tensor. Pure's 7.5K
-        # items are fine at batch 2048, but 1k/27k have million-item catalogues
-        # -> 2048 OOMs a 16GB T4. 512 keeps the tensor under ~4GB.
-        overrides["train_batch_size"] = 512
+    if eval_batch_size is not None:
+        overrides["eval_batch_size"] = eval_batch_size
 
     # RON-31 grid search: arbitrary RecBole keys (learning_rate, weight_decay,
     # hidden_size, n_layers, n_heads, dropout probs, pooling_type, ...). Applied
@@ -176,11 +172,11 @@ def train_pure(**kwargs) -> dict:
 
 # RON-?? 2026-09-16: GPU re-run of the 2026-09-15 overnight local CPU queue.
 # Those seven ran via local_run.py on base.yaml defaults (train_batch_size=2048)
-# and so pair with NOTHING in results/modal/, which reaches this file's
-# `dataset != "kuairand_pure"` branch and trains at 512. Re-run here on the
-# identical code path as noprof_ms/ff_*/tuned so the rank dumps pair user-for-user.
-# Deliberately no train_batch_size/eval_batch_size override: the defaults ARE the
-# thing being matched.
+# and so pair with NOTHING in results/modal/, whose CAFREC runs went down the
+# (since fixed) `dataset != "kuairand_pure"` branch and trained at 512. Re-run here
+# on the identical code path as noprof_ms/ff_*/tuned so the rank dumps pair
+# user-for-user. train_batch_size=512 was the implicit default when these ran;
+# after the tier fix the default is 2048, so it is pinned explicitly.
 RERUN_JOBS = [
     dict(ablation="no_profiler",     seed=42,  tag="gpu_noprof"),
     dict(ablation="np_vector_gate",  seed=42,  tag="gpu_vector_gate"),
@@ -190,6 +186,8 @@ RERUN_JOBS = [
     dict(ablation="np_shuffled_ctx", seed=77,  tag="gpu_shuffled_ctx"),
     dict(ablation="np_shuffled_ctx", seed=123, tag="gpu_shuffled_ctx"),
 ]
+for _job in RERUN_JOBS:
+    _job["train_batch_size"] = 512
 
 
 @app.local_entrypoint()
@@ -220,7 +218,8 @@ def rerun(dataset: str = "kuairand_pure_ctx"):
 
 # RON-?? 2026-09-16: batch-size confound check for the H1 headline.
 # SASRec runs on dataset "kuairand_pure" and CAFREC on "kuairand_pure_ctx".
-# The `dataset != "kuairand_pure"` branch above therefore gives SASRec
+# The `dataset != "kuairand_pure"` branch in `train` (since replaced by
+# cafrec/tiers.py) therefore gave SASRec
 # train_batch_size 2048 (base.yaml) and CAFREC 512 -- so "matched default
 # hyperparameters" and "identical training schedule" may not hold for the
 # paper's primary comparison. The result JSONs record no hyperparameters and
@@ -274,10 +273,15 @@ def main(models: str = "SASRec", dataset: str = "kuairand_pure",
     keys = [m.strip() for m in models.split(",") if m.strip()]
     datasets = (ALL_DATASETS if dataset.strip().lower() == "all"
                 else [d.strip() for d in dataset.split(",") if d.strip()])
+    from cafrec.tiers import catalogue_tier
+
     t0 = time.time()
     for ds in datasets:
+        # Pure-tier work goes to train_pure's trimmed reservations (RON-31);
+        # `train`'s 8 CPU / 64 GiB is sized for the million-item tiers.
+        fn = train_pure if catalogue_tier(ds) == "small" else train
         for key in keys:
-            metrics = train.remote(key, ds, epochs=epochs, seed=seed,
+            metrics = fn.remote(model_key=key, dataset=ds, epochs=epochs, seed=seed,
                                    train_batch_size=train_batch_size,
                                    eval_batch_size=eval_batch_size,
                                    llm_profile_path=llm_profile_path,
