@@ -38,6 +38,13 @@ QUEUES = {
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="np_vector_gate", seed=123, tag="np_vector_gate"),
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="np_shuffled_ctx", seed=123, tag="np_shuffled_ctx"),
     ],
+    # Control seeds missing from "overnight", which ran no_profiler at seed 42 only.
+    # Needed locally (not reused from results/modal/) because the seed-42 CPU vs Modal
+    # check in "overnight" did not reproduce: see QUEUE NOTES at the bottom of this file.
+    "controls": [
+        dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="no_profiler", seed=77, tag="noprof_local"),
+        dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="no_profiler", seed=123, tag="noprof_local"),
+    ],
     # 1-epoch smoke of each new ablation (a few minutes each)
     "smoke": [
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="np_vector_gate", seed=42, tag="smoke_vec", epochs=1),
@@ -125,3 +132,19 @@ if __name__ == "__main__":
     else:
         m, out = run_one(a.model, a.dataset, a.seed, a.ablation, a.tag, a.epochs)
         print(out, m["test"], f"{m['wall_seconds']}s")
+
+
+# ---------------------------------------------------------------------------
+# QUEUE NOTES
+#
+# 2026-09-16, "overnight" job (a): CPU does not reproduce Modal on the same
+# seed and config. CAFREC no_profiler, kuairand_pure_ctx, seed 42:
+#
+#     Modal (noprof_ms_s42)  HR@10 0.0828  NDCG@10 0.0425  MRR@10 0.0304
+#     local-cpu (this file)  HR@10 0.0817  NDCG@10 0.0411  MRR@10 0.0290
+#
+# The local run is uniformly lower, and the NDCG/MRR gaps (-3.3%, -4.6%) are
+# the same size as the ablation effects these queues are meant to measure.
+# So local ablations must be compared against local controls only; do not pair
+# them with results/modal/ rank dumps. Hence the "controls" queue above.
+# ---------------------------------------------------------------------------

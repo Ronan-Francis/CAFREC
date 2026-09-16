@@ -691,3 +691,138 @@ NEXT
   4. Optional 3rd/4th seed on Pure for a publishable multi-seed claim.
   5. Draft the results chapter table + RQ2/H2 write-up off thesis_table.csv.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 10 Working Record — GATE CONTROLS (np_vector_gate / np_shuffled_ctx)
+Date   : 2026-09-16
+Block  : 3 — Evaluation
+Author : R. Francis
+------------------------------------------------------------
+
+LOG GAP (flagged, not filled by this entry)
+  This log jumps 2026-08-15 -> 2026-09-16. Undocumented work sitting in
+  results/modal/: the 08-26 multi-seed batch (noprof_ms, seq10/seq50), the
+  09-10 grid search (gs_CAFREC_logfull_*), the tuned configs (tuned_*) and the
+  fusion-form seeds (ff_additive / ff_per_user / ff_hybrid). Those still need
+  their own retrospective entry; the eval chapter currently cites them from a
+  commented-out TODO(tuning) block.
+
+WHAT RAN
+  Two new CAFREC-NP gate controls (implemented in cafrec/models/cafrec.py,
+  commit ae63ec4), each paired against no_profiler at seeds 42 / 77 / 123:
+    np_vector_gate    g := sigmoid(theta), theta in R^H  -- gate keeps its
+                      parameters but loses its context INPUT entirely.
+    np_shuffled_ctx   x_ctx rows permuted within each batch, train AND eval
+                      -- gate is fed another user's context.
+
+  Executed twice:
+    (1) 2026-09-15 22:07 -> 2026-09-16 02:18, local CPU via local_run.py
+        --queue overnight. Seven runs SERIAL, ~2140s each, 4h11m total.
+    (2) 2026-09-16 06:40, Modal A10G via modal_run.py::rerun. Same seven
+        conditions, spawned in PARALLEL on train_pure. Total wall 169s.
+
+  Run (2) exists because run (1) is not comparable to anything. See below.
+
+DEFECT FOUND — local and Modal were never hyperparameter-matched
+  modal_run.py sizes batches with:  if dataset != "kuairand_pure".
+  The context dataset is named kuairand_pure_ctx, so it FAILS that test and
+  inherits the big-catalogue path: train_batch_size 512, eval_batch_size 256.
+  local_run.py has no such branch and takes base.yaml's 2048.
+  Consequence: every Pure-tier _ctx run on Modal has trained at 512 while the
+  local runs trained at 2048. The result JSONs record model/dataset/seed/metrics
+  and NO hyperparameters, so this is invisible on disk -- which is also the
+  origin of the "ff_* configs inferred as tuned from logs (train_batch_size=512)
+  -- VERIFY" note in 07_evaluation.tex. Those configs may never have been tuned;
+  512 may simply be this branch.
+  ACTION TAKEN: run (2) deliberately does NOT override batch size, so the new
+  rank dumps sit on the identical code path as noprof_ms / ff_* / tuned and pair
+  user-for-user with them.
+
+REPRODUCIBILITY CHECK (GPU vs GPU, seed 42, paired over 22,912 users)
+  gpu_noprof vs noprof_ms:  dNDCG = -0.00059,  p = 0.275  -> NOT significant.
+  The harness reproduces itself on the same code path. An earlier reading of a
+  CPU-vs-Modal gap as a HARDWARE effect was wrong; it was the batch-size branch.
+
+RESULTS — PURE _ctx, Modal A10G, mode:full, seq_len 20, seeds 42/77/123
+    Condition              HR@10             NDCG@10           MRR@10
+    no_profiler (ctrl)     0.0830 +- 0.0006  0.0421 +- 0.0004  0.0298 +- 0.0005
+    np_vector_gate         0.0796 +- 0.0024  0.0405 +- 0.0011  0.0288 +- 0.0006
+    np_shuffled_ctx        0.0815 +- 0.0012  0.0416 +- 0.0012  0.0297 +- 0.0012
+
+  Paired per-user Wilcoxon (two-sided) vs no_profiler, per seed, n = 22,912:
+    np_vector_gate   s42  dNDCG -0.00093  dHR -0.00087  p = 0.157
+                     s77  dNDCG -0.00251  dHR -0.00646  p = 0.000191
+                     s123 dNDCG -0.00117  dHR -0.00288  p = 0.0315
+                     -> lower in 3/3 seeds, significant in 2/3
+    np_shuffled_ctx  s42  dNDCG -0.00019  dHR -0.00039  p = 0.754
+                     s77  dNDCG -0.00169  dHR -0.00362  p = 0.000697
+                     s123 dNDCG +0.00058  dHR -0.00061  p = 0.168
+                     -> lower in 2/3 seeds, significant in 1/3
+
+  READING:
+  * THE HEADLINE IS np_shuffled_ctx. Permuting x_ctx destroys the gate's input
+    signal completely, and costs 1.8% HR@10 / 1.2% NDCG@10 -- indistinguishable
+    from the control in two of three seeds, with a POSITIVE NDCG delta at seed
+    123. A gate whose input can be randomised for ~1.8% is not demonstrably
+    reading context.
+  * Reshaping the gate costs MORE than removing its information content
+    (vector_gate -4.1% HR vs shuffled_ctx -1.8%). That ordering is the signature
+    of a gate earning its keep through PARAMETERS rather than through context.
+  * This does not formally refute H3, which was tested against static_gate and
+    concat -- different comparisons. But shuffled_ctx is the more direct probe of
+    the same mechanism and it does not deliver an effect of the size H3's
+    p = 6.3e-6 implies. Reconciling the two is now the open question for RQ3.
+  * np_vector_gate is a clean supporting result for the scalar gate design:
+    lower on every metric in 3/3 seeds.
+
+  CORRECTIONS to the single-seed reading taken from run (1) on the morning of
+  09-16, before the control seeds existed:
+  * "CPU does not reproduce Modal" -- withdrawn. Batch-size branch, not hardware.
+    Do NOT add a hardware paragraph to Threats to Validity.
+  * "vector_gate is a low-variance effect (sd 0.00035)" -- the CPU path's seed sd
+    was 0.00035; on GPU it is 0.0024, ~7x larger. Direction holds, tightness does
+    not.
+  * "shuffled_ctx costs 3.3% HR" -- it costs 1.8%, and is mostly non-significant.
+    The concern is STRONGER than first reported, not weaker.
+  * Qualitative ordering DID replicate across both paths:
+    control > shuffled_ctx > vector_gate.
+
+  CAVEAT: three seeds, one dataset tier, one split. Seed 42 is non-significant
+  for BOTH controls, so per-seed replication counts (not a pooled p) are the
+  honest summary. The control is noprof_ms (08-26 batch), not a same-batch
+  control -- acceptable because it is the same condition on the same code path,
+  and the seed-42 reproducibility check above supports that.
+
+COST / THROUGHPUT NOTE
+  Seven serial CPU runs = 4h11m. The same seven, parallel on A10G = 169s wall.
+  modal_run.py::main still dispatches to train (8 CPU / 64 GiB) rather than
+  train_pure (4 CPU / 16 GiB) despite the RON-31 cost fix, so every Pure-tier
+  run launched through main since 09-10 has paid for oversized reservations.
+  ::rerun uses train_pure and caps each job at 45 min via with_options().
+
+ARTIFACTS
+  results/modal/CAFREC_kuairand_pure_ctx_gpu_noprof_seed42_*.json
+  results/modal/CAFREC_kuairand_pure_ctx_gpu_vector_gate_seed{42,77,123}_*.json
+  results/modal/CAFREC_kuairand_pure_ctx_gpu_shuffled_ctx_seed{42,77,123}_*.json
+      -- all with per-user rank + top-k dumps; pair against the existing corpus.
+  results/local/*_np_{vector_gate,shuffled_ctx}_seed{42,77,123}.json
+      -- run (1), CPU, batch 2048. Internally consistent; NOT comparable to
+         results/modal/. Retained only as the CPU/GPU offset measurement.
+  cafrec_harness/compare_gpu_rerun.py   reproduces every number in RESULTS
+                                        above (pairs rank dumps by user id)
+  modal_run.py::rerun + RERUN_JOBS      the parallel GPU re-run entry point
+  local_run.py "controls" queue + QUEUE NOTES
+
+NEXT
+  1. Resolve H3 vs np_shuffled_ctx. Either the gate is not context-dependent, or
+     shuffled_ctx is a weaker manipulation than it appears (check whether the
+     permutation is re-drawn per epoch, and whether the gate saturates). This
+     gates the RQ3 write-up.
+  2. Persist the RESOLVED config (train_batch_size, lr, hidden_size, epochs) into
+     every result JSON. One runner change; permanently settles the ff_* VERIFY.
+  3. Fix the dataset != "kuairand_pure" test to match the _ctx variants, or key
+     the batch sizing off catalogue size rather than dataset name.
+  4. Re-check whether the ff_* / tuned configs were genuinely tuned, once (2) lands.
+  5. Point modal_run.py::main at train_pure for Pure-tier work.
+  6. Retrospective log entry for the 08-26 and 09-10 batches (see LOG GAP).
+------------------------------------------------------------
