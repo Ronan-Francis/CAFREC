@@ -1,0 +1,82 @@
+== np_s42  (CAFREC-Sep-15-2026_22-08-38.pth, ablation=no_profiler, batch=2048)
+   gate mean 0.076; per-dim mean range [0.000, 0.670]; across-user sd mean 0.0599 (max 0.3653)
+   deviation from constant gate, rel. to (1-gbar): median 0.125, p90 0.197
+   linear R^2 of g on all six features 0.828; by feature: prefix_session_len_log_z 0.277, prefix_dwell_entropy_z 0.149, prefix_category_drift_z 0.187, inter_session_gap_log_z 0.671, prefix_policy_flag 0.037, is_first_session -0.000
+   [opener] gate mean 0.095; across-user sd mean 0.0548; R^2 inter_session_gap 0.845
+   [continuing] gate mean 0.033; across-user sd mean 0.0400; R^2 inter_session_gap 0.658
+   real     HR@10 0.0817  NDCG@10 0.0411  MRR@10 0.0290
+   shuffled HR@10 0.0808  NDCG@10 0.0408  MRR@10 0.0288
+      all        n=22,912 dNDCG vs real -0.00029 (-0.70%), p=0.475, users changed 1148
+      opener     n=15,706 dNDCG vs real -0.00041 (-1.13%), p=0.346, users changed 744
+      continuing n=7,206 dNDCG vs real -0.00003 (-0.05%), p=0.968, users changed 404
+   mean     HR@10 0.0810  NDCG@10 0.0408  MRR@10 0.0287
+      all        n=22,912 dNDCG vs real -0.00037 (-0.89%), p=0.124, users changed 1145
+      opener     n=15,706 dNDCG vs real -0.00054 (-1.51%), p=0.0562, users changed 745
+      continuing n=7,206 dNDCG vs real +0.00002 (+0.03%), p=0.937, users changed 400
+   none     HR@10 0.0789  NDCG@10 0.0394  MRR@10 0.0275
+      all        n=22,912 dNDCG vs real -0.00176 (-4.28%), p=0.000243, users changed 1427
+      opener     n=15,706 dNDCG vs real -0.00251 (-7.00%), p=8.42e-05, users changed 1104
+      continuing n=7,206 dNDCG vs real -0.00012 (-0.23%), p=0.626, users changed 323
+== shuffled_s42  (CAFREC-Sep-15-2026_23-20-56.pth, ablation=np_shuffled_ctx, batch=2048)
+   gate mean 0.000; per-dim mean range [0.000, 0.000]; across-user sd mean 0.0001 (max 0.0004)
+   deviation from constant gate, rel. to (1-gbar): median 0.000, p90 0.000
+   linear R^2 of g on all six features 0.101; by feature: prefix_session_len_log_z 0.008, prefix_dwell_entropy_z 0.006, prefix_category_drift_z 0.006, inter_session_gap_log_z 0.013, prefix_policy_flag 0.023, is_first_session 0.000
+   [opener] gate mean 0.000; across-user sd mean 0.0000; R^2 inter_session_gap 0.611
+   [continuing] gate mean 0.000; across-user sd mean 0.0002; R^2 inter_session_gap 0.090
+   real     HR@10 0.0805  NDCG@10 0.0404  MRR@10 0.0284
+   shuffled HR@10 0.0805  NDCG@10 0.0404  MRR@10 0.0284
+      all        n=22,912 dNDCG vs real -0.00000 (-0.00%), p=1, users changed 2
+      opener     n=15,706 dNDCG vs real -0.00000 (-0.00%), p=1, users changed 2
+      continuing n=7,206 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+   mean     HR@10 0.0805  NDCG@10 0.0404  MRR@10 0.0284
+      all        n=22,912 dNDCG vs real -0.00000 (-0.00%), p=1, users changed 2
+      opener     n=15,706 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 1
+      continuing n=7,206 dNDCG vs real -0.00000 (-0.00%), p=1, users changed 1
+   none     HR@10 0.0805  NDCG@10 0.0404  MRR@10 0.0284
+      all        n=22,912 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+      opener     n=15,706 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+      continuing n=7,206 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+== shuffled_s77  (CAFREC-Sep-16-2026_00-31-59.pth, ablation=np_shuffled_ctx, batch=2048)
+   gate mean 0.000; per-dim mean range [0.000, 0.000]; across-user sd mean 0.0001 (max 0.0004)
+   deviation from constant gate, rel. to (1-gbar): median 0.000, p90 0.000
+   linear R^2 of g on all six features 0.165; by feature: prefix_session_len_log_z 0.009, prefix_dwell_entropy_z 0.022, prefix_category_drift_z 0.000, inter_session_gap_log_z 0.038, prefix_policy_flag 0.026, is_first_session 0.000
+   [opener] gate mean 0.000; across-user sd mean 0.0001; R^2 inter_session_gap 0.257
+   [continuing] gate mean 0.000; across-user sd mean 0.0002; R^2 inter_session_gap 0.007
+   real     HR@10 0.0779  NDCG@10 0.0394  MRR@10 0.0278
+   shuffled HR@10 0.0779  NDCG@10 0.0394  MRR@10 0.0278
+      all        n=22,912 dNDCG vs real +0.00000 (+0.01%), p=0.5, users changed 2
+      opener     n=15,706 dNDCG vs real +0.00001 (+0.02%), p=0.5, users changed 2
+      continuing n=7,206 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+   mean     HR@10 0.0779  NDCG@10 0.0394  MRR@10 0.0278
+      all        n=22,912 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+      opener     n=15,706 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+      continuing n=7,206 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+   none     HR@10 0.0779  NDCG@10 0.0394  MRR@10 0.0278
+      all        n=22,912 dNDCG vs real +0.00000 (+0.01%), p=1, users changed 1
+      opener     n=15,706 dNDCG vs real +0.00000 (+0.01%), p=1, users changed 1
+      continuing n=7,206 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+== shuffled_s123  (CAFREC-Sep-16-2026_01-43-17.pth, ablation=np_shuffled_ctx, batch=2048)
+   gate mean 0.000; per-dim mean range [0.000, 0.001]; across-user sd mean 0.0001 (max 0.0010)
+   deviation from constant gate, rel. to (1-gbar): median 0.000, p90 0.000
+   linear R^2 of g on all six features 0.199; by feature: prefix_session_len_log_z 0.008, prefix_dwell_entropy_z 0.031, prefix_category_drift_z 0.001, inter_session_gap_log_z 0.039, prefix_policy_flag 0.036, is_first_session -0.000
+   [opener] gate mean 0.000; across-user sd mean 0.0000; R^2 inter_session_gap 0.262
+   [continuing] gate mean 0.000; across-user sd mean 0.0001; R^2 inter_session_gap 0.014
+   real     HR@10 0.0787  NDCG@10 0.0403  MRR@10 0.0288
+   shuffled HR@10 0.0787  NDCG@10 0.0403  MRR@10 0.0288
+      all        n=22,912 dNDCG vs real +0.00001 (+0.02%), p=0.5, users changed 2
+      opener     n=15,706 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 0
+      continuing n=7,206 dNDCG vs real +0.00002 (+0.04%), p=0.5, users changed 2
+   mean     HR@10 0.0787  NDCG@10 0.0403  MRR@10 0.0288
+      all        n=22,912 dNDCG vs real +0.00000 (+0.01%), p=0.75, users changed 3
+      opener     n=15,706 dNDCG vs real -0.00000 (-0.01%), p=1, users changed 1
+      continuing n=7,206 dNDCG vs real +0.00002 (+0.04%), p=0.5, users changed 2
+   none     HR@10 0.0787  NDCG@10 0.0403  MRR@10 0.0288
+      all        n=22,912 dNDCG vs real -0.00000 (-0.00%), p=1, users changed 2
+      opener     n=15,706 dNDCG vs real -0.00000 (-0.00%), p=1, users changed 1
+      continuing n=7,206 dNDCG vs real +0.00000 (+0.00%), p=1, users changed 1
+== vector_s42  (CAFREC-Sep-15-2026_22-44-57.pth, ablation=np_vector_gate, batch=2048)
+   constant gate: mean 0.314  range [0.232, 0.425]
+== vector_s77  (CAFREC-Sep-15-2026_23-56-37.pth, ablation=np_vector_gate, batch=2048)
+   constant gate: mean 0.314  range [0.218, 0.405]
+== vector_s123  (CAFREC-Sep-16-2026_01-07-42.pth, ablation=np_vector_gate, batch=2048)
+   constant gate: mean 0.313  range [0.208, 0.432]

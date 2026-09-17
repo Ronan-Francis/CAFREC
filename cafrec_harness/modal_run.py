@@ -254,6 +254,98 @@ def bsweep():
     print("Total wall: %.0fs" % (time.time() - t0))
 
 
+# 2026-09-16 budget-constrained follow-ups (TODO.md items A/B/C). All pin
+# train_batch_size=512: that is the batch every existing CAFREC Pure result and
+# SASRec bs512_sasrec trained at, and the tier fix made 2048 the default, so
+# leaving it unset would produce runs that pair with nothing.
+MATCHED_BATCH = 512
+ABLATION_SEEDS = [2020, 2021, 403092]
+COST_PER_JOB = 0.60  # USD, measured on 2026-09-16 Pure-tier A10G apps
+
+
+def _fan_out(jobs):
+    """Spawn every job on train_pure in parallel, then collect them in order."""
+    print(f"{len(jobs)} jobs, est. ~${len(jobs) * COST_PER_JOB:.2f} "
+          f"(check `modal billing summary` first)", flush=True)
+    t0 = time.time()
+    # 45 min cap per job, as in rerun/bsweep: a Pure run lands in ~10 min, so a
+    # hung container costs at most ~$0.80 rather than train_pure's 2h default.
+    fn = train_pure.with_options(timeout=45 * 60)
+    calls = []
+    for job in jobs:
+        calls.append((job, fn.spawn(train_batch_size=MATCHED_BATCH,
+                                    dump_ranks=True, dump_topk=True, **job)))
+        print(f"  spawned {job['tag']}", flush=True)
+    for job, c in calls:
+        try:
+            m = c.get()
+            print(f"[{job['tag']}] {m['test']}  -> {m['results_file']}", flush=True)
+        except Exception as e:
+            print(f"[{job['tag']}] FAILED: {e}", flush=True)
+    print(f"Total wall: {time.time() - t0:.0f}s")
+
+
+@app.local_entrypoint()
+def basesweep(loss: str = "native"):
+    """(A) HGN + HGRU4Rec at batch 512 over the 7 headline seeds, 14 jobs.
+
+    Completes the matched-batch four-model comparison: SASRec (bs512_sasrec) and
+    every CAFREC Pure variant already exist at 512 on these seeds.
+    `--loss ce` re-runs both under SASRec's CE contract instead of their native
+    BPR, removing the loss confound as well (another 14 jobs).
+    """
+    if loss not in ("native", "ce"):
+        raise SystemExit("--loss must be 'native' or 'ce'")
+    extra = ({"loss_type": "CE", "train_neg_sample_args": None}
+             if loss == "ce" else None)
+    prefix = "bs512_ce" if loss == "ce" else "bs512"
+    _fan_out([dict(model_key=m, dataset="kuairand_pure", seed=s,
+                   extra_overrides=extra, tag=f"{prefix}_{m.lower()}")
+              for m in ("HGN", "HGRU4Rec") for s in HEADLINE_SEEDS])
+
+
+@app.local_entrypoint()
+def gatectl():
+    """(B) np_vector_gate / np_shuffled_ctx at the ablation seeds, 6 jobs.
+
+    The gpu_vector_gate / gpu_shuffled_ctx runs used the headline seeds
+    {42,77,123}. These match static_gate_s* / concat_s* so the controls can join
+    tab:res:fusion. Tags follow that table's `<ablation>_s<seed>` convention.
+    """
+    _fan_out([dict(model_key="CAFREC", dataset="kuairand_pure_ctx",
+                   ablation=f"np_{a}", seed=s, tag=f"{a}_s{s}")
+              for a in ("vector_gate", "shuffled_ctx") for s in ABLATION_SEEDS])
+
+
+HASHING_PROFILE = "profiles/kuairand_pure_ctx.profiles.hashing.d1024.pt"
+
+
+@app.local_entrypoint()
+def hashsweep(profile: str = HASHING_PROFILE, profile_dim: int = 1024):
+    """(C) Full CAFREC with the no-LLM hashing profile at the ablation seeds, 3 jobs.
+
+    Pairs with bge_topk_s{2020,2021,403092} (bge-large, d1024): same dim and the
+    same template text, so n_params match and the only change is the embedder.
+    If hashing matches BGE, the frozen profile's benefit is not about text
+    semantics (Sec. VI-D(c)).
+
+    The cache is built locally (free) and must be uploaded first:
+        python -m cafrec.features.build_profiles --dataset kuairand_pure_ctx \
+            --backend hashing --dim 1024
+        modal volume put cafrec-data ../data/profiles/kuairand_pure_ctx.profiles.hashing.d1024.pt \
+            profiles/kuairand_pure_ctx.profiles.hashing.d1024.pt
+    """
+    # Fail before spawning (and paying for) anything if the upload was skipped.
+    parent, _, name = profile.rpartition("/")
+    if name not in {e.path.rpartition("/")[2] for e in data_vol.listdir(parent)}:
+        raise SystemExit(f"{profile} is not on the cafrec-data volume; upload it "
+                         f"first (see `hashsweep` docstring)")
+    _fan_out([dict(model_key="CAFREC", dataset="kuairand_pure_ctx", seed=s,
+                   llm_profile_path=f"/data/{profile}", profile_dim=profile_dim,
+                   tag=f"hash_s{s}")
+              for s in ABLATION_SEEDS])
+
+
 ALL_DATASETS = ["kuairand_pure", "kuairand_1k", "kuairand_27k"]
 
 

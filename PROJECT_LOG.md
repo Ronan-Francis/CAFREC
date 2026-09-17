@@ -969,3 +969,176 @@ exhausted; $32.48 billed; measured ~$0.42-0.61 per Pure A10G job. See TODO.md.
 
 NEXT (still open): ff_*/tuned provenance for the pre-fix corpus (no config block).
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 11 Working Record — MATCHED-BATCH BASELINES, GATE CONTROLS @ ABLATION
+SEEDS, HASHING-PROFILE CONTROL
+Date   : 2026-09-16 (runs 19:25-19:33 local)
+Author : R. Francis
+------------------------------------------------------------
+RUNS (modal_run.py entry points added this cycle; all train_batch_size=512 pinned,
+rank + top-k dumps, train_pure, 45-min cap). 23/23 jobs succeeded.
+  basesweep   HGN, HGRU4Rec (native BPR) x seeds {42,77,123,256,512,1024,2048}
+              tags bs512_hgn / bs512_hgru4rec                     14 jobs, 385 s wall
+  gatectl     np_vector_gate, np_shuffled_ctx x {2020,2021,403092}
+              tags vector_gate_s* / shuffled_ctx_s*                6 jobs, 468 s wall
+  hashsweep   CAFREC (full) + HashingBackend profile d1024 x {2020,2021,403092}
+              tag hash_s*                                         3 jobs, 173 s wall
+  Hashing cache built locally on CPU (15 s; 22,913 x 1024, 1 zero row, same shape
+  as the bge d1024 cache) and uploaded to
+  cafrec-data:profiles/kuairand_pure_ctx.profiles.hashing.d1024.pt.
+  Pre-flight: HGN/HGRU4Rec with loss_type=CE checked locally for 1 epoch (OK), not run on Modal.
+
+ANALYSIS  analyze_followups.py -> results/followups_20260916.txt
+  Section IV-F statistics (per-user mean over seeds, Wilcoxon, 2000-resample
+  paired bootstrap CI, per-seed sig/sign counts). No multiplicity correction.
+  References are pre-fix runs at the (then implicit) batch 512: noprof_ms,
+  bge_ms, noprof_topk, bge_topk, static_gate; SASRec bs512_sasrec is explicit.
+
+(A) MATCHED BATCH 512, 7 SEEDS            HR@10            NDCG@10          MRR@10
+    SASRec                           0.0810+-0.0015   0.0411+-0.0009   0.0291+-0.0007
+    CAFREC-NP                        0.0816+-0.0014   0.0416+-0.0006   0.0297+-0.0006
+    CAFREC (bge)                     0.0810+-0.0016   0.0415+-0.0008   0.0297+-0.0006
+    HGRU4Rec (BPR)                   0.0554+-0.0026   0.0278+-0.0013   0.0195+-0.0010
+    HGN (BPR)                        0.0235+-0.0023   0.0112+-0.0008   0.0074+-0.0005
+
+  CAFREC-NP vs SASRec   HR +0.7% p=0.45 sign 4/7 | NDCG +1.4% p=0.11 sign 6/7 |
+                        MRR +1.9% p=0.045 CI [-0.00000,+0.00111] sig 2/7 sign 6/7
+  SASRec vs HGRU4Rec    HR +46%  p=9e-70   7/7      SASRec vs HGN  HR +245% p=2e-235 7/7
+  CAFREC-NP vs HGRU4Rec HR +47%  p=4e-68   7/7      CAFREC-NP vs HGN HR +248%       7/7
+
+  FINDINGS
+  * The four-model comparison now exists at ONE declared batch size (512).
+    Ordering SASRec ~ CAFREC-NP ~ CAFREC >> HGRU4Rec >> HGN is unchanged from the
+    paper, but the transformer-vs-baseline gaps are still confounded by LOSS (CE vs
+    BPR). CE variants (basesweep --loss ce, 14 jobs) would separate architecture
+    from loss.
+  * Batch 512 helps the baselines as well: vs the paper's batch-2048 table,
+    HGRU4Rec 0.0463 -> 0.0554 (+20%), HGN 0.0225 -> 0.0235 (+4%); cf. SASRec +3.0%
+    (Cycle 10 cont.). The small batch is not a CAFREC-specific advantage. Every
+    row of tab:res:main must come from one batch size.
+  * H1 at matched batch: still null on HR@10. MRR@10 p=0.045 with a CI touching zero
+    is borderline and would not survive Holm across this section's tests.
+
+(B) GATE CONTROLS @ ABLATION SEEDS {2020,2021,403092}, ref CAFREC-NP (noprof_topk)
+                     HR@10    dHR              dNDCG            p(HR)    p(NDCG)  sign
+    CAFREC-NP        0.0799
+    vector gate      0.0770   -0.0029 (-3.7%)  -0.0022 (-5.3%)  2.6e-4   2.8e-9   3/3
+    shuffled ctx     0.0798   -0.0002 (-0.2%)  -0.0001 (-0.2%)  0.81     0.93     1/3
+    vector vs shuffled        -0.0028 (-3.5%)  -0.0021 (-5.2%)  6.9e-4   9.5e-10  3/3
+
+  FINDINGS
+  * Both controls REPLICATE on an independent seed set. The shuffled-context null is
+    cleaner here (-0.2% HR) than at {42,77,123} (-1.8% HR, mostly n.s.).
+  * The gate needs an input that VARIES, but not the right session's context.
+    Consistent with the regularizer account (Sec. VI-B) and with the matched-batch
+    H1 null: a varying multiplicative gate is roughly neutral against SASRec, while a
+    constant per-dimension gate is harmful. "Removing variation hurts" does not mean
+    "context helps".
+  * Resolves Cycle 10 NEXT item 1 in favour of "the gate is not context-dependent".
+    The gate-activation export (TODO item 6) is still the direct test.
+
+(C) PROFILE EMBEDDER @ ABLATION SEEDS, full CAFREC
+    CAFREC (bge-large d1024)   0.0791 HR   0.0405 NDCG
+    CAFREC (hashing d1024)     0.0795 HR   0.0407 NDCG
+    CAFREC-NP (no profile)     0.0799 HR   0.0406 NDCG
+    hash vs bge   HR +0.5% p=0.60 | NDCG +0.6% p=0.46 | sign 2/3
+    hash vs NP    HR -0.5% p=0.62 | bge vs NP  HR -0.9% p=0.32
+
+  FINDINGS
+  * Replacing the sentence embedder with a hash of the same template text changes
+    nothing measurable, and neither profile beats no profile. There is no evidence
+    the profile's text semantics carry signal (closes Sec. VI-D(c)). This strengthens
+    the H2 null. Expected given the profile is a template of bucketed context means
+    with no item content (see build_profiles.py::render_profiles).
+  * NOTE: the Cycle 9 "real LLM profile >> learnable stand-in" result compared a
+    frozen cache against a learnable table. With hashing ~ bge, that gap is about
+    frozen-vs-learnable (regularization/capacity), not about content.
+
+COST
+  Posted immediately after: $64.78 metered / $33.97 billed (was $62.48 / $32.48).
+  Billing lags; ~$14 expected in total for 23 jobs (~$0.60/job) -> ~$77 of the
+  $100 Modal usage limit. Recheck before any further run.
+
+ARTIFACTS
+  results/modal/HGN_kuairand_pure_bs512_hgn_seed*_20260916-*.json            (7)
+  results/modal/HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed*_20260916-*.json  (7)
+  results/modal/CAFREC_kuairand_pure_ctx_{vector_gate,shuffled_ctx}_s*_*.json (6)
+  results/modal/CAFREC_kuairand_pure_ctx_hash_s*_*.json                      (3)
+  results/modal/{basesweep,gatectl,hashsweep}_{stdout,stderr}.log
+  results/followups_20260916.txt ; analyze_followups.py
+  New JSONs carry the resolved `config` block (train_batch_size 512 verified in the
+  analysis output's bs column).
+
+NEXT
+  1. AUTHOR DECISION (unchanged): re-frame vs re-baseline. Re-baselining at 512 is
+     now complete for native-loss baselines. Optional: basesweep --loss ce (~$8.50).
+  2. Paper: replace tab:res:main baseline rows with the batch-512 7-seed numbers;
+     move the gate controls to ablation-seed numbers; add the hash-vs-bge row
+     (05_results.tex:104) and resolve the 03_model.tex:85 TODO.
+  3. Holm-Bonferroni across the Sec. V-A family (CPU, existing dumps).
+  4. Gate-activation export (TODO item 6), CPU, to test the regularizer account directly.
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 11 (cont.) — LOSS-MATCHED BASELINES (HGN / HGRU4Rec under CE)
+Date   : 2026-09-16 (run 19:52-19:57 local)
+------------------------------------------------------------
+RUN  modal_run.py::basesweep --loss ce
+  HGN, HGRU4Rec with {"loss_type": "CE", "train_neg_sample_args": None} (SASRec's
+  contract), train_batch_size 512, seeds {42,77,123,256,512,1024,2048},
+  tags bs512_ce_hgn / bs512_ce_hgru4rec. 14/14 succeeded, 314 s wall.
+  (Local 1-epoch CPU pre-check of both under CE passed before launch.)
+
+ANALYSIS  analyze_followups.py --only D -> results/followups_ce_20260916.txt
+  (new section D; --only flag added to skip the slow A-C bootstraps)
+
+  7 seeds, batch 512          loss   HR@10            NDCG@10          MRR@10
+    CAFREC-NP                  CE    0.0816+-0.0014   0.0416+-0.0006   0.0297+-0.0006
+    SASRec                     CE    0.0810+-0.0015   0.0411+-0.0009   0.0291+-0.0007
+    HGN                        CE    0.0717+-0.0014   0.0340+-0.0007   0.0227+-0.0005
+    HGRU4Rec                   CE    0.0668+-0.0010   0.0314+-0.0004   0.0209+-0.0004
+    HGRU4Rec                   BPR   0.0554+-0.0026   0.0278+-0.0013   0.0195+-0.0010
+    HGN                        BPR   0.0235+-0.0023   0.0112+-0.0008   0.0074+-0.0005
+
+  Paired (per-user, Wilcoxon, 2000-resample bootstrap), HR@10:
+    HGN CE vs BPR           +0.04821 (+205.4%) CI [+0.04517,+0.05132] p=2e-219  7/7 7/7
+    HGRU4Rec CE vs BPR      +0.01134 (+20.5%)  CI [+0.00903,+0.01369] p=4e-21   7/7 7/7
+    SASRec vs HGN-CE        +0.00930 (+13.0%)  CI [+0.00653,+0.01208] p=7e-10   7/7 7/7
+    SASRec vs HGRU4Rec-CE   +0.01419 (+21.2%)  CI [+0.01172,+0.01662] p=2e-26   7/7 7/7
+    CAFREC-NP vs HGN-CE     +0.00990 (+13.8%)  CI [+0.00699,+0.01286] p=1e-10   7/7 7/7
+    CAFREC-NP vs HGRU4Rec-CE +0.01479 (+22.1%) CI [+0.01213,+0.01736] p=6e-27   7/7 7/7
+  NDCG@10 / MRR@10 agree in sign and significance everywhere (HGRU4Rec CE-vs-BPR
+  MRR +7.1%, p=3.8e-4, sig 6/7, is the weakest).
+
+FINDINGS
+  * The self-attentive models (SASRec, CAFREC-NP) beat both baselines with loss AND
+    batch matched: +13% HR over HGN, +21% over HGRU4Rec, 7/7 seeds. The architecture
+    advantage is real but far smaller than the BPR comparison suggests (+245% / +46%).
+  * Decomposition of SASRec's HR@10 lead over the BPR baselines (batch 512):
+      over HGN       0.0575 = 0.0482 loss (84%) + 0.0093 architecture (16%)
+      over HGRU4Rec  0.0255 = 0.0113 loss (44%) + 0.0142 architecture (56%)
+  * The baseline ordering FLIPS under CE: HGN (0.0717) > HGRU4Rec (0.0668). Under
+    BPR, HGRU4Rec >> HGN. The paper's HGN-vs-HGRU4Rec ranking is a loss artifact;
+    BPR with one uniform negative is especially damaging to HGN on a 7.2K catalogue.
+  * With Cycle 10 cont. and Cycle 11: every cross-model number in tab:res:main can
+    now come from one batch size (512) and one loss (CE), 7 seeds each. The context
+    gate adds nothing significant on top of SASRec at that setting.
+
+COST
+  Posted immediately after: $65.95 metered / $35.14 billed. Charges lag by hours;
+  37 jobs this evening at ~$0.60 -> expected ~$85-87 of the $100 usage limit once
+  posted. NO FURTHER PAID RUNS THIS CYCLE (credits reset 2026-10-01).
+
+ARTIFACTS
+  results/modal/HGN_kuairand_pure_bs512_ce_hgn_seed*_20260916-*.json            (7)
+  results/modal/HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed*_20260916-*.json  (7)
+  results/modal/basesweep_ce_{stdout,stderr}.log
+  results/followups_ce_20260916.txt ; analyze_followups.py (section D, --only)
+
+NEXT
+  1. Paper tab:res:main: batch-512 rows; CE baselines as the loss-matched
+     comparison (BPR rows optional, labelled). Resolves 05_results.tex:254 TODO.
+  2. Holm-Bonferroni over the Sec. V-A family (CPU).
+  3. Author decision on framing (unchanged).
+------------------------------------------------------------

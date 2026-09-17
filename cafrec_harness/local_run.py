@@ -46,6 +46,18 @@ QUEUES = {
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="no_profiler", seed=123, tag="noprof_local"),
     ],
     # 1-epoch smoke of each new ablation (a few minutes each)
+    # 2026-09-17: supervisor-review fixes. SASRec at batch 512 on the ablation seeds, so
+    # tab:res:coverage and tab:res:seqlen stop mixing batch sizes / seed sets. Every job
+    # pins train_batch_size=512 (the tier default is now 2048, see cafrec/tiers.py).
+    "sasrec512": [
+        dict(model="SASRec", dataset="kuairand_pure", seed=s, tag=f"bs512_L{L}",
+             train_batch_size=512, max_seq_len=L)
+        for L in (20, 10, 50) for s in (2020, 2021, 403092)
+    ],
+    # MostPop baseline (deterministic, so one seed). Reviewers expect a popularity floor.
+    "pop": [
+        dict(model="Pop", dataset="kuairand_pure", seed=2020, tag="pop", epochs=1),
+    ],
     "smoke": [
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="np_vector_gate", seed=42, tag="smoke_vec", epochs=1),
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="np_shuffled_ctx", seed=42, tag="smoke_shuf", epochs=1),
@@ -58,6 +70,7 @@ def _out_path(job):
 
 
 def run_one(model, dataset, seed, ablation=None, tag=None, epochs=None,
+            train_batch_size=None, max_seq_len=None,
             dump_ranks=True, dump_topk=True):
     from cafrec.runner import run_experiment
 
@@ -66,6 +79,10 @@ def run_one(model, dataset, seed, ablation=None, tag=None, epochs=None,
         overrides["ablation"] = ablation
     if epochs is not None:
         overrides["epochs"] = epochs
+    if train_batch_size is not None:
+        overrides["train_batch_size"] = train_batch_size
+    if max_seq_len is not None:
+        overrides["MAX_ITEM_LIST_LENGTH"] = max_seq_len
     t0 = time.time()
     metrics = run_experiment(model, dataset=dataset, config_overrides=overrides,
                              return_ranks=dump_ranks, dump_topk=dump_topk)
@@ -126,11 +143,14 @@ if __name__ == "__main__":
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--tag")
     p.add_argument("--epochs", type=int)
+    p.add_argument("--train-batch-size", type=int)
+    p.add_argument("--max-seq-len", type=int)
     a = p.parse_args()
     if a.queue:
         run_queue(a.queue)
     else:
-        m, out = run_one(a.model, a.dataset, a.seed, a.ablation, a.tag, a.epochs)
+        m, out = run_one(a.model, a.dataset, a.seed, a.ablation, a.tag, a.epochs,
+                         a.train_batch_size, a.max_seq_len)
         print(out, m["test"], f"{m['wall_seconds']}s")
 
 
@@ -147,4 +167,11 @@ if __name__ == "__main__":
 # the same size as the ablation effects these queues are meant to measure.
 # So local ablations must be compared against local controls only; do not pair
 # them with results/modal/ rank dumps. Hence the "controls" queue above.
+#
+# CORRECTION 2026-09-17: the comparison above is confounded. The local runs used
+# base.yaml's train_batch_size=2048 (read back from the saved checkpoint config),
+# whereas noprof_ms_s42 ran at 512. Against Modal at the SAME batch
+# (bs2048_noprof seed 42: HR 0.0802, NDCG 0.0406, MRR 0.0288) the CPU run differs by
+# +1.9% / +1.2% / +0.7%, within seed-to-seed spread (sd ~0.0015 HR). CPU and GPU are
+# still not bitwise identical, so keep pairing within one device where possible.
 # ---------------------------------------------------------------------------
