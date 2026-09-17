@@ -1,0 +1,132 @@
+CONTENT DATA AUDIT  2026-09-17 18:22:39  (script: audit_content_data.py)
+categories file : C:\Users\msc\Desktop\G00403092\CAFREC\data\kuairand_video_categories.csv  (3.69 GB)
+captions file   : C:\Users\msc\Desktop\G00403092\CAFREC\data\kuairand_video_captions.csv  (3.22 GB)
+interactions    : C:\Users\msc\Desktop\G00403092\CAFREC\data\recbole\kuairand_pure\kuairand_pure.inter
+
+== 0. Interaction file
+kuairand_pure.inter     : 651,099 rows, 22,912 users, 7,210 distinct item_id (min 0, max 7581)
+kuairand_pure_ctx.inter : 651,099 rows, 7,210 distinct item_id; same item set as kuairand_pure: True
+items in TRAINING rows (all but each user's last 2): 7,164
+
+== 1a. Categories file inventory
+rows 32,038,725; non-numeric id rows dropped 0; distinct final_video_id 32,038,725 (min 0, max 32038724); duplicate-id rows 0; scan 96s
+columns / dtypes:
+   final_video_id                   int64
+   first_level_category_id          float64
+   first_level_category_name        object
+   first_level_category_prob        float64
+   second_level_category_id         float64
+   second_level_category_name       object
+   second_level_category_prob       float64
+   third_level_category_id          float64
+   third_level_category_name        object
+   third_level_category_prob        float64
+   fourth_level_category_id         float64
+   fourth_level_category_name       object
+   fourth_level_category_prob       float64
+first 5 rows:
+  final_video_id  first_level_category_id first_level_category_name  first_level_category_prob  second_level_category_id second_level_category_name  second_level_category_prob  third_level_category_id third_level_category_name  third_level_category_prob  fourth_level_category_id fourth_level_category_name  fourth_level_category_prob
+0              0                     39.0                       影视综                   0.991811                     698.0                        电视剧                    0.920170                   -124.0                   UNKNOWN                   0.000000                    -124.0                    UNKNOWN                         0.0
+1              1                      2.0                        音乐                   0.998511                     724.0                     音乐点评分享                    0.894628                   2550.0                   音乐剪辑和MV                   0.894628                    -124.0                    UNKNOWN                         0.0
+2              2                      2.0                        音乐                   0.942611                     725.0                       音乐演唱                    0.502129                   -124.0                   UNKNOWN                   0.000000                    -124.0                    UNKNOWN                         0.0
+3              3                      7.0                        运动                   0.999611                     126.0                       球类运动                    1.000000                   1056.0                        篮球                   1.000000                    -124.0                    UNKNOWN                         0.0
+4              4                      9.0                        喜剧                   0.962722                     136.0                       喜剧段子                    0.790180                   -124.0                   UNKNOWN                   0.000000                    -124.0                    UNKNOWN                         0.0
+   first-level UNKNOWN (-124) or null, whole file: 2.52%
+   second-level UNKNOWN (-124) or null, whole file: 37.57%
+   third-level UNKNOWN (-124) or null, whole file: 71.51%
+   fourth-level UNKNOWN (-124) or null, whole file: 94.28%
+rows matching a Pure item id: 7,210 (distinct 7,210)
+category levels on the Pure item subset:
+   first :   38 distinct categories; known for 99.83% of Pure videos; median prob 0.991810977458954
+   second:  154 distinct categories; known for 85.46% of Pure videos; median prob 0.974351167678833
+   third :  237 distinct categories; known for 36.80% of Pure videos; median prob 0.985815167427063
+   fourth:   75 distinct categories; known for 6.99% of Pure videos; median prob 0.9923257827758789
+first-level categories on Pure videos (id, name, n videos):
+      39  影视综  1140
+       3  游戏  729
+      20  二次元  720
+      12  美食  481
+       9  喜剧  343
+       7  运动  334
+      32  短剧  295
+       2  音乐  292
+       6  明星娱乐  229
+       1  舞蹈  220
+      15  艺术  210
+      17  宠物  181
+       4  美妆  169
+       8  颜值  164
+      11  生活  160
+      19  情感  137
+      28  民生资讯  137
+       5  时尚  136
+      18  汽车  115
+      10  旅游  108
+      29  科学与法律  84
+      36  房产家居  79
+      38  读书  73
+      27  高新数码  71
+      25  亲子  70
+      26  摄影  69
+      33  自拍  62
+      35  军事  54
+      21  人文  53
+      13  三农  47
+      14  教育  43
+      22  财经  36
+      24  星座命理  33
+      37  奇人异象  33
+      34  其他  31
+      16  健康  27
+      31  健身  26
+      23  时政资讯  7
+
+== 1b. Captions file inventory
+rows 32,038,725; non-numeric id rows dropped 0; distinct final_video_id 32,038,725 (min 0, max 32038724); duplicate-id rows 0; scan 203s
+columns / dtypes:
+   final_video_id                   int64
+   caption                          object
+   show_cover_text                  object
+   duration                         object
+first 5 rows:
+  final_video_id                                                        caption show_cover_text  duration
+0              0   女子在试衣间离奇遇害最后警方找出凶手后竟然心软了 #上锁的房间 #悬疑剧 #影视解说 @快手热点(O40300129)              NaN   87433.0
+1              1                 慕容晓晓的一首《爱情买卖》句句走心，唱出多少女人的无奈 #音乐 #经典歌曲 #重温经典金曲              NaN  218066.0
+2              2  心情要好，生活要嗨，开心就笑，累了就睡，生活下一定要很酷，但一定要有态度 #好心情自己造 @快手平台帐号(O90041)              NaN    9233.0
+3              3      【康查尔单臂隔扣】高燃！康查尔禁区接球一飞冲天，单臂隔扣格威嗨翻灰熊板凳席！ ##NBA75周年  #快看NBA              NaN   16433.0
+4              4                         岳父是男朋友最大的安全隐患吗~ #娱乐评论大赏  #搞笑  #内容过于真实              NaN   38766.0
+whole file: caption null 22.73%, empty/whitespace 0.02%; non-empty captions containing CJK ideographs 98.93%; show_cover_text non-empty 24.55%; duration null 25.38%, non-numeric 123,698 rows (examples: ['其中有什么含义 #快手娱乐星熠计划第七期 ', '百顷良田变土田。 无字碑头镌满字', '彻底点燃一旁18岁少年，少年出手制止大快人心！ #快手娱乐星熠计划第七期  #快', '痘印都会慢慢消失，大大小小的愿望都会一一实现。 8⃣ 学业上会得到很好的成绩，事', '里面竟然藏着湿体（完）\xa0#法医秦明\xa0\xa0#我在快手追好剧\xa0\xa0#集结吧光合创作者\xa0'])
+whole file caption length (chars, non-empty): quantiles {0.05: 5, 0.25: 15, 0.5: 27, 0.75: 45, 0.95: 94, 0.99: 256}; max 2000
+Pure item subset: 7,210 rows (distinct 7,210); caption null 79, empty 0, non-empty 7131; non-empty with CJK 99.90%; CJK char share 0.691, Latin-letter char share 0.024
+Pure subset caption length (chars): quantiles {'0.05': 11.0, '0.25': 25.0, '0.5': 36.0, '0.75': 51.0, '0.95': 89.0, '0.99': 126.0}; mean 41.6; max 856
+
+wrote Pure subsets to C:\Users\msc\Desktop\G00403092\CAFREC\data\content_pure
+
+== 2. ID coverage of kuairand_pure.inter item ids
+all items in .inter      n=7,210: category row 100.00%; known first-level 99.83%; non-empty caption 98.90%
+items in training rows   n=7,164: category row 100.00%; known first-level 99.83%; non-empty caption 98.90%
+click-weighted: known first-level 99.90%; non-empty caption 98.29%
+
+== 3. Co-consumption lift (consecutive same-user clicks <= 30 min apart; 200 permutations)
+consecutive pairs within 30 min: 208,316 (same item twice: 6,321)
+  first-level category         incl_same_item  pairs=207,914  P(same)=0.1759  E=0.0794  lift=2.22  (pair-marginal E=0.0798, lift=2.20)  null lift 1.415 +/- 0.026 [p99 1.468, max 1.474]  z=31
+  first-level category         excl_same_item  pairs=201,597  P(same)=0.1500  E=0.0794  lift=1.89  (pair-marginal E=0.0812, lift=1.85)  null lift 0.985 +/- 0.018 [p99 1.029, max 1.043]  z=51
+  second-level category        incl_same_item  pairs=145,444  P(same)=0.1409  E=0.0465  lift=3.03  (pair-marginal E=0.0476, lift=2.96)  null lift 1.980 +/- 0.077 [p99 2.163, max 2.189]  z=14
+  second-level category        excl_same_item  pairs=140,136  P(same)=0.1084  E=0.0465  lift=2.33  (pair-marginal E=0.0490, lift=2.21)  null lift 0.965 +/- 0.026 [p99 1.024, max 1.029]  z=53
+  KuaiRand tag (reference)     incl_same_item  pairs=204,547  P(same)=0.2099  E=0.1171  lift=1.79  (pair-marginal E=0.1201, lift=1.75)  null lift 1.340 +/- 0.022 [p99 1.389, max 1.410]  z=21
+  KuaiRand tag (reference)     excl_same_item  pairs=198,358  P(same)=0.1852  E=0.1171  lift=1.58  (pair-marginal E=0.1219, lift=1.52)  null lift 0.989 +/- 0.016 [p99 1.029, max 1.038]  z=36
+  first-level, id+1 shift      incl_same_item  pairs=184,896  P(same)=0.0938  E=0.0647  lift=1.45  (pair-marginal E=0.0657, lift=1.43)  null lift 1.430 +/- 0.025 [p99 1.486, max 1.492]  z=1
+  first-level, id+1 shift      excl_same_item  pairs=179,043  P(same)=0.0642  E=0.0647  lift=0.99  (pair-marginal E=0.0656, lift=0.98)  null lift 0.983 +/- 0.017 [p99 1.024, max 1.039]  z=1
+
+== 4. Per-video attributes shared with KuaiRand-Pure
+Pure rows whose `duration` field holds non-numeric text (caption text spilled across columns, so the parsed caption may be truncated): 33 of 7,210
+   id 94: caption='#集结吧光合创作者 宫女的马铁蹄发型' | cover='95333.0' | duration='其中有什么含义 #快手娱乐星熠计划第七期 '
+   id 211: caption='千秋公案翻云雨' | cover='谁人能识古坤元……#集结吧光合创作者' | duration='百顷良田变土田。 无字碑头镌满字'
+   id 575: caption='“巨婴”儿子啃老要钱' | cover='176360.0' | duration='彻底点燃一旁18岁少年，少年出手制止大快人心！ #快手娱乐星熠计划第七期  #快'
+captions.duration vs video_features_basic_pure.video_duration: 6,918 videos with both; exact match 100.00%; |diff|<=1s 100.00%; Pearson r 1.0000
+   id+1 shift control: exact match 0.00% over 6,705 videos
+captions.duration vs raw-log duration_ms (per-video mode over the 3 Pure logs): 6,918 videos; exact 100.00%; |diff|<=1s 100.00%
+first_level_category_id in KuaiRand tag tokens: 7,117 videos; agreement 77.87% (equals primary tag 75.00%); permuted null 7.06% +/- 0.27 pp
+
+total audit time 332s
+wrote content_data_audit_2026-09-17.txt and content_data_audit_2026-09-17.json

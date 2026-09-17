@@ -1,0 +1,1319 @@
+{
+ "meta": {
+  "category_dims": {
+   "first_level": 38,
+   "second_level": 154,
+   "kuairand_tag": 46
+  }
+ },
+ "groups": {
+  "SASRec @512": {
+   "seeds": [
+    42,
+    77,
+    123,
+    256,
+    512,
+    1024,
+    2048
+   ],
+   "files": [
+    "SASRec_kuairand_pure_bs512_sasrec_seed42_20260916-062609.json",
+    "SASRec_kuairand_pure_bs512_sasrec_seed77_20260916-062605.json",
+    "SASRec_kuairand_pure_bs512_sasrec_seed123_20260916-062558.json",
+    "SASRec_kuairand_pure_bs512_sasrec_seed256_20260916-062616.json",
+    "SASRec_kuairand_pure_bs512_sasrec_seed512_20260916-062617.json",
+    "SASRec_kuairand_pure_bs512_sasrec_seed1024_20260916-062552.json",
+    "SASRec_kuairand_pure_bs512_sasrec_seed2048_20260916-062603.json"
+   ],
+   "ild_first_level": [
+    0.8207335812704903,
+    0.009744027206971689
+   ],
+   "ild_second_level": [
+    0.9023577996662685,
+    0.007067126766550278
+   ],
+   "ild_kuairand_tag": [
+    0.7913544859204974,
+    0.010721883586797671
+   ],
+   "nocat_first_level": [
+    0.00011036013567438147,
+    0.00010930831836499797
+   ],
+   "nocat_second_level": [
+    0.19676152234636873,
+    0.013533721788072193
+   ],
+   "nocat_kuairand_tag": [
+    0.003992293495610535,
+    0.001046751427254062
+   ],
+   "coverage": [
+    0.22765999603724985,
+    0.024859907024971296
+   ],
+   "hr10": [
+    0.08098571428571429,
+    0.001545346316556659
+   ]
+  },
+  "CAFREC-NP": {
+   "seeds": [
+    2020,
+    2021,
+    403092
+   ],
+   "files": [
+    "CAFREC_kuairand_pure_ctx_noprof_topk_s2020_seed2020_20260815-161058.json",
+    "CAFREC_kuairand_pure_ctx_noprof_topk_s2021_seed2021_20260815-161023.json",
+    "CAFREC_kuairand_pure_ctx_noprof_topk_s403092_seed403092_20260815-161026.json"
+   ],
+   "ild_first_level": [
+    0.8092004458109537,
+    0.003535731451934096
+   ],
+   "ild_second_level": [
+    0.8903835018475851,
+    0.0031773759532280144
+   ],
+   "ild_kuairand_tag": [
+    0.7861686746279398,
+    0.004524340750594704
+   ],
+   "nocat_first_level": [
+    4.5100093109869646e-05,
+    3.9602704809171906e-05
+   ],
+   "nocat_second_level": [
+    0.18809793994413407,
+    0.007747065317813846
+   ],
+   "nocat_kuairand_tag": [
+    0.0038524208566108006,
+    0.0009547874672229192
+   ],
+   "coverage": [
+    0.23361072584373557,
+    0.005361526752711858
+   ],
+   "hr10": [
+    0.0799,
+    0.0012489995996796787
+   ]
+  },
+  "CAFREC": {
+   "seeds": [
+    2020,
+    2021,
+    403092
+   ],
+   "files": [
+    "CAFREC_kuairand_pure_ctx_bge_topk_s2020_seed2020_20260815-161356.json",
+    "CAFREC_kuairand_pure_ctx_bge_topk_s2021_seed2021_20260815-161340.json",
+    "CAFREC_kuairand_pure_ctx_bge_topk_s403092_seed403092_20260815-161345.json"
+   ],
+   "ild_first_level": [
+    0.8131893277168274,
+    0.007632061270366284
+   ],
+   "ild_second_level": [
+    0.8924497167269388,
+    0.006610685165893994
+   ],
+   "ild_kuairand_tag": [
+    0.7919787367184957,
+    0.0021448473484678657
+   ],
+   "nocat_first_level": [
+    2.909683426443203e-05,
+    1.5327708555709874e-05
+   ],
+   "nocat_second_level": [
+    0.183875989292365,
+    0.011371443668105297
+   ],
+   "nocat_kuairand_tag": [
+    0.003983356610800745,
+    0.001242106844169102
+   ],
+   "coverage": [
+    0.2293573740175682,
+    0.010355264653490754
+   ],
+   "hr10": [
+    0.07913333333333333,
+    0.00047258156262525874
+   ]
+  },
+  "Static scalar gate": {
+   "seeds": [
+    2020,
+    2021,
+    403092
+   ],
+   "files": [
+    "CAFREC_kuairand_pure_ctx_static_gate_s2020_seed2020_20260825-140734.json",
+    "CAFREC_kuairand_pure_ctx_static_gate_s2021_seed2021_20260825-140802.json",
+    "CAFREC_kuairand_pure_ctx_static_gate_s403092_seed403092_20260825-140738.json"
+   ],
+   "ild_first_level": [
+    0.8175343871116638,
+    0.0025784831113098753
+   ],
+   "ild_second_level": [
+    0.898812492688497,
+    0.0031160615133647186
+   ],
+   "ild_kuairand_tag": [
+    0.7928315798441569,
+    0.0051057556874833905
+   ],
+   "nocat_first_level": [
+    2.1822625698324023e-05,
+    1.745810055865922e-05
+   ],
+   "nocat_second_level": [
+    0.1989568784916201,
+    0.011966467793465453
+   ],
+   "nocat_kuairand_tag": [
+    0.004120111731843575,
+    0.00033158903479788026
+   ],
+   "coverage": [
+    0.20073971336107257,
+    0.0012887064137555475
+   ],
+   "hr10": [
+    0.07643333333333334,
+    0.0018770544300401486
+   ]
+  },
+  "Concatenation": {
+   "seeds": [
+    2020,
+    2021,
+    403092
+   ],
+   "files": [
+    "CAFREC_kuairand_pure_ctx_concat_s2020_seed2020_20260825-140739.json",
+    "CAFREC_kuairand_pure_ctx_concat_s2021_seed2021_20260825-140745.json",
+    "CAFREC_kuairand_pure_ctx_concat_s403092_seed403092_20260825-140738.json"
+   ],
+   "ild_first_level": [
+    0.8160953919092814,
+    0.008527654087419035
+   ],
+   "ild_second_level": [
+    0.8938272794087728,
+    0.008540095690987801
+   ],
+   "ild_kuairand_tag": [
+    0.8005180756251017,
+    0.006530661120267896
+   ],
+   "nocat_first_level": [
+    3.928072625698324e-05,
+    1.3093575418994413e-05
+   ],
+   "nocat_second_level": [
+    0.18785207169459964,
+    0.014060086119212115
+   ],
+   "nocat_kuairand_tag": [
+    0.0038567853817504656,
+    0.0014596732214961052
+   ],
+   "coverage": [
+    0.1858067498844198,
+    0.015448505011449155
+   ],
+   "hr10": [
+    0.07216666666666666,
+    0.0018903262505010478
+   ]
+  },
+  "CAFREC-H": {
+   "seeds": [
+    2020,
+    2021,
+    403092
+   ],
+   "files": [
+    "CAFREC_kuairand_pure_ctx_hglogfull_s2020_seed2020_20260826-151513.json",
+    "CAFREC_kuairand_pure_ctx_hglogfull_s2021_seed2021_20260826-151527.json",
+    "CAFREC_kuairand_pure_ctx_hglogfull_s403092_seed403092_20260826-151558.json"
+   ],
+   "ild_first_level": [
+    0.8254048029581705,
+    0.0010561470887626829
+   ],
+   "ild_second_level": [
+    0.9016038775444031,
+    0.0036513899471410523
+   ],
+   "ild_kuairand_tag": [
+    0.8013108174006144,
+    0.006684160140000559
+   ],
+   "nocat_first_level": [
+    1.7458100558659216e-05,
+    2.6548369982097673e-05
+   ],
+   "nocat_second_level": [
+    0.18360247905027935,
+    0.009794298797351868
+   ],
+   "nocat_kuairand_tag": [
+    0.0034799813780260706,
+    0.0013936601499400672
+   ],
+   "coverage": [
+    0.20115580212667591,
+    0.00684734482906097
+   ],
+   "hr10": [
+    0.08286666666666669,
+    0.002025668613898467
+   ]
+  },
+  "HGN (BPR) @512": {
+   "seeds": [
+    42,
+    77,
+    123,
+    256,
+    512,
+    1024,
+    2048
+   ],
+   "files": [
+    "HGN_kuairand_pure_bs512_hgn_seed42_20260916-192741.json",
+    "HGN_kuairand_pure_bs512_hgn_seed77_20260916-192731.json",
+    "HGN_kuairand_pure_bs512_hgn_seed123_20260916-192734.json",
+    "HGN_kuairand_pure_bs512_hgn_seed256_20260916-192738.json",
+    "HGN_kuairand_pure_bs512_hgn_seed512_20260916-192739.json",
+    "HGN_kuairand_pure_bs512_hgn_seed1024_20260916-192930.json",
+    "HGN_kuairand_pure_bs512_hgn_seed2048_20260916-192935.json"
+   ],
+   "ild_first_level": [
+    0.8087270855903625,
+    0.07185992071859704
+   ],
+   "ild_second_level": [
+    0.8884926012584141,
+    0.05647886588048827
+   ],
+   "ild_kuairand_tag": [
+    0.7795857531683785,
+    0.06621969741554981
+   ],
+   "nocat_first_level": [
+    6.235035913806863e-07,
+    1.6496354443489315e-06
+   ],
+   "nocat_second_level": [
+    0.10636721867517958,
+    0.07603464004337053
+   ],
+   "nocat_kuairand_tag": [
+    4.364525139664805e-06,
+    5.039719528540727e-06
+   ],
+   "coverage": [
+    0.010739052902714484,
+    0.0012858600129002865
+   ],
+   "hr10": [
+    0.02347142857142857,
+    0.00227135369747814
+   ]
+  },
+  "HGN (CE) @512": {
+   "seeds": [
+    42,
+    77,
+    123,
+    256,
+    512,
+    1024,
+    2048
+   ],
+   "files": [
+    "HGN_kuairand_pure_bs512_ce_hgn_seed42_20260916-195431.json",
+    "HGN_kuairand_pure_bs512_ce_hgn_seed77_20260916-195412.json",
+    "HGN_kuairand_pure_bs512_ce_hgn_seed123_20260916-195547.json",
+    "HGN_kuairand_pure_bs512_ce_hgn_seed256_20260916-195514.json",
+    "HGN_kuairand_pure_bs512_ce_hgn_seed512_20260916-195541.json",
+    "HGN_kuairand_pure_bs512_ce_hgn_seed1024_20260916-195554.json",
+    "HGN_kuairand_pure_bs512_ce_hgn_seed2048_20260916-195444.json"
+   ],
+   "ild_first_level": [
+    0.8192975946835109,
+    0.002414339457391289
+   ],
+   "ild_second_level": [
+    0.9010634166853768,
+    0.0009190094251708807
+   ],
+   "ild_kuairand_tag": [
+    0.7865042345864433,
+    0.0031300779700930443
+   ],
+   "nocat_first_level": [
+    0.0002999052274541102,
+    7.541558815946012e-05
+   ],
+   "nocat_second_level": [
+    0.17000199521149242,
+    0.001986681199243377
+   ],
+   "nocat_kuairand_tag": [
+    0.004511048483639266,
+    0.0007089716560720378
+   ],
+   "coverage": [
+    0.42185456706954627,
+    0.04906024989353835
+   ],
+   "hr10": [
+    0.07168571428571428,
+    0.0014088157809883839
+   ]
+  },
+  "HGRU4Rec (BPR) @512": {
+   "seeds": [
+    42,
+    77,
+    123,
+    256,
+    512,
+    1024,
+    2048
+   ],
+   "files": [
+    "HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed42_20260916-192959.json",
+    "HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed77_20260916-193001.json",
+    "HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed123_20260916-193008.json",
+    "HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed256_20260916-193014.json",
+    "HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed512_20260916-193021.json",
+    "HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed1024_20260916-193037.json",
+    "HGRU4Rec_kuairand_pure_bs512_hgru4rec_seed2048_20260916-193145.json"
+   ],
+   "ild_first_level": [
+    0.877647944859096,
+    0.013108309593013713
+   ],
+   "ild_second_level": [
+    0.9536381789616176,
+    0.007570295513914433
+   ],
+   "ild_kuairand_tag": [
+    0.8395000355584281,
+    0.022758360175878928
+   ],
+   "nocat_first_level": [
+    1.7458100558659216e-05,
+    4.070958036438903e-05
+   ],
+   "nocat_second_level": [
+    0.27767108938547486,
+    0.02636392955051203
+   ],
+   "nocat_kuairand_tag": [
+    0.0014303172386272943,
+    0.003165924485449697
+   ],
+   "coverage": [
+    0.05662769962353874,
+    0.010215527433027219
+   ],
+   "hr10": [
+    0.05544285714285714,
+    0.0026228846351915316
+   ]
+  },
+  "HGRU4Rec (CE) @512": {
+   "seeds": [
+    42,
+    77,
+    123,
+    256,
+    512,
+    1024,
+    2048
+   ],
+   "files": [
+    "HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed42_20260916-195213.json",
+    "HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed77_20260916-195224.json",
+    "HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed123_20260916-195247.json",
+    "HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed256_20260916-195322.json",
+    "HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed512_20260916-195345.json",
+    "HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed1024_20260916-195416.json",
+    "HGRU4Rec_kuairand_pure_bs512_ce_hgru4rec_seed2048_20260916-195432.json"
+   ],
+   "ild_first_level": [
+    0.850371641772134,
+    0.0038640233904785213
+   ],
+   "ild_second_level": [
+    0.9260139635631016,
+    0.00214542674323736
+   ],
+   "ild_kuairand_tag": [
+    0.8063937085015433,
+    0.008538013936931675
+   ],
+   "nocat_first_level": [
+    0.0001558758978451716,
+    0.0001656741067339485
+   ],
+   "nocat_second_level": [
+    0.20892108938547488,
+    0.011587830684687815
+   ],
+   "nocat_kuairand_tag": [
+    0.0029391959297685555,
+    0.001211142900364444
+   ],
+   "coverage": [
+    0.16318605111947693,
+    0.009768607801980387
+   ],
+   "hr10": [
+    0.0668,
+    0.001036018017861334
+   ]
+  },
+  "MostPop": {
+   "seeds": [
+    2020
+   ],
+   "files": [
+    "Pop_kuairand_pure_pop_seed2020.json"
+   ],
+   "ild_first_level": [
+    0.9581423401832581,
+    NaN
+   ],
+   "ild_second_level": [
+    0.9915425181388855,
+    NaN
+   ],
+   "ild_kuairand_tag": [
+    0.8673213124275208,
+    NaN
+   ],
+   "nocat_first_level": [
+    0.0,
+    NaN
+   ],
+   "nocat_second_level": [
+    0.07806826117318436,
+    NaN
+   ],
+   "nocat_kuairand_tag": [
+    0.0,
+    NaN
+   ],
+   "coverage": [
+    0.003883495145631068,
+    NaN
+   ],
+   "hr10": [
+    0.0357,
+    NaN
+   ]
+  }
+ },
+ "h4": {
+  "strata_sizes": {
+   "users": 22912,
+   "high_drift": 3521,
+   "low_drift": 19391,
+   "sample": 3521
+  },
+  "first_level": {
+   "descriptive": {
+    "CAFREC": {
+     "all": [
+      0.8131892812738344,
+      0.007632067325539069
+     ],
+     "high drift": [
+      0.8342810948314533,
+      0.0006928208867763719
+     ],
+     "low drift": [
+      0.8104452747891462,
+      0.010792550628456488
+     ]
+    },
+    "Static scalar gate": {
+     "all": [
+      0.8175344084943618,
+      0.0025784983685055614
+     ],
+     "high drift": [
+      0.8274900951694045,
+      0.00398930659011349
+     ],
+     "low drift": [
+      0.8154775151037915,
+      0.0018511956891662526
+     ]
+    },
+    "Concatenation": {
+     "all": [
+      0.8160954084701739,
+      0.008527593286455833
+     ],
+     "high drift": [
+      0.8218119945756235,
+      0.009277643463427744
+     ],
+     "low drift": [
+      0.8151829859913157,
+      0.00886627411244667
+     ]
+    },
+    "CAFREC-NP": {
+     "all": [
+      0.8092004287616371,
+      0.003535719214221337
+     ],
+     "high drift": [
+      0.8263456390672116,
+      0.0032235083295014027
+     ],
+     "low drift": [
+      0.8050364579814611,
+      0.004402397028952598
+     ]
+    }
+   },
+   "tests": [
+    {
+     "alt": "Static scalar gate",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "all",
+     "n_users": 22912,
+     "delta": -0.004345127220527447,
+     "rel_pct": -0.5314916626603873,
+     "ci": [
+      -0.005247597839001278,
+      -0.003503574054603451
+     ],
+     "p": 1.4748975299766654e-16,
+     "seeds_cafrec_higher": 2
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.006790999662048899,
+     "rel_pct": 0.8206744348593852,
+     "ci": [
+      0.004640884567829773,
+      0.00897693162903713
+     ],
+     "p": 3.152004614788024e-10,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "low drift",
+     "n_users": 3521,
+     "delta": -0.005032240314645252,
+     "rel_pct": -0.6170912405849429,
+     "ci": [
+      -0.007197187153789499,
+      -0.0028127530587054687
+     ],
+     "p": 0.00013627233781585518,
+     "seeds_cafrec_higher": 2
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "high minus low drift",
+     "margin": 0.011823239976694152,
+     "ci": [
+      0.008839870418273716,
+      0.014998211142289011
+     ],
+     "p_mannwhitney": 3.4579024222592956e-12
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "first_level",
+     "sampling": "full stratum",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.006790999662048899,
+     "rel_pct": 0.8206744348593852,
+     "ci": [
+      0.004687009868214249,
+      0.008868061053433234
+     ],
+     "p": 3.152004614788024e-10,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "first_level",
+     "sampling": "full stratum",
+     "cohort": "low drift",
+     "n_users": 19391,
+     "delta": -0.006367214928925741,
+     "rel_pct": -0.7805574109124633,
+     "ci": [
+      -0.007287897863853009,
+      -0.0054009304934604105
+     ],
+     "p": 1.3995500186744389e-31,
+     "seeds_cafrec_higher": 1
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "first_level",
+     "sampling": "full stratum",
+     "cohort": "high minus low drift",
+     "margin": 0.01315821459097464,
+     "ci": [
+      0.010753507949996808,
+      0.015343247751677164
+     ],
+     "p_mannwhitney": 3.17151724906081e-24
+    },
+    {
+     "alt": "Concatenation",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "all",
+     "n_users": 22912,
+     "delta": -0.002906127196339478,
+     "rel_pct": -0.3561014026273239,
+     "ci": [
+      -0.003921445011643839,
+      -0.0018078187079673105
+     ],
+     "p": 9.236827361742714e-07,
+     "seeds_cafrec_higher": 1
+    },
+    {
+     "alt": "Concatenation",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.012469100255829856,
+     "rel_pct": 1.5172691975941273,
+     "ci": [
+      0.009643619394342997,
+      0.015157782845146206
+     ],
+     "p": 8.732830327078176e-14,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Concatenation",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "low drift",
+     "n_users": 3521,
+     "delta": -0.004737711202169497,
+     "rel_pct": -0.5811837689924466,
+     "ci": [
+      -0.007319311501761057,
+      -0.002057180660957982
+     ],
+     "p": 0.0010022815115595194,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Concatenation",
+     "level": "first_level",
+     "sampling": "sample",
+     "cohort": "high minus low drift",
+     "margin": 0.017206811457999353,
+     "ci": [
+      0.01348038699273713,
+      0.021027537692885928
+     ],
+     "p_mannwhitney": 4.668690914832197e-14
+    },
+    {
+     "alt": "Concatenation",
+     "level": "first_level",
+     "sampling": "full stratum",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.012469100255829856,
+     "rel_pct": 1.5172691975941273,
+     "ci": [
+      0.009807030396088273,
+      0.015380888726993579
+     ],
+     "p": 8.732830327078176e-14,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Concatenation",
+     "level": "first_level",
+     "sampling": "full stratum",
+     "cohort": "low drift",
+     "n_users": 19391,
+     "delta": -0.005697946899247437,
+     "rel_pct": -0.6990853560943456,
+     "ci": [
+      -0.006770638093893311,
+      -0.004599566010238709
+     ],
+     "p": 1.166536783640676e-17,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Concatenation",
+     "level": "first_level",
+     "sampling": "full stratum",
+     "cohort": "high minus low drift",
+     "margin": 0.018167047155077293,
+     "ci": [
+      0.015153217671687478,
+      0.021149946719052383
+     ],
+     "p_mannwhitney": 7.681378059232607e-24
+    }
+   ]
+  },
+  "second_level": {
+   "descriptive": {
+    "CAFREC": {
+     "all": [
+      0.8924497002902662,
+      0.0066107305762408775
+     ],
+     "high drift": [
+      0.9136251320720882,
+      0.002697418471123961
+     ],
+     "low drift": [
+      0.8898082462679106,
+      0.00878607483745429
+     ]
+    },
+    "Static scalar gate": {
+     "all": [
+      0.8988125311554144,
+      0.003116066841204121
+     ],
+     "high drift": [
+      0.9084056556072468,
+      0.003783889793590961
+     ],
+     "low drift": [
+      0.8980550613509292,
+      0.0031310365638248985
+     ]
+    },
+    "Concatenation": {
+     "all": [
+      0.8938272738117322,
+      0.008540105137312777
+     ],
+     "high drift": [
+      0.8991069508642227,
+      0.008430863413738101
+     ],
+     "low drift": [
+      0.8942051451915277,
+      0.009303542499130959
+     ]
+    },
+    "CAFREC-NP": {
+     "all": [
+      0.8903835018280741,
+      0.003177332035861177
+     ],
+     "high drift": [
+      0.9080627394407568,
+      0.0021798068570660924
+     ],
+     "low drift": [
+      0.8877044667884909,
+      0.004013938317627567
+     ]
+    }
+   },
+   "tests": [
+    {
+     "alt": "Static scalar gate",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "all",
+     "n_users": 22912,
+     "delta": -0.0063628308651483235,
+     "rel_pct": -0.707915237560047,
+     "ci": [
+      -0.007044690928183014,
+      -0.0056867659517721705
+     ],
+     "p": 1.7889456358752037e-69,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.005219476464841332,
+     "rel_pct": 0.5745755139923958,
+     "ci": [
+      0.003536084816417017,
+      0.006883618560259308
+     ],
+     "p": 1.4234511029815967e-10,
+     "seeds_cafrec_higher": 2
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "low drift",
+     "n_users": 3521,
+     "delta": -0.008246815083018536,
+     "rel_pct": -0.9182972668304982,
+     "ci": [
+      -0.009972177088700787,
+      -0.006538546235279175
+     ],
+     "p": 1.0542199534073807e-18,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "high minus low drift",
+     "margin": 0.013466291547859867,
+     "ci": [
+      0.010929081047841302,
+      0.015885953390361578
+     ],
+     "p_mannwhitney": 4.198684635129868e-26
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "second_level",
+     "sampling": "full stratum",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.005219476464841332,
+     "rel_pct": 0.5745755139923958,
+     "ci": [
+      0.003527879998832729,
+      0.006808250631513179
+     ],
+     "p": 1.4234511029815967e-10,
+     "seeds_cafrec_higher": 2
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "second_level",
+     "sampling": "full stratum",
+     "cohort": "low drift",
+     "n_users": 19391,
+     "delta": -0.008465935610076051,
+     "rel_pct": -0.943731231123472,
+     "ci": [
+      -0.009209760982351309,
+      -0.007704881931130526
+     ],
+     "p": 2.6926131945947745e-105,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "second_level",
+     "sampling": "full stratum",
+     "cohort": "high minus low drift",
+     "margin": 0.013685412074917382,
+     "ci": [
+      0.011896536307824276,
+      0.015500553401726274
+     ],
+     "p_mannwhitney": 1.422794347136183e-45
+    },
+    {
+     "alt": "Concatenation",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "all",
+     "n_users": 22912,
+     "delta": -0.0013775735214661316,
+     "rel_pct": -0.1541207749894966,
+     "ci": [
+      -0.0022938489574341543,
+      -0.00047268624146173477
+     ],
+     "p": 0.10928842406085885,
+     "seeds_cafrec_higher": 1
+    },
+    {
+     "alt": "Concatenation",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.014518181207865506,
+     "rel_pct": 1.6147335079448126,
+     "ci": [
+      0.012397519017734684,
+      0.01658214649765157
+     ],
+     "p": 9.543740660603144e-42,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Concatenation",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "low drift",
+     "n_users": 3521,
+     "delta": -0.004396898923617223,
+     "rel_pct": -0.4917103135964915,
+     "ci": [
+      -0.0066609337058334125,
+      -0.002082741581108786
+     ],
+     "p": 0.02825411338151477,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Concatenation",
+     "level": "second_level",
+     "sampling": "sample",
+     "cohort": "high minus low drift",
+     "margin": 0.018915080131482728,
+     "ci": [
+      0.015790862615325963,
+      0.022260457430852015
+     ],
+     "p_mannwhitney": 2.1424324301385276e-27
+    },
+    {
+     "alt": "Concatenation",
+     "level": "second_level",
+     "sampling": "full stratum",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.014518181207865506,
+     "rel_pct": 1.6147335079448126,
+     "ci": [
+      0.012376060439174084,
+      0.016664246494811182
+     ],
+     "p": 9.543740660603144e-42,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Concatenation",
+     "level": "second_level",
+     "sampling": "full stratum",
+     "cohort": "low drift",
+     "n_users": 19391,
+     "delta": -0.004263910090079236,
+     "rel_pct": -0.47755180487532195,
+     "ci": [
+      -0.005275967922976465,
+      -0.0032729482964364387
+     ],
+     "p": 6.699473598231116e-05,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Concatenation",
+     "level": "second_level",
+     "sampling": "full stratum",
+     "cohort": "high minus low drift",
+     "margin": 0.018782091297944743,
+     "ci": [
+      0.016545329398519597,
+      0.02112239248982532
+     ],
+     "p_mannwhitney": 1.1156415383832402e-41
+    }
+   ]
+  },
+  "kuairand_tag": {
+   "descriptive": {
+    "CAFREC": {
+     "all": [
+      0.7919787262130425,
+      0.002144886766031385
+     ],
+     "high drift": [
+      0.8099501907563081,
+      0.0018843957033692516
+     ],
+     "low drift": [
+      0.7906902790934337,
+      0.005007681356648419
+     ]
+    },
+    "Static scalar gate": {
+     "all": [
+      0.7928316164935212,
+      0.005105743363811926
+     ],
+     "high drift": [
+      0.804366603366728,
+      0.004795688345088005
+     ],
+     "low drift": [
+      0.7920492422412283,
+      0.005463939871126191
+     ]
+    },
+    "Concatenation": {
+     "all": [
+      0.800518063423497,
+      0.006530668415310941
+     ],
+     "high drift": [
+      0.8053360356893107,
+      0.008145318541001513
+     ],
+     "low drift": [
+      0.8011650149723261,
+      0.00696042647892241
+     ]
+    },
+    "CAFREC-NP": {
+     "all": [
+      0.7861686661072921,
+      0.004524386130558632
+     ],
+     "high drift": [
+      0.7965525091089422,
+      0.004340973467950034
+     ],
+     "low drift": [
+      0.7847371461938687,
+      0.004489789040453945
+     ]
+    }
+   },
+   "tests": [
+    {
+     "alt": "Static scalar gate",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "all",
+     "n_users": 22912,
+     "delta": -0.0008528902804785972,
+     "rel_pct": -0.10757521051578381,
+     "ci": [
+      -0.0017772136562230934,
+      5.006088778329734e-05
+     ],
+     "p": 0.005166856203681872,
+     "seeds_cafrec_higher": 2
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.00558358738958006,
+     "rel_pct": 0.6941595245513174,
+     "ci": [
+      0.003462645068622206,
+      0.007759915967509367
+     ],
+     "p": 0.0005438511556288973,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "low drift",
+     "n_users": 3521,
+     "delta": -0.0013589631477946586,
+     "rel_pct": -0.17157558840019319,
+     "ci": [
+      -0.003705797929125961,
+      0.0008779940708609775
+     ],
+     "p": 0.06550583412770841,
+     "seeds_cafrec_higher": 2
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "high minus low drift",
+     "margin": 0.006942550537374719,
+     "ci": [
+      0.0038722994598109207,
+      0.00998705033788463
+     ],
+     "p_mannwhitney": 0.0002111315045826376
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "kuairand_tag",
+     "sampling": "full stratum",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.00558358738958006,
+     "rel_pct": 0.6941595245513174,
+     "ci": [
+      0.0034751485140760894,
+      0.007938802718846765
+     ],
+     "p": 0.0005438511556288973,
+     "seeds_cafrec_higher": 3
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "kuairand_tag",
+     "sampling": "full stratum",
+     "cohort": "low drift",
+     "n_users": 19391,
+     "delta": -0.0020216199940713223,
+     "rel_pct": -0.25566272070094337,
+     "ci": [
+      -0.002971423507764438,
+      -0.0010087145918992498
+     ],
+     "p": 6.7306059387658894e-06,
+     "seeds_cafrec_higher": 1
+    },
+    {
+     "alt": "Static scalar gate",
+     "level": "kuairand_tag",
+     "sampling": "full stratum",
+     "cohort": "high minus low drift",
+     "margin": 0.0076052073836513825,
+     "ci": [
+      0.005414861253679889,
+      0.009903777917567974
+     ],
+     "p_mannwhitney": 9.973599439400806e-07
+    },
+    {
+     "alt": "Concatenation",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "all",
+     "n_users": 22912,
+     "delta": -0.008539337210454311,
+     "rel_pct": -1.0667263614183753,
+     "ci": [
+      -0.009632388577774625,
+      -0.007336092694573955
+     ],
+     "p": 2.563335564860868e-29,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Concatenation",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.004614155066997435,
+     "rel_pct": 0.5729477960151187,
+     "ci": [
+      0.001794135402688798,
+      0.007632886809489554
+     ],
+     "p": 0.014344012795664189,
+     "seeds_cafrec_higher": 1
+    },
+    {
+     "alt": "Concatenation",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "low drift",
+     "n_users": 3521,
+     "delta": -0.010474735878892529,
+     "rel_pct": -1.3074380037992983,
+     "ci": [
+      -0.013416245436551733,
+      -0.007673072373394169
+     ],
+     "p": 2.6143151198351045e-07,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Concatenation",
+     "level": "kuairand_tag",
+     "sampling": "sample",
+     "cohort": "high minus low drift",
+     "margin": 0.015088890945889964,
+     "ci": [
+      0.011227230111939891,
+      0.01913024526065447
+     ],
+     "p_mannwhitney": 1.0131801389915949e-07
+    },
+    {
+     "alt": "Concatenation",
+     "level": "kuairand_tag",
+     "sampling": "full stratum",
+     "cohort": "high drift",
+     "n_users": 3521,
+     "delta": 0.004614155066997435,
+     "rel_pct": 0.5729477960151187,
+     "ci": [
+      0.0016763455707314993,
+      0.007475095353600911
+     ],
+     "p": 0.014344012795664189,
+     "seeds_cafrec_higher": 1
+    },
+    {
+     "alt": "Concatenation",
+     "level": "kuairand_tag",
+     "sampling": "full stratum",
+     "cohort": "low drift",
+     "n_users": 19391,
+     "delta": -0.010927736277490958,
+     "rel_pct": -1.3665764928910096,
+     "ci": [
+      -0.012087280269222768,
+      -0.009672157589111854
+     ],
+     "p": 3.3916625432623512e-40,
+     "seeds_cafrec_higher": 0
+    },
+    {
+     "alt": "Concatenation",
+     "level": "kuairand_tag",
+     "sampling": "full stratum",
+     "cohort": "high minus low drift",
+     "margin": 0.015541891344488393,
+     "ci": [
+      0.012638163051285279,
+      0.018665524821337532
+     ],
+     "p_mannwhitney": 1.3333344023322824e-13
+    }
+   ]
+  }
+ }
+}

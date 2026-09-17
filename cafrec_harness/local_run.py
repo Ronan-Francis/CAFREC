@@ -46,11 +46,50 @@ QUEUES = {
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="no_profiler", seed=123, tag="noprof_local"),
     ],
     # 1-epoch smoke of each new ablation (a few minutes each)
+    # 2026-09-17: supervisor-review fixes. SASRec at batch 512 on the ablation seeds, so
+    # tab:res:coverage and tab:res:seqlen stop mixing batch sizes / seed sets. Every job
+    # pins train_batch_size=512 (the tier default is now 2048, see cafrec/tiers.py).
+    "sasrec512": [
+        dict(model="SASRec", dataset="kuairand_pure", seed=s, tag=f"bs512_L{L}",
+             train_batch_size=512, max_seq_len=L)
+        for L in (20, 10, 50) for s in (2020, 2021, 403092)
+    ],
+    # MostPop baseline (deterministic, so one seed). Reviewers expect a popularity floor.
+    "pop": [
+        dict(model="Pop", dataset="kuairand_pure", seed=2020, tag="pop", epochs=1),
+    ],
     "smoke": [
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="np_vector_gate", seed=42, tag="smoke_vec", epochs=1),
         dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="np_shuffled_ctx", seed=42, tag="smoke_shuf", epochs=1),
     ],
+    # 2026-09-17 content-bearing long-term profiles (build_content_profiles.py) vs a
+    # CAFREC-NP reference trained on this same device. Stage 1 = ablation seeds.
+    # `profile` names a cache in data/profiles/; run_queue resolves its path and dim.
+    "content_profiles": [
+        dict(model="CAFREC", dataset="kuairand_pure_ctx", seed=seed, train_batch_size=512, **cond)
+        for seed in (2020, 2021, 403092)
+        for cond in (dict(ablation="no_profiler", tag="np512"),
+                     dict(ablation=None, profile="cat_beyond", tag="catbeyond512"),
+                     dict(ablation=None, profile="cap_beyond", tag="capbeyond512"),
+                     dict(ablation=None, profile="cap_all", tag="capall512"))
+    ],
+    "content_smoke": [
+        dict(model="CAFREC", dataset="kuairand_pure_ctx", seed=2020, train_batch_size=512,
+             ablation=None, profile="cap_beyond", tag="smoke_capbeyond512", epochs=1),
+    ],
 }
+
+PROFILE_DIR = HERE.parent / "data" / "profiles"
+
+
+def resolve_profile(name, dataset="kuairand_pure_ctx"):
+    """Profile cache name -> (absolute path, profile_dim), read from the file name
+    `<dataset>.profiles.<name>.d<dim>.pt` written by build_content_profiles.py."""
+    hits = sorted(PROFILE_DIR.glob(f"{dataset}.profiles.{name}.d*.pt"))
+    if len(hits) != 1:
+        raise FileNotFoundError(f"expected one {name} cache in {PROFILE_DIR}, found {hits}")
+    dim = int(hits[0].name.rsplit(".d", 1)[1][:-len(".pt")])
+    return str(hits[0]), dim
 
 
 def _out_path(job):
@@ -58,7 +97,8 @@ def _out_path(job):
 
 
 def run_one(model, dataset, seed, ablation=None, tag=None, epochs=None,
-            dump_ranks=True, dump_topk=True):
+            train_batch_size=None, max_seq_len=None,
+            dump_ranks=True, dump_topk=True, llm_profile_path=None, profile_dim=None):
     from cafrec.runner import run_experiment
 
     overrides = {"seed": seed}
@@ -66,6 +106,16 @@ def run_one(model, dataset, seed, ablation=None, tag=None, epochs=None,
         overrides["ablation"] = ablation
     if epochs is not None:
         overrides["epochs"] = epochs
+    if train_batch_size is not None:
+        overrides["train_batch_size"] = train_batch_size
+    if max_seq_len is not None:
+        overrides["MAX_ITEM_LIST_LENGTH"] = max_seq_len
+    # CAFREC only: frozen profile cache instead of the learnable stand-in (as in
+    # modal_run.train); profile_dim must match the cache.
+    if llm_profile_path is not None:
+        overrides["llm_profile_path"] = llm_profile_path
+    if profile_dim is not None:
+        overrides["profile_dim"] = profile_dim
     t0 = time.time()
     metrics = run_experiment(model, dataset=dataset, config_overrides=overrides,
                              return_ranks=dump_ranks, dump_topk=dump_topk)
@@ -102,6 +152,10 @@ def run_queue(name):
             continue
         _log(log, f"[{i}/{len(jobs)}] START {job}")
         try:
+            job = dict(job)
+            profile = job.pop("profile", None)
+            if profile is not None:
+                job["llm_profile_path"], job["profile_dim"] = resolve_profile(profile, job["dataset"])
             m, out = run_one(**job)
             _log(log, f"[{i}/{len(jobs)}] DONE  {out.name}  test={m['test']}  "
                       f"wall={m['wall_seconds']}s")
@@ -126,11 +180,17 @@ if __name__ == "__main__":
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--tag")
     p.add_argument("--epochs", type=int)
+    p.add_argument("--train-batch-size", type=int)
+    p.add_argument("--max-seq-len", type=int)
+    p.add_argument("--llm-profile-path")
+    p.add_argument("--profile-dim", type=int)
     a = p.parse_args()
     if a.queue:
         run_queue(a.queue)
     else:
-        m, out = run_one(a.model, a.dataset, a.seed, a.ablation, a.tag, a.epochs)
+        m, out = run_one(a.model, a.dataset, a.seed, a.ablation, a.tag, a.epochs,
+                         a.train_batch_size, a.max_seq_len,
+                         llm_profile_path=a.llm_profile_path, profile_dim=a.profile_dim)
         print(out, m["test"], f"{m['wall_seconds']}s")
 
 
@@ -147,4 +207,11 @@ if __name__ == "__main__":
 # the same size as the ablation effects these queues are meant to measure.
 # So local ablations must be compared against local controls only; do not pair
 # them with results/modal/ rank dumps. Hence the "controls" queue above.
+#
+# CORRECTION 2026-09-17: the comparison above is confounded. The local runs used
+# base.yaml's train_batch_size=2048 (read back from the saved checkpoint config),
+# whereas noprof_ms_s42 ran at 512. Against Modal at the SAME batch
+# (bs2048_noprof seed 42: HR 0.0802, NDCG 0.0406, MRR 0.0288) the CPU run differs by
+# +1.9% / +1.2% / +0.7%, within seed-to-seed spread (sd ~0.0015 HR). CPU and GPU are
+# still not bitwise identical, so keep pairing within one device where possible.
 # ---------------------------------------------------------------------------

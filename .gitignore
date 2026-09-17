@@ -124,3 +124,6 @@ desktop.ini
 # Keep deliberately committed PDFs (e.g. submitted reports)
 !reports/**/*.pdf
 !dissertation/**/*.pdf
+# Thesis and paper drafts are never committed (author rule, 2026-09-17)
+Thesis/
+JournalPaper/

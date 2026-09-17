@@ -1,0 +1,87 @@
+ILD@10  2026-09-17 18:50:16  (analyze_ild.py)
+category vocabularies on Pure: first_level 38, second_level 154, kuairand_tag 46
+
+== ILD@10 by model (mean +- sd over seeds). nocat = share of top-10 slots whose item has no category at that level ==
+  model                  seeds   ILD first-level  nocat  ILD second-level  nocat           ILD tag  nocat     Coverage@10    HR@10
+  (check: vectorised ILD 0.809466 == diversity.intra_list_diversity 0.809466 on SASRec_kuairand_pure_bs512_sasrec_seed42_20260916-062609.json)
+  SASRec @512                7    0.8207+-0.0097  0.000    0.9024+-0.0071  0.197    0.7914+-0.0107  0.004  0.2277+-0.0249  0.0810
+  CAFREC-NP                  3    0.8092+-0.0035  0.000    0.8904+-0.0032  0.188    0.7862+-0.0045  0.004  0.2336+-0.0054  0.0799
+  CAFREC                     3    0.8132+-0.0076  0.000    0.8924+-0.0066  0.184    0.7920+-0.0021  0.004  0.2294+-0.0104  0.0791
+  Static scalar gate         3    0.8175+-0.0026  0.000    0.8988+-0.0031  0.199    0.7928+-0.0051  0.004  0.2007+-0.0013  0.0764
+  Concatenation              3    0.8161+-0.0085  0.000    0.8938+-0.0085  0.188    0.8005+-0.0065  0.004  0.1858+-0.0154  0.0722
+  CAFREC-H                   3    0.8254+-0.0011  0.000    0.9016+-0.0037  0.184    0.8013+-0.0067  0.003  0.2012+-0.0068  0.0829
+  HGN (BPR) @512             7    0.8087+-0.0719  0.000    0.8885+-0.0565  0.106    0.7796+-0.0662  0.000  0.0107+-0.0013  0.0235
+  HGN (CE) @512              7    0.8193+-0.0024  0.000    0.9011+-0.0009  0.170    0.7865+-0.0031  0.005  0.4219+-0.0491  0.0717
+  HGRU4Rec (BPR) @512        7    0.8776+-0.0131  0.000    0.9536+-0.0076  0.278    0.8395+-0.0228  0.001  0.0566+-0.0102  0.0554
+  HGRU4Rec (CE) @512         7    0.8504+-0.0039  0.000    0.9260+-0.0021  0.209    0.8064+-0.0085  0.003  0.1632+-0.0098  0.0668
+  MostPop                    1    0.9581          0.000    0.9915          0.078    0.8673          0.000  0.0039          0.0357
+
+== H4 (registered): ILD@10, context gate vs static fusion, 3 ablation seeds [2020, 2021, 403092] ==
+users 22,912; high drift 3,521, low drift 19,391; equal-size sample 3,521 per drift stratum (one sample, shared by all models and seeds); 'all' uses every user
+
+-- first_level (PRIMARY) --
+  descriptive ILD@10 (mean +- sd over seeds of the per-seed sample mean):
+    CAFREC              all 0.8132+-0.0076   high drift 0.8343+-0.0007   low drift 0.8104+-0.0108
+    Static scalar gate  all 0.8175+-0.0026   high drift 0.8275+-0.0040   low drift 0.8155+-0.0019
+    Concatenation       all 0.8161+-0.0085   high drift 0.8218+-0.0093   low drift 0.8152+-0.0089
+    CAFREC-NP           all 0.8092+-0.0035   high drift 0.8263+-0.0032   low drift 0.8050+-0.0044
+  CAFREC vs Static scalar gate  sample       all        n=22,912  d=-0.00435 (-0.53%) CI[-0.00525,-0.00350] p=1.47e-16  CAFREC higher in 2/3 seeds
+  CAFREC vs Static scalar gate  sample       high drift n= 3,521  d=+0.00679 (+0.82%) CI[+0.00464,+0.00898] p=3.15e-10  CAFREC higher in 3/3 seeds
+  CAFREC vs Static scalar gate  sample       low drift  n= 3,521  d=-0.00503 (-0.62%) CI[-0.00720,-0.00281] p=0.000136  CAFREC higher in 2/3 seeds
+  CAFREC vs Static scalar gate  sample       margin (high - low drift) +0.01182 CI[+0.00884,+0.01500] Mann-Whitney p=3.46e-12
+  CAFREC vs Static scalar gate  full stratum high drift n= 3,521  d=+0.00679 (+0.82%) CI[+0.00469,+0.00887] p=3.15e-10  CAFREC higher in 3/3 seeds
+  CAFREC vs Static scalar gate  full stratum low drift  n=19,391  d=-0.00637 (-0.78%) CI[-0.00729,-0.00540] p=1.4e-31  CAFREC higher in 1/3 seeds
+  CAFREC vs Static scalar gate  full stratum margin (high - low drift) +0.01316 CI[+0.01075,+0.01534] Mann-Whitney p=3.17e-24
+  CAFREC vs Concatenation       sample       all        n=22,912  d=-0.00291 (-0.36%) CI[-0.00392,-0.00181] p=9.24e-07  CAFREC higher in 1/3 seeds
+  CAFREC vs Concatenation       sample       high drift n= 3,521  d=+0.01247 (+1.52%) CI[+0.00964,+0.01516] p=8.73e-14  CAFREC higher in 3/3 seeds
+  CAFREC vs Concatenation       sample       low drift  n= 3,521  d=-0.00474 (-0.58%) CI[-0.00732,-0.00206] p=0.001  CAFREC higher in 0/3 seeds
+  CAFREC vs Concatenation       sample       margin (high - low drift) +0.01721 CI[+0.01348,+0.02103] Mann-Whitney p=4.67e-14
+  CAFREC vs Concatenation       full stratum high drift n= 3,521  d=+0.01247 (+1.52%) CI[+0.00981,+0.01538] p=8.73e-14  CAFREC higher in 3/3 seeds
+  CAFREC vs Concatenation       full stratum low drift  n=19,391  d=-0.00570 (-0.70%) CI[-0.00677,-0.00460] p=1.17e-17  CAFREC higher in 0/3 seeds
+  CAFREC vs Concatenation       full stratum margin (high - low drift) +0.01817 CI[+0.01515,+0.02115] Mann-Whitney p=7.68e-24
+
+-- second_level (sensitivity) --
+  descriptive ILD@10 (mean +- sd over seeds of the per-seed sample mean):
+    CAFREC              all 0.8924+-0.0066   high drift 0.9136+-0.0027   low drift 0.8898+-0.0088
+    Static scalar gate  all 0.8988+-0.0031   high drift 0.9084+-0.0038   low drift 0.8981+-0.0031
+    Concatenation       all 0.8938+-0.0085   high drift 0.8991+-0.0084   low drift 0.8942+-0.0093
+    CAFREC-NP           all 0.8904+-0.0032   high drift 0.9081+-0.0022   low drift 0.8877+-0.0040
+  CAFREC vs Static scalar gate  sample       all        n=22,912  d=-0.00636 (-0.71%) CI[-0.00704,-0.00569] p=1.79e-69  CAFREC higher in 0/3 seeds
+  CAFREC vs Static scalar gate  sample       high drift n= 3,521  d=+0.00522 (+0.57%) CI[+0.00354,+0.00688] p=1.42e-10  CAFREC higher in 2/3 seeds
+  CAFREC vs Static scalar gate  sample       low drift  n= 3,521  d=-0.00825 (-0.92%) CI[-0.00997,-0.00654] p=1.05e-18  CAFREC higher in 0/3 seeds
+  CAFREC vs Static scalar gate  sample       margin (high - low drift) +0.01347 CI[+0.01093,+0.01589] Mann-Whitney p=4.2e-26
+  CAFREC vs Static scalar gate  full stratum high drift n= 3,521  d=+0.00522 (+0.57%) CI[+0.00353,+0.00681] p=1.42e-10  CAFREC higher in 2/3 seeds
+  CAFREC vs Static scalar gate  full stratum low drift  n=19,391  d=-0.00847 (-0.94%) CI[-0.00921,-0.00770] p=2.69e-105  CAFREC higher in 0/3 seeds
+  CAFREC vs Static scalar gate  full stratum margin (high - low drift) +0.01369 CI[+0.01190,+0.01550] Mann-Whitney p=1.42e-45
+  CAFREC vs Concatenation       sample       all        n=22,912  d=-0.00138 (-0.15%) CI[-0.00229,-0.00047] p=0.109  CAFREC higher in 1/3 seeds
+  CAFREC vs Concatenation       sample       high drift n= 3,521  d=+0.01452 (+1.61%) CI[+0.01240,+0.01658] p=9.54e-42  CAFREC higher in 3/3 seeds
+  CAFREC vs Concatenation       sample       low drift  n= 3,521  d=-0.00440 (-0.49%) CI[-0.00666,-0.00208] p=0.0283  CAFREC higher in 0/3 seeds
+  CAFREC vs Concatenation       sample       margin (high - low drift) +0.01892 CI[+0.01579,+0.02226] Mann-Whitney p=2.14e-27
+  CAFREC vs Concatenation       full stratum high drift n= 3,521  d=+0.01452 (+1.61%) CI[+0.01238,+0.01666] p=9.54e-42  CAFREC higher in 3/3 seeds
+  CAFREC vs Concatenation       full stratum low drift  n=19,391  d=-0.00426 (-0.48%) CI[-0.00528,-0.00327] p=6.7e-05  CAFREC higher in 0/3 seeds
+  CAFREC vs Concatenation       full stratum margin (high - low drift) +0.01878 CI[+0.01655,+0.02112] Mann-Whitney p=1.12e-41
+
+-- kuairand_tag (sensitivity) --
+  descriptive ILD@10 (mean +- sd over seeds of the per-seed sample mean):
+    CAFREC              all 0.7920+-0.0021   high drift 0.8100+-0.0019   low drift 0.7907+-0.0050
+    Static scalar gate  all 0.7928+-0.0051   high drift 0.8044+-0.0048   low drift 0.7920+-0.0055
+    Concatenation       all 0.8005+-0.0065   high drift 0.8053+-0.0081   low drift 0.8012+-0.0070
+    CAFREC-NP           all 0.7862+-0.0045   high drift 0.7966+-0.0043   low drift 0.7847+-0.0045
+  CAFREC vs Static scalar gate  sample       all        n=22,912  d=-0.00085 (-0.11%) CI[-0.00178,+0.00005] p=0.00517  CAFREC higher in 2/3 seeds
+  CAFREC vs Static scalar gate  sample       high drift n= 3,521  d=+0.00558 (+0.69%) CI[+0.00346,+0.00776] p=0.000544  CAFREC higher in 3/3 seeds
+  CAFREC vs Static scalar gate  sample       low drift  n= 3,521  d=-0.00136 (-0.17%) CI[-0.00371,+0.00088] p=0.0655  CAFREC higher in 2/3 seeds
+  CAFREC vs Static scalar gate  sample       margin (high - low drift) +0.00694 CI[+0.00387,+0.00999] Mann-Whitney p=0.000211
+  CAFREC vs Static scalar gate  full stratum high drift n= 3,521  d=+0.00558 (+0.69%) CI[+0.00348,+0.00794] p=0.000544  CAFREC higher in 3/3 seeds
+  CAFREC vs Static scalar gate  full stratum low drift  n=19,391  d=-0.00202 (-0.26%) CI[-0.00297,-0.00101] p=6.73e-06  CAFREC higher in 1/3 seeds
+  CAFREC vs Static scalar gate  full stratum margin (high - low drift) +0.00761 CI[+0.00541,+0.00990] Mann-Whitney p=9.97e-07
+  CAFREC vs Concatenation       sample       all        n=22,912  d=-0.00854 (-1.07%) CI[-0.00963,-0.00734] p=2.56e-29  CAFREC higher in 0/3 seeds
+  CAFREC vs Concatenation       sample       high drift n= 3,521  d=+0.00461 (+0.57%) CI[+0.00179,+0.00763] p=0.0143  CAFREC higher in 1/3 seeds
+  CAFREC vs Concatenation       sample       low drift  n= 3,521  d=-0.01047 (-1.31%) CI[-0.01342,-0.00767] p=2.61e-07  CAFREC higher in 0/3 seeds
+  CAFREC vs Concatenation       sample       margin (high - low drift) +0.01509 CI[+0.01123,+0.01913] Mann-Whitney p=1.01e-07
+  CAFREC vs Concatenation       full stratum high drift n= 3,521  d=+0.00461 (+0.57%) CI[+0.00168,+0.00748] p=0.0143  CAFREC higher in 1/3 seeds
+  CAFREC vs Concatenation       full stratum low drift  n=19,391  d=-0.01093 (-1.37%) CI[-0.01209,-0.00967] p=3.39e-40  CAFREC higher in 0/3 seeds
+  CAFREC vs Concatenation       full stratum margin (high - low drift) +0.01554 CI[+0.01264,+0.01867] Mann-Whitney p=1.33e-13
+
+ILD for all 174 result JSONs with top-k lists -> ild_all_runs_2026-09-17.csv
+
+wall 188s

@@ -969,6 +969,114 @@ dominates. 1K single-seed (budget floor). EMPIRICAL PHASE DONE.
 ------------------------------------------------------------
 
 ------------------------------------------------------------
+Cycle 11 — RON-31 GRID SEARCH: the untuned-baseline hole, closed
+Date   : 2026-09-10
+Author : R. Francis
+------------------------------------------------------------
+
+Reversed the Cycle 8 "grid search abandoned" position. The recorded reason
+(budget exhausted at the Cycle 7-8 boundary) was STALE: the Modal bill was paid
+2026-08-14 and ~$5-6 was subsequently spent on 10-seed + 1K work. The honest
+framing is that budget was spent on POWER and GENERALISATION instead of tuning
+-- a prioritisation, not a blocker. With the headline margin at only +0.00254
+NDCG, an untuned SASRec was the softest target on the board.
+
+RAN: full factorial, 2 levels, seed 403092, mode:full. SASRec 64/64 configs,
+CAFREC-logfull 52/64. run_gridsearch.py -> gridsearch_ron31.csv. Then each
+model's VALIDATION-best config re-run over the same 10 seeds as the defaults
+study (run_tuned_confirm.py -> tuned_confirm.csv). analysis_gridsearch_ron31.md.
+
+VALIDATION: config [000] == current defaults for each model, and both reproduce
+  the published numbers (SASRec 0.0400 vs 0.0396-7; logfull 0.0422 vs 0.0422).
+  Environment has not drifted.
+
+RESULT -- THE CLAIM SURVIVES, THE MARGIN SHRINKS:
+  * Tuned 10-seed: SASRec 0.04509 (sd 0.00076), logfull 0.04680 (sd 0.00077).
+  * logfull - SASRec: +0.00171 (+3.79%), WINS 10/10, Wilcoxon p=1.95e-3
+    (n=10 floor), t-test p=4.24e-4. Direction, consistency, significance intact
+    after an EQUAL 64-config search for each -> not a tuning artefact.
+  * BUT the margin falls from +0.00254 (+6.4%) to +0.00171 (+3.79%), -33% rel.
+    Tuning lifted SASRec MORE (+0.00539) than CAFREC (+0.00460). Part of the old
+    margin was a well-suited default meeting a poorly-suited one. Report +3.79%.
+  * ONE PARAMETER DOMINATES: dropout 0.5 -> 0.2, in every top config for BOTH
+    models. RecBole's 0.5 default costs ~12% NDCG on Pure. Every accuracy number
+    currently in the results chapter was produced at 0.5 and is ~12% low.
+
+COST -- OVERRUN, HALTED (record this honestly):
+  Sweep estimated at $9.68-19.36 (GPU-only at ~$1.10/hr). ACTUAL burn hit ~$40
+  before it was stopped at 116/176 runs. Cause: modal_run.train reserves cpu=8.0
+  and memory=65536 MiB -- sized for the 27k million-item catalogue -- and Modal
+  bills reserved CPU+MEMORY ON TOP of GPU. Real billed container time was ~7
+  min/run, not the ~3 min training figure. ~4x under-estimate.
+  FIX: added modal_run.train_pure (cpu=4.0, memory=16384) for Pure-tier work;
+  `train` untouched so the 1k/27k paths keep the reservations they need. The
+  18-leg confirmation ran on train_pure for ~$3-5.
+  HGRU4Rec + HGN were NOT tuned (sweep halted). They stay at defaults and must
+  be labelled as such -- an asymmetry to state, not hide. Neither is competitive,
+  so H1 is unaffected.
+
+THESIS EDITS REQUIRED:
+  * 04_methodology.tex sec:hparam is now FALSE ("could not be executed"). Rewrite
+    around what was run, the halt, and its reason.
+  * Same paragraph cites risk R4; the compute risk is R1. R4 is "baselines fail
+    to reproduce" -- which this sweep actually retires. Fix the cross-reference.
+  * Headline -> +3.79%; report defaults as the untuned comparison.
+  * RON-52: drop "no hyperparameter tuning"; add the partial-sweep asymmetry.
+  * RON-31 -> Done (partial, documented). RON-32 stays Cancelled: its intent is
+    covered by the profiler capacity ladder + histgate variant bake-off.
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 11 (cont.) — RON-61 FUSION FORM: null result (honest)
+Date   : 2026-09-10
+------------------------------------------------------------
+
+Ran the pre-scaffolded RON-61 fusion-form family (never previously executed;
+fusion_form.csv was header-only). Added a HYBRID mode this session:
+lambda_u = sigmoid(f(x_ctx) + b_u) -- context head + free per-user offset --
+alongside the existing convex / additive / per_user modes. 3 arms x 10 seeds =
+30 legs on train_pure, 0 failures, ~$2. run_fusion_form.py +
+analysis_fusion_form.md.
+
+    z = z_short + g * (z_long - (1 - lambda) * z_short)
+    lambda 0 -> convex (incumbent)   lambda 1 -> additive
+
+RESULT -- NO significant gain over the incumbent:
+  convex 0.04680 | additive 0.04642 | per_user 0.04652 | hybrid 0.04718
+  * hybrid vs convex: +0.00038, 7/10, p=0.235 -> NOT SIGNIFICANT. Nominally the
+    best config to date but statistically TIED. Do NOT adopt it: +65 params and
+    a more complex fusion equation cannot be defended on a null.
+  * additive vs convex: -0.00038 -> the zero-sum property of convex fusion was
+    hypothesised to be a handicap. REFUTED: removing it COSTS accuracy. The
+    subtraction acts as a useful constraint.
+  * per_user vs convex: -0.00028, 4/10 -> free personalisation of the FORM fails.
+  * hybrid vs additive: +0.00076, 8/10, p=0.0195 -> conditioning helps WITHIN
+    the additive family; it just does not beat plain convex.
+  * hybrid vs SASRec tuned: +0.00209 (+4.64%), 10/10, p=1.95e-3 -- but convex
+    already gives +3.79% at 10/10, so no form change is needed for the headline.
+
+MECHANISM (seed 2020 lambda export):
+  * per_user lambda NEVER LEFT INIT: 0.497 +- 0.024 over 22,913 users
+    (sigmoid(0)=0.5). No features -> no gradient signal -> null by construction.
+  * hybrid context head DID learn: bias -0.919, weights inter_session_gap -0.895,
+    is_first_session +0.822, policy_flag -0.767, session_len_log +0.717.
+  * logfull_history weight ~= -0.057 (near zero). DIRECT NEGATIVE ANSWER to the
+    motivating hypothesis: the sparse/dense axis behind the H2 failure does NOT
+    determine fusion FORM. H2 is a MAGNITUDE problem (logfull already fixes it),
+    not a FORM problem.
+  * Caveat: for hybrid the persisted per-user lambda is the BIAS component only;
+    realised lambda also carries the per-request context term.
+  * Asymmetry worth noting: the two AUXILIARY recency features RON-40 found
+    contribute nothing to the GATE dominate the fusion-form head.
+
+VERDICT: incumbent convex fusion stands. Report RON-61 in discussion/future work
+as a tested-and-rejected design alternative with a mechanistic explanation.
+EMPIRICAL PHASE CLOSED (again). Remaining work is WRITING: 06_design,
+07_evaluation, 08_conclusion, 01_abstract are still ATU template stubs, and the
+sec:hparam + R4->R1 fixes from the RON-31 entry are outstanding.
+------------------------------------------------------------
+
+------------------------------------------------------------
 Cycle 10 Working Record — GATE CONTROLS (np_vector_gate / np_shuffled_ctx)
 Date   : 2026-09-16
 Block  : 3 — Evaluation
@@ -1101,4 +1209,330 @@ NEXT
   4. Re-check whether the ff_* / tuned configs were genuinely tuned, once (2) lands.
   5. Point modal_run.py::main at train_pure for Pure-tier work.
   6. Retrospective log entry for the 08-26 and 09-10 batches (see LOG GAP).
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 11 (cont.) — MATCHED-BATCH DIVERSITY: the coverage advantage was the batch size
+Date   : 2026-09-16
+Block  : 3 — Evaluation
+Author : R. Francis
+------------------------------------------------------------
+
+TRIGGER: abstract TODO(compute) "add ILD result to the coverage sentence".
+The coverage sentence (CAFREC ~+22% catalogue coverage vs SASRec) rested on
+analysis_pure_diversity.md, whose SASRec arm trained at batch 2048 and CAFREC
+arms at 512 -- the same dataset-name batch-size branch that invalidated the H1
+accuracy headline (Cycle 10 GATE CONTROLS entry). No same-batch multi-seed
+top-k dump existed for either arm (the 08-26 ms corpus has ranks only).
+
+RAN (Modal A10G, train_pure, NOT local CPU): 2 models {SASRec, CAFREC-NP} x
+2 train_batch_size {512, 2048} x 7 seeds (42/77/123/256/512/1024/2048) = 28
+legs, 0 failures, dump_ranks + dump_topk, eval_batch_size pinned to 4096 and
+train_batch_size passed explicitly. 1 metering leg (509 s) then 27 in parallel
+(776 s wall). ~$5-9 of the $20.22 ceiling (client wall summed 4.6 h incl.
+queueing; check dashboard). run_diversity_matched.py -> diversity_matched.csv;
+results/diversity_matched.py -> analysis_diversity_matched.md.
+REPRODUCIBILITY: SASRec@2048 and NP@512 reproduce the 08-26 ms and 09-16
+gpu_noprof numbers seed-for-seed (SASRec s42 HR .0818/NDCG .0411; NP s42
+.0820/.0419), so these pair with the existing corpus.
+
+RESULT (7-seed means):
+                    ILD@10   Cov@10   HR@10   NDCG@10
+  SASRec    @512    0.7914   0.2277   0.0810  0.0411
+  CAFREC-NP @512    0.7894   0.2268   0.0811  0.0413
+  SASRec    @2048   0.7892   0.1944   0.0786  0.0397
+  CAFREC-NP @2048   0.7937   0.1941   0.0788  0.0399
+  * MATCHED batch, NP - SASRec: coverage -0.4% (3/7, p=1.0) at 512 and -0.1%
+    (4/7, p=0.69) at 2048. ILD -0.2% (p=0.94) / +0.6% (6/7, p=0.11). HR/NDCG
+    +0.1..0.7%, 3-4/7, p>0.4. EVERYTHING TIED.
+  * WITHIN model, 2048 -> 512: coverage +14.5% for BOTH models (t p=0.015),
+    HR +2.9% / NDCG +3.3% (Wilcoxon p=0.016, 7/7).
+  * The old confounded pairing (NP@512 vs SASRec@2048) reproduces exactly:
+    Cov +16.7% 7/7 p=0.016, HR +3.1% 7/7, NDCG +4.1% 7/7.
+  => The coverage advantage was ENTIRELY the batch size. ILD is tied (~0.79).
+
+THESIS CONSEQUENCES:
+  * Abstract coverage sentence: REWRITE. Replacement text in
+    analysis_diversity_matched.md ("Sentence for the abstract").
+  * analysis_pure_diversity.md's ablation rows (concat .186, static_gate .201,
+    noprof .234, all @512) remain valid INTERNAL comparisons, but the reference
+    changes: SASRec@512 is ~.228, so gated fusion does not ADD coverage over
+    SASRec; concat/static_gate LOSE coverage that both SASRec and the gated
+    model retain. Rewrite that paragraph wherever cited (07_evaluation).
+  * Unaffected: H2 (profile null), H3 fusion ablations, cohort analysis --
+    all same-batch internal comparisons, as the 09-16 banner already states.
+  * Batch 512 is the better operating point for BOTH models on Pure; if one
+    defaults table is reported, put both arms at 512 and say so.
+  * Cycle 11 tuned confirm (+3.79%) ALSO ran SASRec on kuairand_pure and
+    CAFREC on _ctx through the same branch, and batch size was not a grid
+    factor -> the tuned headline needs the same matched-batch treatment
+    before it is cited.
+
+ARTIFACTS
+  results/modal/{SASRec_kuairand_pure,CAFREC_kuairand_pure_ctx}_div_b{512,2048}_seed*_20260916-*.json
+  cafrec_harness/run_diversity_matched.py, results/diversity_matched.{py,csv}
+  results/analysis_diversity_matched.md
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 11 (cont.) — MATCHED-BATCH RE-TEST OF EVERY CLAIM: tuned win survives, defaults win is batch-512-only
+Date   : 2026-09-16
+Block  : 3 — Evaluation
+Author : R. Francis
+------------------------------------------------------------
+
+CODE FIRST (free): runner.py now persists the RESOLVED config (train/eval
+batch, lr, wd, dropout, layers, ablation, history_gate_mode, profile path...)
+in every result JSON, so the 512-vs-2048 confound can never be invisible on
+disk again. modal_run.py's batch branch is keyed on the "kuairand_pure" name
+PREFIX (was `!= "kuairand_pure"`, which _ctx failed). rerun / run_tuned_confirm
+/ run_fusion_form / run_gridsearch now pass their HISTORICAL batch sizes
+explicitly so re-running them reproduces what they did.
+
+RAN (Modal A10G, train_pure, NOT local CPU): run_matched_queue.py, 44 legs,
+0 failures (3 canary, then 41 in parallel, 2399 s wall). ~$0.30/leg -> ~$13;
+confirm on dashboard. With the morning's 28 (run_diversity_matched.py) that
+is one same-day corpus, batch explicit everywhere:
+  A  SASRec @512 seeds 2020/2021/403092 (+topk)           -> SASRec@512 x10
+  B  SASRec TUNED @512 x10                                 -> matched tuned pair
+  C  logfull TUNED @2048 x10                               -> reverse arm
+  D  logfull @512 x7 (+topk), logfull @2048 x10 (+topk)    -> diversity + 2x2
+  E  np_shuffled_ctx @512 seeds 256/512/1024/2048 (+topk)  -> 7-seed control
+results/matched_queue.py -> analysis_matched_queue.md (full tables + abstract
+sentences).
+
+RESULTS (NDCG@10, across-seed paired, n=10 unless noted):
+  DEFAULTS logfull - SASRec:
+    @512   +4.05%  9/10  Wilcoxon p=0.0039   per-user: higher 6/10, lower 0/10
+    @2048  +0.55%  7/10  p=0.63 (NULL)       per-user: higher 2/10, lower 1/10
+    confounded (512 vs 2048): +6.68% 10/10 p=0.002  <- the Cycle 10 headline
+    batch 2048-512: SASRec -2.5% (p=0.004), logfull -5.7% (p=0.002)
+    => SURVIVES AT 512 ONLY. Half the published margin was batch size. The
+       profiler is more batch-sensitive than SASRec.
+    decomposition (n=7): gate alone (NP - SASRec) +0.5..0.7%, p>0.6 at both
+    batches = FREE BUT NULL; profiler on top (logfull - NP) +2.6% 6/7 p=0.028
+    at 512, +0.4% p=0.58 at 2048. The 512 win is the PROFILE, not the gate.
+  TUNED logfull_t - SASRec_t (RON-31 configs, aggregate only):
+    @512   +2.90%  9/10  p=0.0076
+    @2048  +2.04%  9/10  p=0.0039
+    confounded: +3.79% 10/10 p=0.002  <- the Cycle 11 headline
+    batch 2048-512: SASRec_t -0.9% (n.s.), logfull_t -1.7% (p=0.049)
+    => SURVIVES AT BOTH BATCH SIZES. Margin +2.0..2.9%, not +3.79%. Tuning
+       (dropout 0.2) removes most batch sensitivity. THIS IS THE CLAIM TO LEAD
+       WITH: equal search, 10 seeds, matched batch, significant both ways.
+  DIVERSITY logfull vs SASRec (n=7, matched):
+    ILD@10  +1.5% 6/7 p=0.047 (@512), +1.1% 7/7 p=0.016 (@2048)
+    Cov@10  -3.8% 1/7 p=0.11  (@512), -2.9% 1/7 p=0.031 (@2048)
+    => small ILD-for-coverage trade. ILD, previously "non-discriminative", is
+       now the diversity metric that separates the profiler from SASRec, in
+       the MORE-diverse direction. Neither "+22% coverage" nor "equal coverage"
+       is right for logfull (the morning's "equal" holds for NP only).
+  GATE CONTROL np_shuffled_ctx vs NP @512 (n=7):
+    -1.5% 2/7 p=0.16; per-user lower 3/7, higher 0/7; diversity identical.
+    => 7 seeds do not change the 3-seed verdict: destroying the gate input
+       costs ~1.5%, directionally consistent, not significant across seeds.
+       RQ3: the gate is cheap, harmless, reads context weakly, and is not
+       where the accuracy comes from.
+
+THESIS CONSEQUENCES (supersede the morning's list where they overlap):
+  * Abstract/H1: lead with the TUNED matched-batch result (+2.0..2.9%, 9/10,
+    p<0.01 at both batch sizes). Report defaults as +4.0% at 512 with the
+    batch dependence stated. Drop every 10/10 and every +6.4/+6.7/+3.79%.
+  * Attribute the gain to the history-gated PROFILE; state the context gate's
+    isolated effect as null (RQ3 honest negative, shuffled_ctx supports it).
+  * Coverage sentence -> ILD-for-coverage trade sentence (text in
+    analysis_matched_queue.md). analysis_pure_diversity.md's SASRec-vs-CAFREC
+    coverage paragraph is withdrawn; its within-CAFREC ablation rows stand.
+  * The 09-16 abstract banner's "gate effect +0.2..0.7%, not significant" is
+    confirmed here (NP - SASRec), but that banner framed the thesis around
+    the GATE; the surviving result is the PROFILE. Reframe accordingly.
+  * Operating point: batch 512 for every model in every reported table.
+  * H2 (profile null) was tested on ctx-vs-ctx (same batch) and is unaffected
+    as a cohort result, but note logfull - NP is now significant at 512.
+
+ARTIFACTS
+  cafrec_harness/run_matched_queue.py, results/matched_queue.{py,csv}
+  results/analysis_matched_queue.md
+  results/modal/*_div_b{512,2048}_*, *_tuned_SASRec_b512_*,
+  *_tuned_logfull_b2048_*, *_gpu_shuffled_ctx_seed{256,512,1024,2048}_*
+  cafrec/runner.py (config persisted), modal_run.py (prefix fix),
+  run_tuned_confirm.py / run_fusion_form.py / run_gridsearch.py (explicit batch)
+------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 12 — CONTENT-BEARING PROFILES, ILD COMPUTED, REGISTERED-WORDING PAPER PASS
+Date   : 2026-09-17 (18:10-23:00 local; Stage 1 queue continues overnight)
+Author : R. Francis
+Machine: labBL6O0K (lab VM, 4-core Xeon 8272CL, no CUDA), conda env `recbole`
+------------------------------------------------------------
+
+Two jobs this cycle: (A) compute intra-list diversity, unmeasured since the plan
+registered it; (B) build content-bearing long-term profiles and test them against
+a CAFREC-NP reference trained on the same device. Modal is at its $100 limit until
+2026-10-01, so every run here is CPU. Per author decision (2026-09-17), the 7-seed
+extension waits for that reset rather than spending ~19 h of CPU.
+
+DATA AUDIT  audit_content_data.py -> results/content_data_audit_2026-09-17.{txt,json}
+  Two new files arrived: data/kuairand_video_categories.csv (3.69 GB) and
+  kuairand_video_captions.csv (3.22 GB). Both key on `final_video_id` over
+  32,038,725 videos (the 27K id space); KuaiRand-Pure ids are the same ids.
+  Coverage of the 7,210 items in kuairand_pure.inter: 99.83% have a first-level
+  category (38 categories), 85.46% a second-level (154), 98.90% a non-empty
+  caption. Captions are Chinese (99.9% contain CJK; median 36 chars).
+
+  ALIGNMENT (matching ids do not prove matching videos):
+    * caption-file `duration` == video_features_basic_pure.video_duration for
+      100.00% of the 6,918 videos with both; 0.00% under an id+1 shift; the raw
+      Pure logs' duration_ms agrees 100% too.
+    * co-consumption lift, consecutive same-user clicks <=30 min, distinct items
+      (201,597 pairs): first level 1.89 vs permuted null 0.985 +- 0.018 (z~51);
+      second level 2.33 vs 0.965 +- 0.026; id+1 shift 0.99 == null.
+    * KuaiRand `tag` (which DOES exist on this machine, contrary to the brief)
+      agrees with the first-level category for 77.87% of videos vs 7.06% permuted,
+      and gives a weaker lift (1.58), so the categories file is the better source.
+  VERDICT: aligned. 33 Pure caption rows have caption text split across the
+  caption/show_cover_text/duration fields in the file itself; the builder rejoins
+  the non-numeric text fields in file order.
+
+JOB A — ILD  analyze_ild.py -> results/ild_2026-09-17.{txt,json},
+             results/ild_all_runs_2026-09-17.csv (174 Pure runs with top-k dumps)
+  Primary: one-hot first-level category. Sensitivity: second level and multi-hot
+  `tag`. Vectorised ILD verified equal to cafrec.eval.diversity.intra_list_diversity
+  (0.809466 on SASRec bs512 seed 42). At first level <=0.03% of recommended slots
+  hold a video with no category, so the zero-row convention is immaterial.
+
+  ILD@10 (mean +- sd over seeds)        Coverage@10      HR@10
+    SASRec @512   (7)  0.8207 +- 0.0097   0.228          0.0810
+    CAFREC-NP     (3)  0.8092 +- 0.0035   0.234          0.0799
+    CAFREC        (3)  0.8132 +- 0.0076   0.229          0.0791
+    Static gate   (3)  0.8175 +- 0.0026   0.201          0.0764
+    Concatenation (3)  0.8161 +- 0.0085   0.186          0.0722
+    CAFREC-H      (3)  0.8254 +- 0.0011   0.201          0.0829
+    HGN (CE)      (7)  0.8193 +- 0.0024   0.422          0.0717
+    HGRU4Rec (CE) (7)  0.8504 +- 0.0039   0.163          0.0668
+    HGN (BPR)     (7)  0.8087 +- 0.0719   0.011          0.0235
+    HGRU4Rec(BPR) (7)  0.8776 +- 0.0131   0.057          0.0554
+    MostPop       (1)  0.9581             0.004          0.0357
+
+  H4 AS REGISTERED (higher ILD *and* coverage vs static fusion, largest gains on
+  high-drift sessions; 3 ablation seeds, equal-size samples of 3,521 per stratum):
+    * Coverage: context gate > static gate and > concatenation, overall and in
+      both drift strata (1,654 items vs 1,447 and 1,340).
+    * ILD overall: context gate BELOW both (-0.53% vs static, -0.36% vs concat;
+      same sign in only 1-2 of 3 seeds).
+    * ILD high drift: ABOVE both, 3/3 seeds (+0.82% vs static, CI [+0.0046,
+      +0.0090]; +1.52% vs concat, CI [+0.0096, +0.0152]); below both on low drift.
+    * high-minus-low margin +0.0118 and +0.0172, both CIs exclude zero. Second
+      level and `tag` reproduce the pattern.
+    VERDICT: H4 PARTLY SUPPORTED. Coverage as predicted; ILD only in the stratum
+    H4 named. Caveat: seed sd (0.001-0.011) is the size of the model differences.
+  NOTE: ILD and coverage rank models differently. MostPop recommends 28 distinct
+  videos and has the highest ILD measured, because a few popular videos still span
+  categories. Report both; neither substitutes for the other.
+
+JOB B — CONTENT PROFILES  build_content_profiles.py -> data/profiles/*.pt + .json
+  Beyond-window = after dropping each user's valid/test rows, also drop the 20
+  rows before them (the rows SASRec attends over at test time); <=22 rows -> zero.
+    cat_beyond  d=38    L1 category histogram, beyond-window   11,123 users (48.5%)
+    cap_beyond  d=1024  L2-normalised mean caption embedding   11,118 users (48.5%)
+    cap_all     d=1024  same over ALL training rows            22,912 users (100%)
+  Encoder BAAI/bge-large-zh-v1.5 (Chinese captions), 7,131 captions embedded once
+  in 536 s on CPU. By cohort, the beyond-window profiles are non-zero for 88.5% of
+  dense users (the 11.5% gap is the 1,444 dense users with 20-22 rows) and for NO
+  sparse or Q1/Q2 user, which is why cap_all exists: it is the only one that can
+  test H2 in the lowest quartile.
+
+  VALIDATION (all passed before training):
+    * RecBole internal user id == order of first appearance in the .inter file for
+      22,912/22,912 users.
+    * 320 users recomputed from the raw file in plain Python: 0 mismatches; all 451
+      users with exactly 22 rows get a zero cat_beyond vector.
+    * RecBole stores timestamps as float32 (~65 s resolution at KuaiRand epochs), so
+      near-simultaneous rows tie and fall back to file order. The file is already
+      time-ordered within each user, and RecBole's order matches the stable sort for
+      every user (0 differences in valid/test item, training sequence, beyond set),
+      so no profile can contain a held-out row.
+    * Smoke run (1 epoch, cap_beyond, seed 2020): profile loads at d=1024 and the
+      saved checkpoint's user_profile.weight is bit-identical to the cache, i.e. it
+      stayed frozen; JSON records batch 512 and top-10 lists for all 22,912 users.
+
+STAGE 1 RUNS  local_run.py --queue content_profiles -> results/local/ (CPU, batch 512)
+  12 jobs = {no_profiler, cat_beyond, cap_beyond, cap_all} x seeds {2020, 2021,
+  403092}. ~41 min/run. 4/12 done at 22:25; the rest finish ~04:00 (detached
+  process, survives session end).
+
+  PRELIMINARY, SEED 2020 ONLY -- do not quote:
+    np512        HR@10 0.0806  NDCG@10 0.0406
+    catbeyond512       0.0782          0.0397
+    capbeyond512       0.0792          0.0407
+    capall512          0.0613          0.0291   <- large drop, stopped early
+  Local CAFREC-NP (0.0806) vs the Modal ablation-seed reference (0.0799) is the
+  expected CPU/GPU gap; that is why these runs pair only with each other.
+
+PAPER  JournalPaper/ (untracked; pre-edit copy at JournalPaper_pre-edit_2026-09-17/)
+  MiKTeX installed on this machine (winget, user scope). Build: 19 pages, no
+  undefined references except sec:res:content (the pending profile section), no
+  overfull boxes. Baseline before edits was 16 pages.
+  * H1-H4 now stated and tested AS REGISTERED in Project_Plan_2. This changes two
+    outcomes: H3 -> partly supported (wins every stratum vs concatenation with the
+    predicted drift ordering; vs the static gate only in aggregate after Holm) and
+    H4 -> partly supported. H4 no longer "fails because accuracy did not improve";
+    the registered wording has no accuracy condition.
+  * New: Deviations From the Registered Plan (protocol, seeds, tuning, hypothesis
+    wording, profile, category data, unexecuted analyses); session-position table
+    for H1; H3 per-stratum table; ILD column + MostPop row in tab:res:coverage;
+    H4 coverage/ILD-by-drift table; content-profile description in Section III;
+    three ablation rows marked with the post-hoc dagger.
+  * Whole-paper style pass: 96 American spellings -> British/Irish, we/our removed
+    except in two paragraphs pending Stage 1, em-dashes cut to the one-per-section
+    rule in every finished section.
+
+COST
+  No Modal spend (limit until 2026-10-01). ~5.5 h CPU so far tonight, ~6 h more
+  queued overnight. Disk: 15 GB free after MiKTeX + the bge encoder download.
+
+ARTIFACTS
+  cafrec_harness/audit_content_data.py, analyze_ild.py, analyze_content_profiles.py,
+  build_content_profiles.py, local_run.py (llm_profile_path/profile_dim + queues
+  content_profiles, content_smoke)
+  results/content_data_audit_2026-09-17.{txt,json}, results/ild_2026-09-17.{txt,json},
+  results/ild_all_runs_2026-09-17.csv, results/local/*512_seed*.json (4 of 12 so far)
+  data/profiles/kuairand_pure_ctx.profiles.{cat_beyond.d38,cap_beyond.d1024,
+  cap_all.d1024}.pt + sidecar .json; data/content_pure/ (Pure subsets, caption
+  embeddings, per-user row counts)
+
+NEXT — PLAN TO THE 2026-10-19 DEADLINE
+  Week of 09-18 (no new compute; ~1-2 h)
+    1. Stage 1 finishes ~04:00. Run analyze_content_profiles.py: dense cohort first
+       (Holm over 3 profiles x HR/NDCG), then Q1 NDCG (cap_all vs CAFREC-NP, and the
+       cross-device stand-in comparison, indicative only), all users, session
+       position, coverage and ILD.
+    2. Paper Phase 2: new Section V profile-results subsection (resolves the
+       sec:res:content reference), H2 row and profile paragraphs in the discussion,
+       introduction outcome sentence and contribution bullet, abstract (<=250 words)
+       and conclusion. Rebuild; report page count.
+    3. AUTHOR ITEMS (blocking, small): provenance/citation for the two category and
+       caption CSVs (04_experimental_setup.tex TODO(cite)); replace or drop
+       wang2023continual; verify the CA-GGNN characterisation; harness repository
+       URL; decide on supervisor co-authorship.
+  Week of 09-22
+    4. Optional: fold results/gate_export_20260917.txt into Section V-D, or state
+       why it is not reported (the paper currently says attribution is not reported).
+    5. Full proofread against the writing rules; check every number against a file.
+  2026-10-01 (Modal credits reset)
+    6. Upload the three profile caches to the cafrec-data volume; run Stage 2:
+       4 conditions x 7 headline seeds = 28 GPU runs (~$15-20 at ~$0.60/job).
+    7. Same batch: SASRec @512 reruns (local_run.py --queue sasrec512, 9 runs) to
+       remove the last batch-size mismatch (tab:res:seqlen's SASRec column at 2048)
+       and add its coverage/ILD row. Label the device in the caption.
+  Week of 10-05
+    8. Fold Stage 2 into the profile tables; move the content-profile claims from
+       3 seeds to 7; update H2/H4 rows, abstract and conclusion; rerun analyze_ild
+       for the new runs; rebuild.
+  Week of 10-12
+    9. Final proof, page count, figure and table placement, reference check.
+   10. Buffer. Submission 2026-10-19.
+  NOT PLANNED unless the author asks: no_policy_flag ablation, tuned comparison,
+  fresh temporal split for CAFREC-H, KuaiRand-1K k-core replication, fusion-form
+  block. Each is a paper TODO with its reason recorded.
 ------------------------------------------------------------
