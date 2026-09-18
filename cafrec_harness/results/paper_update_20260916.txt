@@ -1,0 +1,10 @@
+cohorts: sparse 10,345  dense 12,567   (paper: 10,345 / 12,567)
+
+=== Cohort means (7 seeds)  sparse HR, NDCG | dense HR, NDCG ===
+  SASRec @2048   0.1031  0.0526  0.0585  0.0291
+  SASRec @512    0.1059  0.0541  0.0604  0.0303
+  CAFREC-NP      0.1058  0.0549  0.0617  0.0307
+  CAFREC         0.1048  0.0542  0.0614  0.0311
+  CAFREC-H       0.1076  0.0554  0.0626  0.0315
+
+=== Overall paired tests vs SASRec @512 (7 seeds) ===

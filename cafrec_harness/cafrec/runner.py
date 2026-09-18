@@ -34,6 +34,36 @@ from cafrec.registry import get_spec
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BASE_CONFIG = REPO_ROOT / "configs" / "base.yaml"
 
+# Hyperparameters persisted into every result as `config`, read back from the
+# RESOLVED RecBole config (base.yaml < model spec < overrides), not the overrides.
+# Without this the H1 batch-size confound was invisible in the JSONs (PROJECT_LOG,
+# Cycle 10 cont.). Keys a model does not use resolve to None.
+RESOLVED_CONFIG_KEYS = (
+    "train_batch_size", "eval_batch_size", "epochs", "stopping_step",
+    "learning_rate", "weight_decay", "loss_type", "train_neg_sample_args",
+    "MAX_ITEM_LIST_LENGTH", "embedding_size", "hidden_size", "inner_size",
+    "n_layers", "num_layers", "n_heads", "hidden_dropout_prob",
+    "attn_dropout_prob", "dropout_prob", "valid_metric", "eval_args",
+    # CAFREC-specific
+    "ablation", "fusion_mode", "profile_dim", "llm_profile_path",
+    "context_fields", "n_context_features", "history_gate", "history_gate_mode",
+)
+
+
+def _resolved_config(config):
+    """JSON-safe snapshot of RESOLVED_CONFIG_KEYS from a RecBole Config."""
+    import json
+
+    out = {}
+    for k in RESOLVED_CONFIG_KEYS:
+        v = config[k]
+        try:
+            json.dumps(v)
+        except TypeError:
+            v = str(v)
+        out[k] = v
+    return out
+
 
 def _resolve_model_class(spec, config):
     """Built-in name -> get_model(); custom class -> use directly."""
@@ -116,6 +146,7 @@ def run_experiment(key, dataset="ml-100k", config_overrides=None,
         "n_params": sum(p.numel() for p in model.parameters()),
         "timestamp": time.strftime("%Y%m%d-%H%M%S"),
         "split_sizes": split_sizes,
+        "config": _resolved_config(config),
         "valid_best": dict(best_valid_result),
         "test": dict(test_result),
     }

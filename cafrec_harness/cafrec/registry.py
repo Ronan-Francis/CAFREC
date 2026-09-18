@@ -48,6 +48,8 @@ def _build_registry():
         # --- Baselines (resolved by RecBole name) ---------------------------
         "SASRec": ModelSpec(model="SASRec", contract=CE),   # strong sequential anchor
         "HGN":    ModelSpec(model="HGN",    contract=BPR),  # long+short via gating
+        # MostPop floor (2026-09-17). Non-personalised; one training pass counts items.
+        "Pop":    ModelSpec(model="Pop",    contract=CE),
         # "SHAN":  ModelSpec(model="SHAN",  contract=BPR),  # uncomment to add a 3rd
 
         # --- RNN baseline (custom class; not a RecBole built-in) -------------
