@@ -1,0 +1,1184 @@
+{
+ "seeds": [
+  2020,
+  2021,
+  403092
+ ],
+ "profile_coverage": {
+  "cat_beyond": {
+   "all": 0.4854661312849162,
+   "sparse (<20)": 0.0,
+   "dense (>=20)": 0.8850958860507678,
+   "Q1 activity": 0.0,
+   "Q2 activity": 0.0,
+   "Q3 activity": 1.0,
+   "Q4 activity": 1.0,
+   "short session": 0.4739589965618235,
+   "longer session": 0.5105467665834027
+  },
+  "cap_beyond": {
+   "all": 0.48524790502793297,
+   "sparse (<20)": 0.0,
+   "dense (>=20)": 0.8846980186201957,
+   "Q1 activity": 0.0,
+   "Q2 activity": 0.0,
+   "Q3 activity": 0.9990812201396545,
+   "Q4 activity": 1.0,
+   "short session": 0.4737679867566535,
+   "longer session": 0.5102692200943658
+  },
+  "cap_all": {
+   "all": 1.0,
+   "sparse (<20)": 1.0,
+   "dense (>=20)": 1.0,
+   "Q1 activity": 1.0,
+   "Q2 activity": 1.0,
+   "Q3 activity": 1.0,
+   "Q4 activity": 1.0,
+   "short session": 1.0,
+   "longer session": 1.0
+  }
+ },
+ "diversity": {
+  "CAFREC-NP (local)": {
+   "coverage": [
+    0.23582986592695332,
+    0.008831296405935093
+   ],
+   "ild_first_level": [
+    0.8108337124188741,
+    0.01159315337384431
+   ],
+   "ild_second_level": [
+    0.8926663001378378,
+    0.014267033793264562
+   ],
+   "ild_kuairand_tag": [
+    0.7848140597343445,
+    0.0069492448262122326
+   ]
+  },
+  "cat_beyond": {
+   "coverage": [
+    0.2287563569116967,
+    0.006841723803489938
+   ],
+   "ild_first_level": [
+    0.8239719470342001,
+    0.004604395895798708
+   ],
+   "ild_second_level": [
+    0.9062732458114624,
+    0.005040307306915293
+   ],
+   "ild_kuairand_tag": [
+    0.7966768542925516,
+    0.0076186345498890085
+   ]
+  },
+  "cap_beyond": {
+   "coverage": [
+    0.24863615349052245,
+    0.025122150883436205
+   ],
+   "ild_first_level": [
+    0.8269837498664856,
+    0.014264801849135068
+   ],
+   "ild_second_level": [
+    0.9079372684160868,
+    0.010836649963399227
+   ],
+   "ild_kuairand_tag": [
+    0.8014894922574362,
+    0.008151894126446482
+   ]
+  },
+  "cap_all": {
+   "coverage": [
+    0.2527970411465557,
+    0.0014435963935271372
+   ],
+   "ild_first_level": [
+    0.7593514124552408,
+    0.005572715460209076
+   ],
+   "ild_second_level": [
+    0.8690451780954996,
+    0.003786307879507923
+   ],
+   "ild_kuairand_tag": [
+    0.7353395223617554,
+    0.0045582116625179385
+   ]
+  }
+ },
+ "diagnostics": {
+  "profile_similarity": {
+   "cat_beyond": {
+    "pairwise_cos_mean": 0.402622252702713,
+    "pairwise_cos_p5": 0.0,
+    "pairwise_cos_p95": 0.8073007464408875,
+    "cos_to_mean_profile": 0.634435772895813
+   },
+   "cap_beyond": {
+    "pairwise_cos_mean": 0.810558557510376,
+    "pairwise_cos_p5": 0.5495210886001587,
+    "pairwise_cos_p95": 0.9425248503684998,
+    "cos_to_mean_profile": 0.9008720517158508
+   },
+   "cap_all": {
+    "pairwise_cos_mean": 0.8490472435951233,
+    "pairwise_cos_p5": 0.6998186111450195,
+    "pairwise_cos_p95": 0.9461809992790222,
+    "cos_to_mean_profile": 0.921639621257782
+   }
+  },
+  "best_epoch": {
+   "CAFREC-NP (local)": {
+    "2020": 8,
+    "2021": 9,
+    "403092": 9
+   },
+   "cat_beyond": {
+    "2020": 8,
+    "2021": 8,
+    "403092": 9
+   },
+   "cap_beyond": {
+    "2020": 7,
+    "2021": 9,
+    "403092": 8
+   },
+   "cap_all": {
+    "2020": 3,
+    "2021": 3,
+    "403092": 3
+   }
+  }
+ },
+ "sections": [
+  {
+   "title": "1. PRIMARY: dense cohort (>= 20 rows), profile vs CAFREC-NP (local); Holm over 3 profiles x HR/NDCG",
+   "rows": [
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.0023076310973183735,
+     "rel_pct": -3.7727666955767565,
+     "ci": [
+      -0.004456115222407893,
+      -0.00015848385984456987
+     ],
+     "p": 0.06523963431044592,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "dense (>=20)",
+     "p_holm": 0.13047926862089185
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.0010566791544660973,
+     "rel_pct": -3.4740751351854886,
+     "ci": [
+      -0.0020938167795859506,
+      -0.0001029123840396964
+     ],
+     "p": 0.06781844306602737,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "dense (>=20)",
+     "p_holm": 0.13047926862089185
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "mrr@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.0006755325845005162,
+     "rel_pct": -3.1786990512935436,
+     "ci": [
+      -0.0015481666416157544,
+      0.00022831827752453225
+     ],
+     "p": 0.05972526368667541,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "dense (>=20)"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.003978674305721333,
+     "rel_pct": -6.5047701647875105,
+     "ci": [
+      -0.006897031908967932,
+      -0.0010875043102304975
+     ],
+     "p": 0.00844318038351444,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "dense (>=20)",
+     "p_holm": 0.03377272153405776
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.0017573790591567833,
+     "rel_pct": -5.77778682082266,
+     "ci": [
+      -0.003291102175563398,
+      -0.00028578166606276585
+     ],
+     "p": 0.014351516878459758,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "dense (>=20)",
+     "p_holm": 0.043054550635379274
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "mrr@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.001090619885877306,
+     "rel_pct": -5.131880350558301,
+     "ci": [
+      -0.00236934528282901,
+      0.00012074776552177664
+     ],
+     "p": 0.028075962958722597,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "dense (>=20)"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.011803400440306623,
+     "rel_pct": -19.29748482220295,
+     "ci": [
+      -0.015172011352484019,
+      -0.008673509986472507
+     ],
+     "p": 1.2130065550394e-10,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "dense (>=20)",
+     "p_holm": 6.065032775197e-10
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.006795586770406201,
+     "rel_pct": -22.34205049686262,
+     "ci": [
+      -0.008478653560119441,
+      -0.005097275018649778
+     ],
+     "p": 1.5996383648536616e-12,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "dense (>=20)",
+     "p_holm": 9.59783018912197e-12
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "mrr@10",
+     "n_users": 12567,
+     "seeds": 3,
+     "delta": -0.005298352155199453,
+     "rel_pct": -24.93124292680027,
+     "ci": [
+      -0.006879615998986175,
+      -0.003817966387991056
+     ],
+     "p": 5.338906124058397e-11,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "dense (>=20)"
+    }
+   ]
+  },
+  {
+   "title": "2a. Lowest activity quartile (<= 12 rows), NDCG@10, vs CAFREC-NP (local, same device)",
+   "rows": [
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": -0.01828945953701793,
+     "rel_pct": -30.762520728964812,
+     "ci": [
+      -0.02194899085630948,
+      -0.014487802403236555
+     ],
+     "p": 1.9624237067378658e-19,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": -0.001193500399216586,
+     "rel_pct": -2.007444817962857,
+     "ci": [
+      -0.0028693125667710313,
+      0.00039702888041781814
+     ],
+     "p": 0.0401522336736696,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": 0.0024067626989383163,
+     "rel_pct": 4.0481287741683065,
+     "ci": [
+      0.00030284010534461326,
+      0.004510353479249908
+     ],
+     "p": 0.022343393429601014,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    }
+   ]
+  },
+  {
+   "title": "2b. H2 INDICATIVE, cross-device: cap_all (local CPU) vs trainable stand-in (Modal GPU); the Modal-vs-Modal rows are same-device references for the frozen profiles",
+   "rows": [
+    {
+     "a": "cap_all",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": -0.010581867657768711,
+     "rel_pct": -20.449587831304296,
+     "ci": [
+      -0.013983921706588421,
+      -0.006933197847492822
+     ],
+     "p": 2.9087896588443717e-08,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "CAFREC-NP (Modal)",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": 0.008045012665251162,
+     "rel_pct": 15.547084732365585,
+     "ci": [
+      0.005440993042024443,
+      0.01074867461645781
+     ],
+     "p": 8.023388204549336e-09,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "CAFREC template (Modal)",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": 0.00550541445032937,
+     "rel_pct": 10.639280322797159,
+     "ci": [
+      0.0026809514931518045,
+      0.008340859963734362
+     ],
+     "p": 0.0006199343934533268,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "Hashing (Modal)",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": 0.006520634145656778,
+     "rel_pct": 12.601204720181414,
+     "ci": [
+      0.003773012899272341,
+      0.009229729336756812
+     ],
+     "p": 2.6331529472849088e-05,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "CAFREC template (Modal)",
+     "b": "CAFREC-NP (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": -0.0025395982149217927,
+     "rel_pct": -4.247449791516648,
+     "ci": [
+      -0.004062849318965979,
+      -0.0008833978005057515
+     ],
+     "p": 0.003770211529315161,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "cap_all",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.004885278841426501,
+     "rel_pct": -13.935361077396427,
+     "ci": [
+      -0.006307000975687206,
+      -0.0034471631336442953
+     ],
+     "p": 2.85987909634779e-12,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "CAFREC-NP (Modal)",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": 0.005579763785692768,
+     "rel_pct": 15.916394049168417,
+     "ci": [
+      0.00441285791467003,
+      0.006832868886915355
+     ],
+     "p": 2.402283943500022e-13,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "CAFREC template (Modal)",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": 0.005416522258268754,
+     "rel_pct": 15.450744144358662,
+     "ci": [
+      0.004187010387011704,
+      0.006719904960747762
+     ],
+     "p": 6.491434748191139e-11,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "Hashing (Modal)",
+     "b": "Stand-in (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": 0.00566564499382696,
+     "rel_pct": 16.161372009272643,
+     "ci": [
+      0.00440057729777659,
+      0.006974332590439892
+     ],
+     "p": 2.8608229388533833e-13,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "CAFREC template (Modal)",
+     "b": "CAFREC-NP (Modal)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.00016324152742401603,
+     "rel_pct": -0.40171186192372615,
+     "ci": [
+      -0.0009012771710477157,
+      0.0005558272498323044
+     ],
+     "p": 0.7671946570593904,
+     "sig": 0,
+     "sign": 2,
+     "cohort": "all"
+    }
+   ]
+  },
+  {
+   "title": "3. All users",
+   "rows": [
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.003011522346368715,
+     "rel_pct": -3.7116729424421733,
+     "ci": [
+      -0.0046558571927374295,
+      -0.0014257448789571697
+     ],
+     "p": 0.002084566223479158,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.0011889371404184043,
+     "rel_pct": -2.900709485609921,
+     "ci": [
+      -0.001967628675578414,
+      -0.0004078660290640146
+     ],
+     "p": 0.0010600604185769056,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "mrr@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.0006475315723744494,
+     "rel_pct": -2.23302347101541,
+     "ci": [
+      -0.001354785118724321,
+      6.859925068723895e-05
+     ],
+     "p": 0.003955581110142843,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.000902001862197393,
+     "rel_pct": -1.1117088040164964,
+     "ci": [
+      -0.0030271618947858474,
+      0.001251527583798881
+     ],
+     "p": 0.5631417963891583,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -2.0697255709996162e-05,
+     "rel_pct": -0.05049613131183047,
+     "ci": [
+      -0.00113582966170273,
+      0.0010864543358910022
+     ],
+     "p": 0.7364760181431587,
+     "sig": 0,
+     "sign": 1,
+     "cohort": "all"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "mrr@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": 0.00022690912181135643,
+     "rel_pct": 0.78249990642811,
+     "ci": [
+      -0.0007413050692227543,
+      0.0011949788389808895
+     ],
+     "p": 0.4833847929095593,
+     "sig": 0,
+     "sign": 2,
+     "cohort": "all"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.018156424581005588,
+     "rel_pct": -22.37762237762238,
+     "ci": [
+      -0.021211955889199254,
+      -0.015406410032588457
+     ],
+     "p": 1.1968999976562736e-31,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.010816375596187212,
+     "rel_pct": -26.38925324575068,
+     "ci": [
+      -0.012455827372272237,
+      -0.0092571867985958
+     ],
+     "p": 1.9982268597333847e-36,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "all"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "mrr@10",
+     "n_users": 22912,
+     "seeds": 3,
+     "delta": -0.008623314461957967,
+     "rel_pct": -29.737644329662924,
+     "ci": [
+      -0.009957841054155214,
+      -0.007230699417462905
+     ],
+     "p": 3.819905097976637e-33,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "all"
+    }
+   ]
+  },
+  {
+   "title": "4. Session opener (short session, prefix length 0) vs within-session (longer session)",
+   "rows": [
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 15706,
+     "seeds": 3,
+     "delta": -0.0031622734411477565,
+     "rel_pct": -4.21976777116964,
+     "ci": [
+      -0.005220934674646632,
+      -0.0011885054543911032
+     ],
+     "p": 0.00518592508116802,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "short session"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 15706,
+     "seeds": 3,
+     "delta": -0.0013559856687440199,
+     "rel_pct": -3.8043442295354057,
+     "ci": [
+      -0.0022867431484617745,
+      -0.0004565186990584934
+     ],
+     "p": 0.0016894799773858901,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "short session"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 7206,
+     "seeds": 3,
+     "delta": -0.0026829493940234987,
+     "rel_pct": -2.834799608993157,
+     "ci": [
+      -0.005552086224442594,
+      0.00041631973355537075
+     ],
+     "p": 0.1691955164664123,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "longer session"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 7206,
+     "seeds": 3,
+     "delta": -0.0008248427488166666,
+     "rel_pct": -1.5670395751655297,
+     "ci": [
+      -0.002329304609581367,
+      0.000696130737956036
+     ],
+     "p": 0.2104973287540144,
+     "sig": 0,
+     "sign": 2,
+     "cohort": "longer session"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 15706,
+     "seeds": 3,
+     "delta": -0.0008489324674222169,
+     "rel_pct": -1.1328235627301053,
+     "ci": [
+      -0.0033532832463177556,
+      0.001825204804957765
+     ],
+     "p": 0.6874967530581327,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "short session"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 15706,
+     "seeds": 3,
+     "delta": 4.794879696337802e-05,
+     "rel_pct": 0.13452482075990702,
+     "ci": [
+      -0.0012847552450786272,
+      0.001362507679252529
+     ],
+     "p": 0.7949693463150256,
+     "sig": 0,
+     "sign": 1,
+     "cohort": "short session"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 7206,
+     "seeds": 3,
+     "delta": -0.001017670459802017,
+     "rel_pct": -1.0752688172043012,
+     "ci": [
+      -0.005088352299010084,
+      0.003006753631233232
+     ],
+     "p": 0.6729666338237139,
+     "sig": 0,
+     "sign": 2,
+     "cohort": "longer session"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 7206,
+     "seeds": 3,
+     "delta": -0.00017031630973275615,
+     "rel_pct": -0.32356761095404835,
+     "ci": [
+      -0.0022331730708842605,
+      0.0020012966781240583
+     ],
+     "p": 0.8426450849339816,
+     "sig": 0,
+     "sign": 2,
+     "cohort": "longer session"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 15706,
+     "seeds": 3,
+     "delta": -0.014198395517636572,
+     "rel_pct": -18.946474086661002,
+     "ci": [
+      -0.017466785517212105,
+      -0.010823358376841126
+     ],
+     "p": 3.6153083269031094e-14,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "short session"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 15706,
+     "seeds": 3,
+     "delta": -0.007065718231060536,
+     "rel_pct": -19.823531324454354,
+     "ci": [
+      -0.008751415551606039,
+      -0.005383742834277434
+     ],
+     "p": 2.860679746625874e-16,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "short session"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "hit@10",
+     "n_users": 7206,
+     "seeds": 3,
+     "delta": -0.02678323619206217,
+     "rel_pct": -28.299120234604107,
+     "ci": [
+      -0.032381580164677584,
+      -0.02118604866315108
+     ],
+     "p": 4.198078331622379e-21,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "longer session"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 7206,
+     "seeds": 3,
+     "delta": -0.018991205540217125,
+     "rel_pct": -36.07956874727608,
+     "ci": [
+      -0.022314601258828577,
+      -0.01577712967366038
+     ],
+     "p": 6.656880576628548e-24,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "longer session"
+    }
+   ]
+  },
+  {
+   "title": "Supplementary: NDCG@10 by sparse cohort and activity quartile, vs CAFREC-NP (local)",
+   "rows": [
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 10345,
+     "seeds": 3,
+     "delta": -0.0013496027865723566,
+     "rel_pct": -2.5071494583833673,
+     "ci": [
+      -0.002588869206795416,
+      -0.00011209978574200827
+     ],
+     "p": 0.006289345712824169,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "sparse (<20)"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": -0.001193500399216586,
+     "rel_pct": -2.007444817962857,
+     "ci": [
+      -0.0028004756484420667,
+      0.000395516443815808
+     ],
+     "p": 0.0401522336736696,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5549,
+     "seeds": 3,
+     "delta": -0.0011225710093943587,
+     "rel_pct": -2.4617323545881074,
+     "ci": [
+      -0.0028852488053490925,
+      0.0005740675713771356
+     ],
+     "p": 0.08576020873645107,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "Q2 activity"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5442,
+     "seeds": 3,
+     "delta": -0.002066325495493426,
+     "rel_pct": -6.210846118344707,
+     "ci": [
+      -0.0038161492086280714,
+      -0.0004409110558629187
+     ],
+     "p": 0.04844395547162016,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "Q3 activity"
+    },
+    {
+     "a": "cat_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5681,
+     "seeds": 3,
+     "delta": -0.00040827238031164556,
+     "rel_pct": -1.7305179753221367,
+     "ci": [
+      -0.0016799873315583268,
+      0.0007598152401963315
+     ],
+     "p": 0.6019772342037624,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "Q4 activity"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 10345,
+     "seeds": 3,
+     "delta": 0.0020890060042141967,
+     "rel_pct": 3.880734631059113,
+     "ci": [
+      0.0004202003015422798,
+      0.0037246641740790844
+     ],
+     "p": 0.003262414422169893,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "sparse (<20)"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": 0.0024067626989383163,
+     "rel_pct": 4.0481287741683065,
+     "ci": [
+      0.00024456959143315547,
+      0.004477096448208714
+     ],
+     "p": 0.022343393429601014,
+     "sig": 2,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5549,
+     "seeds": 3,
+     "delta": 0.0012046704479300612,
+     "rel_pct": 2.6417716059543936,
+     "ci": [
+      -0.0011284410165207902,
+      0.0034752548933327113
+     ],
+     "p": 0.22113226617391735,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "Q2 activity"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5442,
+     "seeds": 3,
+     "delta": -0.0020984141472387033,
+     "rel_pct": -6.307296401017852,
+     "ci": [
+      -0.004712434837671971,
+      0.00043874380513479
+     ],
+     "p": 0.06923517108769098,
+     "sig": 0,
+     "sign": 3,
+     "cohort": "Q3 activity"
+    },
+    {
+     "a": "cap_beyond",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5681,
+     "seeds": 3,
+     "delta": -0.0018936034660259472,
+     "rel_pct": -8.026295664646339,
+     "ci": [
+      -0.003717839443464918,
+      -0.00017687765098069302
+     ],
+     "p": 0.09661979948256277,
+     "sig": 1,
+     "sign": 3,
+     "cohort": "Q4 activity"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 10345,
+     "seeds": 3,
+     "delta": -0.0157007886627498,
+     "rel_pct": -29.16726623837215,
+     "ci": [
+      -0.01844994893516212,
+      -0.012948242358425845
+     ],
+     "p": 9.309136970905925e-26,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "sparse (<20)"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 6240,
+     "seeds": 3,
+     "delta": -0.01828945953701793,
+     "rel_pct": -30.762520728964812,
+     "ci": [
+      -0.022134898692770737,
+      -0.014562437494063182
+     ],
+     "p": 1.9624237067378658e-19,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q1 activity"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5549,
+     "seeds": 3,
+     "delta": -0.011683923255513779,
+     "rel_pct": -25.62215812266568,
+     "ci": [
+      -0.015388239611025659,
+      -0.008416238393758385
+     ],
+     "p": 6.638415120275467e-10,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q2 activity"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5442,
+     "seeds": 3,
+     "delta": -0.007058086772107089,
+     "rel_pct": -21.21480421506075,
+     "ci": [
+      -0.009849155043716504,
+      -0.004200336721703757
+     ],
+     "p": 6.070114069485282e-06,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q3 activity"
+    },
+    {
+     "a": "cap_all",
+     "b": "CAFREC-NP (local)",
+     "metric": "ndcg@10",
+     "n_users": 5681,
+     "seeds": 3,
+     "delta": -0.005360741381833616,
+     "rel_pct": -22.722230965599536,
+     "ci": [
+      -0.007716754277682245,
+      -0.0031987044934152983
+     ],
+     "p": 4.20082215327559e-06,
+     "sig": 3,
+     "sign": 3,
+     "cohort": "Q4 activity"
+    }
+   ]
+  }
+ ]
+}

@@ -1536,3 +1536,75 @@ NEXT — PLAN TO THE 2026-10-19 DEADLINE
   fresh temporal split for CAFREC-H, KuaiRand-1K k-core replication, fusion-form
   block. Each is a paper TODO with its reason recorded.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 12 (cont.) — STAGE 1 COMPLETE: NO CONTENT PROFILE HELPS DENSE USERS; PAPER FILLED
+Date   : 2026-09-18
+Author : R. Francis
+Machine: labBL6O0K (CPU)
+------------------------------------------------------------
+
+INCIDENT
+  The lab VM was stopped at 23:32 on 2026-09-17 by Azure Lab Services (wvchelper, "Stop
+  call", System event 1074) about 15 min after the RDP session disconnected. Job 6 was
+  killed mid-run. Relaunched 10:26; the queue skipped the 5 finished jobs and completed all
+  12 by 14:46, no failures. On this VM, keep RDP connected for long CPU runs.
+
+RESULTS  analyze_content_profiles.py --seeds 2020,2021,403092
+         -> results/content_profiles_2026-09-18.{txt,json}
+  All 12 runs: batch 512, 10 epochs max, L=20, device local-cpu, paired only with the
+  CPU-trained CAFREC-NP reference (np512).
+
+  PRIMARY: dense cohort (>=20 rows, n=12,567), Holm over 3 profiles x HR/NDCG
+                 HR@10                      NDCG@10                     seeds
+    cat_beyond   -3.8%  p_Holm 0.13         -3.5%  p_Holm 0.13          sign 3/3
+    cap_beyond   -6.5%  p_Holm 0.034        -5.8%  p_Holm 0.043         sign 3/3
+    cap_all     -19.3%  p_Holm 6.1e-10     -22.3%  p_Holm 9.6e-12       sig 3/3
+  -> No content-bearing profile helps dense users; both caption profiles hurt significantly.
+
+  All users, NDCG@10: cat_beyond -2.9% (p=1.1e-3), cap_beyond -0.1% (p=0.74),
+    cap_all -26.4% (p=2e-36). cap_all loses more within sessions (-36.1%) than for
+    openers (-19.8%).
+
+  H2 AS REGISTERED (lowest quartile, <=12 clicks, n=6,240, NDCG@10). No profile is
+  LLM-generated, so H2 cannot be tested as worded. Nearest tests:
+    template (Modal) vs stand-in (Modal)      +10.6%  (p_Holm 0.0019, H2 family)
+    hashing  (Modal) vs stand-in (Modal)      +12.6%  (same device, 3 seeds)
+    CAFREC-NP (Modal) vs stand-in (Modal)     +15.5%  -> the stand-in is the weakest condition
+    template vs CAFREC-NP, 7 seeds            -3.0%   (p_Holm 0.048)
+    cap_all vs CAFREC-NP (local, same device) -30.8%
+    cap_all (CPU) vs stand-in (GPU)           -20.4%  cross-device, indicative only
+  VERDICT: H2 not supported. (cap_beyond +4.0% in Q1 comes from users whose profile is a
+  zero vector, so not from their own content.)
+
+  DIAGNOSTICS (why the caption profiles fail)
+    mean pairwise cosine between users: cap_all 0.849, cap_beyond 0.811, cat_beyond 0.403
+    mean cosine to the average profile: cap_all 0.922, cap_beyond 0.901, cat_beyond 0.634
+    best validation epoch (0-9): cap_all 3/3/3 in every seed; NP 8/9/9; cat 8/8/9; capb 7/9/8
+  Averaged caption embeddings are nearly one shared vector; cap_all peaks early and stops.
+
+  Coverage / ILD@10 (first level): NP 0.236 / 0.811; cat_beyond 0.229 / 0.824;
+    cap_beyond 0.249 / 0.827; cap_all 0.253 / 0.759.
+
+PAPER  JournalPaper/ (untracked)
+  Author decisions this cycle: 16-17 pages; "main points, no story"; CAFREC-H cut to one
+  paragraph; batch-size story = one methods note + one finding; voice matched to the plan
+  and literature review (zero prose em-dashes, impersonal, no hedge-then-qualify, no
+  rhetorical questions, British spelling); new title "Session-Context Gating in Sequential
+  Recommendation: A Controlled Study of Context Gates and Long-Term Profiles for
+  Short-Form Video Content".
+  Build: 17 pages, 0 undefined references, 0 overfull boxes, 0 visible TODO markers,
+  abstract 238 words. New table tab:res:content; H2 row now "Not supported".
+  Remaining author items (source TODOs): provenance/citation of the two content CSVs;
+  wang2023continual; CA-GGNN check; repository URL; co-author decision.
+
+ARTIFACTS
+  results/content_profiles_2026-09-18.{txt,json}
+  results/local/CAFREC_kuairand_pure_ctx_{np512,catbeyond512,capbeyond512,capall512}_seed{2020,2021,403092}.json
+  analyze_content_profiles.py (diagnostics section: profile similarity, best epoch)
+
+NEXT
+  2026-10-01: Modal resets. Upload the three profile caches to cafrec-data; run Stage 2
+  (4 conditions x 7 headline seeds) and the SASRec @512 reruns in one batch. Then update
+  tab:res:content, the H2 row, abstract and conclusion from 3 to 7 seeds.
+------------------------------------------------------------

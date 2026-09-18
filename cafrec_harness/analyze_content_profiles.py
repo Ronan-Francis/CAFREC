@@ -234,6 +234,47 @@ def main():
             + "  ".join(f"ILD {l} {div[name][f'ild_{l}'][0]:.4f}+-{div[name][f'ild_{l}'][1]:.4f}" for l in LEVELS))
     out["diversity"] = div
 
+    # ------------------------------------------------ diagnostics (descriptive)
+    say("\n== 6. Diagnostics: how distinct are users' profile vectors, and when did training peak? ==")
+    import torch
+    gen = torch.Generator().manual_seed(0)
+    prof_dir = os.path.join(HERE, "..", "data", "profiles")
+    diag = {"profile_similarity": {}, "best_epoch": {}}
+    for p in PROFILES:
+        path = glob.glob(os.path.join(prof_dir, f"kuairand_pure_ctx.profiles.{p}.d*.pt"))[0]
+        P = torch.load(path)
+        nz = P[P.abs().sum(1) > 0]
+        U = nz / nz.norm(dim=1, keepdim=True)
+        i = torch.randint(0, len(U), (20000,), generator=gen)
+        j = torch.randint(0, len(U), (20000,), generator=gen)
+        cos = (U[i] * U[j]).sum(1)
+        m = U.mean(0)
+        to_mean = float((U @ (m / m.norm())).mean())
+        diag["profile_similarity"][p] = {"pairwise_cos_mean": float(cos.mean()),
+                                         "pairwise_cos_p5": float(cos.quantile(0.05)),
+                                         "pairwise_cos_p95": float(cos.quantile(0.95)),
+                                         "cos_to_mean_profile": to_mean}
+        say(f"  {p:<11} users with a vector {len(U):,}: mean pairwise cosine {float(cos.mean()):.3f} "
+            f"(p5 {float(cos.quantile(0.05)):.3f}, p95 {float(cos.quantile(0.95)):.3f}); "
+            f"mean cosine to the average profile {to_mean:.3f}")
+    # best epoch: RecBole stores it in the checkpoint, not the JSON. Take the newest checkpoint per
+    # (seed, ablation, profile), which skips checkpoints left by interrupted runs.
+    newest = {}
+    for ck_path in sorted(glob.glob(os.path.join(HERE, "saved", "CAFREC-*.pth")), key=os.path.getmtime):
+        ck = torch.load(ck_path, weights_only=False, map_location="cpu")
+        cfg = ck["config"]
+        if cfg["epochs"] != 10 or cfg["train_batch_size"] != 512 or cfg["dataset"] != "kuairand_pure_ctx":
+            continue
+        prof = os.path.basename(str(cfg["llm_profile_path"])) if cfg["llm_profile_path"] else "none"
+        newest[(cfg["seed"], cfg["ablation"], prof)] = ck.get("epoch")
+    for name, (abl, stem) in ((REF, ("no_profiler", "none")),
+                              *[(p, ("none", p)) for p in PROFILES]):
+        eps = {s: v for (s, a, pf), v in newest.items()
+               if s in seeds and a == abl and (stem == "none" and pf == "none" or stem in pf)}
+        diag["best_epoch"][name] = eps
+        say(f"  best validation epoch (0-9), {name:<18}: " + ", ".join(f"seed {s}: {eps.get(s)}" for s in seeds))
+    out["diagnostics"] = diag
+
     for sec in sections:
         for r in sec["rows"]:
             r.pop("_diffs", None)

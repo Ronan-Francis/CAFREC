@@ -1,0 +1,108 @@
+CONTENT PROFILES vs CAFREC-NP  2026-09-18 14:47:47  seeds [2020, 2021, 403092]
+users 22,912; activity quartile cuts [12.0, 22.0, 38.0]
+  all 22,912  sparse (<20) 10,345  dense (>=20) 12,567  Q1 activity 6,240  Q2 activity 5,549  Q3 activity 5,442  Q4 activity 5,681  short session 15,706  longer session 7,206  high drift 3,521  low drift 19,391
+files:
+  CAFREC-NP (local)  seed 2020   CAFREC_kuairand_pure_ctx_np512_seed2020.json               device=local-cpu batch=512 ablation=no_profiler profile_dim=64 profile=None HR@10=0.0806 wall=2463.2s
+  CAFREC-NP (local)  seed 2021   CAFREC_kuairand_pure_ctx_np512_seed2021.json               device=local-cpu batch=512 ablation=no_profiler profile_dim=64 profile=None HR@10=0.0801 wall=2523.7s
+  CAFREC-NP (local)  seed 403092 CAFREC_kuairand_pure_ctx_np512_seed403092.json             device=local-cpu batch=512 ablation=no_profiler profile_dim=64 profile=None HR@10=0.0827 wall=2285.5s
+  cat_beyond         seed 2020   CAFREC_kuairand_pure_ctx_catbeyond512_seed2020.json        device=local-cpu batch=512 ablation=none profile_dim=38 profile=kuairand_pure_ctx.profiles.cat_beyond.d38.pt HR@10=0.0782 wall=2375.6s
+  cat_beyond         seed 2021   CAFREC_kuairand_pure_ctx_catbeyond512_seed2021.json        device=local-cpu batch=512 ablation=none profile_dim=38 profile=kuairand_pure_ctx.profiles.cat_beyond.d38.pt HR@10=0.0768 wall=2264.4s
+  cat_beyond         seed 403092 CAFREC_kuairand_pure_ctx_catbeyond512_seed403092.json      device=local-cpu batch=512 ablation=none profile_dim=38 profile=kuairand_pure_ctx.profiles.cat_beyond.d38.pt HR@10=0.0793 wall=2325.0s
+  cap_beyond         seed 2020   CAFREC_kuairand_pure_ctx_capbeyond512_seed2020.json        device=local-cpu batch=512 ablation=none profile_dim=1024 profile=kuairand_pure_ctx.profiles.cap_beyond.d1024.pt HR@10=0.0792 wall=2449.2s
+  cap_beyond         seed 2021   CAFREC_kuairand_pure_ctx_capbeyond512_seed2021.json        device=local-cpu batch=512 ablation=none profile_dim=1024 profile=kuairand_pure_ctx.profiles.cap_beyond.d1024.pt HR@10=0.0797 wall=2470.1s
+  cap_beyond         seed 403092 CAFREC_kuairand_pure_ctx_capbeyond512_seed403092.json      device=local-cpu batch=512 ablation=none profile_dim=1024 profile=kuairand_pure_ctx.profiles.cap_beyond.d1024.pt HR@10=0.0818 wall=2432.3s
+  cap_all            seed 2020   CAFREC_kuairand_pure_ctx_capall512_seed2020.json           device=local-cpu batch=512 ablation=none profile_dim=1024 profile=kuairand_pure_ctx.profiles.cap_all.d1024.pt HR@10=0.0613 wall=2009.7s
+  cap_all            seed 2021   CAFREC_kuairand_pure_ctx_capall512_seed2021.json           device=local-cpu batch=512 ablation=none profile_dim=1024 profile=kuairand_pure_ctx.profiles.cap_all.d1024.pt HR@10=0.0655 wall=1914.0s
+  cap_all            seed 403092 CAFREC_kuairand_pure_ctx_capall512_seed403092.json         device=local-cpu batch=512 ablation=none profile_dim=1024 profile=kuairand_pure_ctx.profiles.cap_all.d1024.pt HR@10=0.0622 wall=1891.2s
+
+== Profile coverage: share of users with a non-zero profile vector ==
+  cat_beyond  all 48.5%  sparse (<20) 0.0%  dense (>=20) 88.5%  Q1 activity 0.0%  Q2 activity 0.0%  Q3 activity 100.0%  Q4 activity 100.0%  short session 47.4%  longer session 51.1%
+  cap_beyond  all 48.5%  sparse (<20) 0.0%  dense (>=20) 88.5%  Q1 activity 0.0%  Q2 activity 0.0%  Q3 activity 99.9%  Q4 activity 100.0%  short session 47.4%  longer session 51.0%
+  cap_all     all 100.0%  sparse (<20) 100.0%  dense (>=20) 100.0%  Q1 activity 100.0%  Q2 activity 100.0%  Q3 activity 100.0%  Q4 activity 100.0%  short session 100.0%  longer session 100.0%
+
+== 1. PRIMARY: dense cohort (>= 20 rows), profile vs CAFREC-NP (local); Holm over 3 profiles x HR/NDCG ==
+  cat_beyond  vs CAFREC-NP (local)        dense (>=20)    hit@10   n=12,567 d=-0.00231 (-3.8%) CI[-0.00446,-0.00016] p=0.0652 holm=0.13 sig 0/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        dense (>=20)    ndcg@10  n=12,567 d=-0.00106 (-3.5%) CI[-0.00209,-0.00010] p=0.0678 holm=0.13 sig 1/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        dense (>=20)    mrr@10   n=12,567 d=-0.00068 (-3.2%) CI[-0.00155,+0.00023] p=0.0597 sig 0/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        dense (>=20)    hit@10   n=12,567 d=-0.00398 (-6.5%) CI[-0.00690,-0.00109] p=0.00844 holm=0.0338 sig 1/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        dense (>=20)    ndcg@10  n=12,567 d=-0.00176 (-5.8%) CI[-0.00329,-0.00029] p=0.0144 holm=0.0431 sig 1/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        dense (>=20)    mrr@10   n=12,567 d=-0.00109 (-5.1%) CI[-0.00237,+0.00012] p=0.0281 sig 1/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        dense (>=20)    hit@10   n=12,567 d=-0.01180 (-19.3%) CI[-0.01517,-0.00867] p=1.21e-10 holm=6.07e-10 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        dense (>=20)    ndcg@10  n=12,567 d=-0.00680 (-22.3%) CI[-0.00848,-0.00510] p=1.6e-12 holm=9.6e-12 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        dense (>=20)    mrr@10   n=12,567 d=-0.00530 (-24.9%) CI[-0.00688,-0.00382] p=5.34e-11 sig 3/3 sign 3/3
+
+== 2a. Lowest activity quartile (<= 12 rows), NDCG@10, vs CAFREC-NP (local, same device) ==
+  cap_all     vs CAFREC-NP (local)        Q1 activity     ndcg@10  n= 6,240 d=-0.01829 (-30.8%) CI[-0.02195,-0.01449] p=1.96e-19 sig 3/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        Q1 activity     ndcg@10  n= 6,240 d=-0.00119 (-2.0%) CI[-0.00287,+0.00040] p=0.0402 sig 1/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        Q1 activity     ndcg@10  n= 6,240 d=+0.00241 (+4.0%) CI[+0.00030,+0.00451] p=0.0223 sig 2/3 sign 3/3
+
+== 2b. H2 INDICATIVE, cross-device: cap_all (local CPU) vs trainable stand-in (Modal GPU); the Modal-vs-Modal rows are same-device references for the frozen profiles ==
+  cap_all     vs Stand-in (Modal)         Q1 activity     ndcg@10  n= 6,240 d=-0.01058 (-20.4%) CI[-0.01398,-0.00693] p=2.91e-08 sig 3/3 sign 3/3
+  CAFREC-NP (Modal) vs Stand-in (Modal)         Q1 activity     ndcg@10  n= 6,240 d=+0.00805 (+15.5%) CI[+0.00544,+0.01075] p=8.02e-09 sig 3/3 sign 3/3
+  CAFREC template (Modal) vs Stand-in (Modal)         Q1 activity     ndcg@10  n= 6,240 d=+0.00551 (+10.6%) CI[+0.00268,+0.00834] p=0.00062 sig 2/3 sign 3/3
+  Hashing (Modal) vs Stand-in (Modal)         Q1 activity     ndcg@10  n= 6,240 d=+0.00652 (+12.6%) CI[+0.00377,+0.00923] p=2.63e-05 sig 3/3 sign 3/3
+  CAFREC template (Modal) vs CAFREC-NP (Modal)        Q1 activity     ndcg@10  n= 6,240 d=-0.00254 (-4.2%) CI[-0.00406,-0.00088] p=0.00377 sig 2/3 sign 3/3
+  cap_all     vs Stand-in (Modal)         all             ndcg@10  n=22,912 d=-0.00489 (-13.9%) CI[-0.00631,-0.00345] p=2.86e-12 sig 3/3 sign 3/3
+  CAFREC-NP (Modal) vs Stand-in (Modal)         all             ndcg@10  n=22,912 d=+0.00558 (+15.9%) CI[+0.00441,+0.00683] p=2.4e-13 sig 3/3 sign 3/3
+  CAFREC template (Modal) vs Stand-in (Modal)         all             ndcg@10  n=22,912 d=+0.00542 (+15.5%) CI[+0.00419,+0.00672] p=6.49e-11 sig 3/3 sign 3/3
+  Hashing (Modal) vs Stand-in (Modal)         all             ndcg@10  n=22,912 d=+0.00567 (+16.2%) CI[+0.00440,+0.00697] p=2.86e-13 sig 3/3 sign 3/3
+  CAFREC template (Modal) vs CAFREC-NP (Modal)        all             ndcg@10  n=22,912 d=-0.00016 (-0.4%) CI[-0.00090,+0.00056] p=0.767 sig 0/3 sign 2/3
+
+== 3. All users ==
+  cat_beyond  vs CAFREC-NP (local)        all             hit@10   n=22,912 d=-0.00301 (-3.7%) CI[-0.00466,-0.00143] p=0.00208 sig 2/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        all             ndcg@10  n=22,912 d=-0.00119 (-2.9%) CI[-0.00197,-0.00041] p=0.00106 sig 1/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        all             mrr@10   n=22,912 d=-0.00065 (-2.2%) CI[-0.00135,+0.00007] p=0.00396 sig 0/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        all             hit@10   n=22,912 d=-0.00090 (-1.1%) CI[-0.00303,+0.00125] p=0.563 sig 0/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        all             ndcg@10  n=22,912 d=-0.00002 (-0.1%) CI[-0.00114,+0.00109] p=0.736 sig 0/3 sign 1/3
+  cap_beyond  vs CAFREC-NP (local)        all             mrr@10   n=22,912 d=+0.00023 (+0.8%) CI[-0.00074,+0.00119] p=0.483 sig 0/3 sign 2/3
+  cap_all     vs CAFREC-NP (local)        all             hit@10   n=22,912 d=-0.01816 (-22.4%) CI[-0.02121,-0.01541] p=1.2e-31 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        all             ndcg@10  n=22,912 d=-0.01082 (-26.4%) CI[-0.01246,-0.00926] p=2e-36 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        all             mrr@10   n=22,912 d=-0.00862 (-29.7%) CI[-0.00996,-0.00723] p=3.82e-33 sig 3/3 sign 3/3
+
+== 4. Session opener (short session, prefix length 0) vs within-session (longer session) ==
+  cat_beyond  vs CAFREC-NP (local)        short session   hit@10   n=15,706 d=-0.00316 (-4.2%) CI[-0.00522,-0.00119] p=0.00519 sig 2/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        short session   ndcg@10  n=15,706 d=-0.00136 (-3.8%) CI[-0.00229,-0.00046] p=0.00169 sig 2/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        longer session  hit@10   n= 7,206 d=-0.00268 (-2.8%) CI[-0.00555,+0.00042] p=0.169 sig 0/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        longer session  ndcg@10  n= 7,206 d=-0.00082 (-1.6%) CI[-0.00233,+0.00070] p=0.21 sig 0/3 sign 2/3
+  cap_beyond  vs CAFREC-NP (local)        short session   hit@10   n=15,706 d=-0.00085 (-1.1%) CI[-0.00335,+0.00183] p=0.687 sig 0/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        short session   ndcg@10  n=15,706 d=+0.00005 (+0.1%) CI[-0.00128,+0.00136] p=0.795 sig 0/3 sign 1/3
+  cap_beyond  vs CAFREC-NP (local)        longer session  hit@10   n= 7,206 d=-0.00102 (-1.1%) CI[-0.00509,+0.00301] p=0.673 sig 0/3 sign 2/3
+  cap_beyond  vs CAFREC-NP (local)        longer session  ndcg@10  n= 7,206 d=-0.00017 (-0.3%) CI[-0.00223,+0.00200] p=0.843 sig 0/3 sign 2/3
+  cap_all     vs CAFREC-NP (local)        short session   hit@10   n=15,706 d=-0.01420 (-18.9%) CI[-0.01747,-0.01082] p=3.62e-14 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        short session   ndcg@10  n=15,706 d=-0.00707 (-19.8%) CI[-0.00875,-0.00538] p=2.86e-16 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        longer session  hit@10   n= 7,206 d=-0.02678 (-28.3%) CI[-0.03238,-0.02119] p=4.2e-21 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        longer session  ndcg@10  n= 7,206 d=-0.01899 (-36.1%) CI[-0.02231,-0.01578] p=6.66e-24 sig 3/3 sign 3/3
+
+== Supplementary: NDCG@10 by sparse cohort and activity quartile, vs CAFREC-NP (local) ==
+  cat_beyond  vs CAFREC-NP (local)        sparse (<20)    ndcg@10  n=10,345 d=-0.00135 (-2.5%) CI[-0.00259,-0.00011] p=0.00629 sig 1/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        Q1 activity     ndcg@10  n= 6,240 d=-0.00119 (-2.0%) CI[-0.00280,+0.00040] p=0.0402 sig 1/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        Q2 activity     ndcg@10  n= 5,549 d=-0.00112 (-2.5%) CI[-0.00289,+0.00057] p=0.0858 sig 0/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        Q3 activity     ndcg@10  n= 5,442 d=-0.00207 (-6.2%) CI[-0.00382,-0.00044] p=0.0484 sig 1/3 sign 3/3
+  cat_beyond  vs CAFREC-NP (local)        Q4 activity     ndcg@10  n= 5,681 d=-0.00041 (-1.7%) CI[-0.00168,+0.00076] p=0.602 sig 0/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        sparse (<20)    ndcg@10  n=10,345 d=+0.00209 (+3.9%) CI[+0.00042,+0.00372] p=0.00326 sig 2/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        Q1 activity     ndcg@10  n= 6,240 d=+0.00241 (+4.0%) CI[+0.00024,+0.00448] p=0.0223 sig 2/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        Q2 activity     ndcg@10  n= 5,549 d=+0.00120 (+2.6%) CI[-0.00113,+0.00348] p=0.221 sig 0/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        Q3 activity     ndcg@10  n= 5,442 d=-0.00210 (-6.3%) CI[-0.00471,+0.00044] p=0.0692 sig 0/3 sign 3/3
+  cap_beyond  vs CAFREC-NP (local)        Q4 activity     ndcg@10  n= 5,681 d=-0.00189 (-8.0%) CI[-0.00372,-0.00018] p=0.0966 sig 1/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        sparse (<20)    ndcg@10  n=10,345 d=-0.01570 (-29.2%) CI[-0.01845,-0.01295] p=9.31e-26 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        Q1 activity     ndcg@10  n= 6,240 d=-0.01829 (-30.8%) CI[-0.02213,-0.01456] p=1.96e-19 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        Q2 activity     ndcg@10  n= 5,549 d=-0.01168 (-25.6%) CI[-0.01539,-0.00842] p=6.64e-10 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        Q3 activity     ndcg@10  n= 5,442 d=-0.00706 (-21.2%) CI[-0.00985,-0.00420] p=6.07e-06 sig 3/3 sign 3/3
+  cap_all     vs CAFREC-NP (local)        Q4 activity     ndcg@10  n= 5,681 d=-0.00536 (-22.7%) CI[-0.00772,-0.00320] p=4.2e-06 sig 3/3 sign 3/3
+
+== 5. Coverage@10 and ILD@10 (mean +- sd over seeds) ==
+  CAFREC-NP (local)  coverage 0.2358+-0.0088  ILD first_level 0.8108+-0.0116  ILD second_level 0.8927+-0.0143  ILD kuairand_tag 0.7848+-0.0069
+  cat_beyond         coverage 0.2288+-0.0068  ILD first_level 0.8240+-0.0046  ILD second_level 0.9063+-0.0050  ILD kuairand_tag 0.7967+-0.0076
+  cap_beyond         coverage 0.2486+-0.0251  ILD first_level 0.8270+-0.0143  ILD second_level 0.9079+-0.0108  ILD kuairand_tag 0.8015+-0.0082
+  cap_all            coverage 0.2528+-0.0014  ILD first_level 0.7594+-0.0056  ILD second_level 0.8690+-0.0038  ILD kuairand_tag 0.7353+-0.0046
+
+== 6. Diagnostics: how distinct are users' profile vectors, and when did training peak? ==
+  cat_beyond  users with a vector 11,123: mean pairwise cosine 0.403 (p5 0.000, p95 0.807); mean cosine to the average profile 0.634
+  cap_beyond  users with a vector 11,118: mean pairwise cosine 0.811 (p5 0.550, p95 0.943); mean cosine to the average profile 0.901
+  cap_all     users with a vector 22,912: mean pairwise cosine 0.849 (p5 0.700, p95 0.946); mean cosine to the average profile 0.922
+  best validation epoch (0-9), CAFREC-NP (local) : seed 2020: 8, seed 2021: 9, seed 403092: 9
+  best validation epoch (0-9), cat_beyond        : seed 2020: 8, seed 2021: 8, seed 403092: 9
+  best validation epoch (0-9), cap_beyond        : seed 2020: 7, seed 2021: 9, seed 403092: 8
+  best validation epoch (0-9), cap_all           : seed 2020: 3, seed 2021: 3, seed 403092: 3
+
+wall 28s
