@@ -1924,3 +1924,152 @@ NEXT
   (4 conditions x 7 headline seeds) and the SASRec @512 reruns in one batch. Then update
   tab:res:content, the H2 row, abstract and conclusion from 3 to 7 seeds.
 ------------------------------------------------------------
+
+------------------------------------------------------------
+Cycle 13 — SHUFFLED CONTROL BY SESSION POSITION (7 seeds); LOCAL GPU QUEUES
+Date   : 2026-09-19
+Author : R. Francis
+Machine: home PC (Ryzen 7 3800XT, RTX 2060 SUPER 8 GB)
+------------------------------------------------------------
+
+DATA FETCHED (no GPU cost): from the cafrec-results volume, the 2026-09-16 runs that
+had never been downloaded: gpu_shuffled_ctx seeds 256/512/1024/2048 (batch 512 in
+their config block) and tuned_SASRec_b512 x9. The latter record the RON-31 SASRec
+config: dropout 0.2, 4 layers / 4 heads, lr 1e-3, wd 1e-5. run_gridsearch.py,
+run_tuned_confirm.py and run_matched_queue.py are cited above but are not in the repo.
+
+RESULT  analyze_shuffled_position.py -> results/shuffled_position_20260919.{txt,json}
+  7 headline seeds, batch 512, Modal A10G. Openers = prefix session length 0
+  (15,706 users); within session = prefix > 0 (7,206). Follow-up, not Holm-corrected.
+  (sign count / user-level Wilcoxon p / seed-level exact Wilcoxon W, n=7)
+                                   openers                        within session
+  CAFREC-NP vs SASRec   NDCG@10  +4.6%  7/7  p=2.4e-4  W=0.016   -3.0%  6/7  p=0.021  W=0.22
+  Shuffled  vs SASRec   NDCG@10  -0.3%  6/7  p=0.29    W=0.22    -1.3%  4/7  p=0.016  W=0.22
+  CAFREC-NP vs Shuffled NDCG@10  +5.0%  7/7  p=1.0e-4  W=0.016   -1.7%  6/7  p=0.16   W=0.16
+  CAFREC-NP vs Shuffled HR@10    +3.9%  6/7  p=3.0e-4  W=0.031   -1.8%  4/7  p=0.19   W=0.30
+  NP-minus-shuffled interaction (NDCG): +0.00265, MW p=6.0e-5, seed-level W p=0.047, 6/7.
+  -> A gate fed shuffled context does not keep the opener gain; it lands on SASRec.
+     The opener gain needs the right session's context values. This revises the
+     3-seed reading ("inconclusive") and the Cycle 11 reading ("a gate needs a
+     varying input, not the right one"), which was based on the aggregate only.
+  Seeds 42/77/123 of the shuffled control predate the config block; batch 512 is
+  inferred from Cycle 10 (same code path as noprof_ms). The reference rows reproduce
+  plan_hypotheses_20260917.txt exactly.
+
+LOCAL GPU QUEUES (design fixed before any grid result; runs started 2026-09-19 17:50)
+  Environment: cafrec_harness/.venv-gpu (Python 3.11, torch 2.8.0+cu126, recbole 1.2.1,
+  same numpy/pandas pins as .venv). Results -> results/local_gpu/, device label
+  "local-gpu (NVIDIA GeForce RTX 2060 SUPER)". Every arm runs on this device, batch 512,
+  10 epochs, patience 3, L=20; nothing pairs with Modal or CPU runs.
+  Smoke (1 epoch, seed 403092): SASRec HR@10 0.0642, CAFREC-NP 0.0647, but 135-150 s
+  per epoch with the GPU ~35% busy. The queues therefore run as 3 parallel workers with
+  OMP_NUM_THREADS=MKL_NUM_THREADS=4; local_run.run_queue claims jobs with <result>.lock
+  files and each process writes checkpoints to saved/pid<N>/ (RecBole names checkpoints
+  by the second). Timing is CPU-bound, not GPU-bound: a profile shows ~11 ms of GPU work
+  per batch against ~150 ms of CPU-side dispatch, and each worker keeps ~4 cores busy
+  (94% total). Typical 10-epoch run with 3 workers: ~31 min (~3 min/epoch). The first
+  two CAFREC-NP grid runs took only 278 s (~22 s/epoch) for reasons not established.
+  Grid point 00 reproduces the same config elsewhere: validation NDCG@10 0.0451 (2060)
+  vs 0.0452 (Modal) vs 0.0461 (CPU).
+  From 18:37 the queues are driven by gpu_chain.py, started through WMI so it does not
+  depend on any terminal or app session (grid -> tuned -> analyze_tuned_gpu.py; progress
+  in results/local_gpu/chain.log). The first 8 grid runs came from session-launched
+  workers under the same code and settings.
+  gpu_grid   16-point grid, identical for SASRec and CAFREC-NP (no_profiler):
+             dropout {0.5, 0.2} x layers=heads {2, 4} x lr {1e-3, 3e-3} x wd {0, 1e-5}.
+             Point 00 = RecBole defaults; point 13 = the RON-31 SASRec pick. Selection on
+             VALIDATION NDCG@10 at seed 403092, which is not an evaluation seed.
+  gpu_tuned  each model's winning point x 7 headline seeds, plus the policy-flag
+             ablation: CAFREC-NP at its winning point with the five-feature x_ctx
+             (prefix_policy_flag removed, n_context_features 5). 21 runs, ranks + top-k.
+  Analysis   analyze_tuned_gpu.py -> results/tuned_gpu_<date>.txt: NP vs SASRec on all
+             users and openers (Holm over those 4 tests), within-session and the
+             opener-minus-within interaction; policy ablation vs NP (Holm over HR/NDCG);
+             coverage@10.
+
+RESULTS — TUNED COMPARISON + POLICY-FLAG ABLATION (local GPU, finished 2026-09-20 02:38)
+  53 runs, 0 failures, 7h13m wall with 5 workers (the first 8 grid runs used 3 workers).
+  analyze_tuned_gpu.py -> results/tuned_gpu_20260920.{txt,json}.
+
+  GRID (seed 403092, validation NDCG@10). SASRec best = point 13 (dropout 0.2, 4 layers /
+  4 heads, lr 1e-3, wd 1e-5), valid 0.0496 — the SAME configuration the 64-point RON-31
+  search picked, an independent confirmation. CAFREC-NP best = point 08 (dropout 0.2,
+  2 layers / 2 heads, lr 1e-3, wd 0), valid 0.0507, with point 13 close behind (0.0502).
+  Each model was therefore evaluated at its own validation optimum after an identical
+  16-point search, so the tuned pair differs in depth as well as in the gate.
+  lr 3e-3 with 4 layers diverged for both models (valid 0.012-0.028): report the space,
+  not just the winner.
+
+  TUNED CAFREC-NP vs TUNED SASRec, 7 headline seeds, batch 512, same device
+  (Holm over all SIX tests of the comparison; author's choice 2026-09-20, the widest
+  family, so the correction cannot be said to favour a result):
+    all users   HR@10  +1.0%  Holm 0.397   5/7   seed-level t p=0.35
+                NDCG   +1.4%  Holm 1.00    5/7   seed-level t p=0.072
+    openers     HR@10  +1.6%  Holm 0.339   6/7   seed-level t p=0.16
+                NDCG   +2.1%  Holm 1.00    6/7   seed-level W p=0.031, t p=0.024
+    within      HR@10  +0.0%  n.s.         3/7 ; NDCG +0.5% n.s.
+    opener-minus-within  HR +0.00123 (W p=0.375), NDCG +0.00043 (W p=0.578)
+  => The aggregate null SURVIVES equal-budget tuning: no comparison passes Holm.
+  => The SESSION-POSITION INTERACTION DOES NOT REPLICATE under tuning. In the untuned
+     batch-512 corpus the gate gained +4.6% NDCG on openers and LOST 3.0% within
+     sessions (interaction user-level p=1.8e-4, seed-level 0.047). Tuned, the
+     within-session penalty is gone (+0.5%, n.s.) and the interaction is n.s. The
+     opener advantage shrinks to +2.1% NDCG, significant across seeds (p=0.024) but not
+     after Holm. Treat the Cycle 13 / S13 finding as specific to the untuned setting.
+
+  POLICY-FLAG ABLATION (five-feature x_ctx vs six, tuned CAFREC-NP, 7 seeds): all users
+  HR -0.8% (Holm 0.717), NDCG -0.0% (Holm 0.832); openers -1.0% / -0.1%; within -0.4% /
+  +0.0%. Nothing differs. prefix_policy_flag fires on 0.98% of context rows, so this is
+  the expected result and closes the "no_policy_flag ablation" item.
+
+  COVERAGE@10 (descriptive, all test users): SASRec 0.337+-0.055, CAFREC-NP 0.366+-0.034,
+  NP without the policy flag 0.373+-0.053.
+
+  CAVEATS: user-level Wilcoxon p-values and bootstrap CIs disagree on the NDCG rows
+  (p~0.49 with a CI excluding zero) because the per-user differences are mostly ties;
+  the seed-level tests are the ones to quote. Tuned runs are 2060-SUPER-only and pair
+  with nothing on Modal or CPU.
+
+  PAPER UPDATED 2026-09-20 (JournalPaper/, untracked). New Section V-B "Equal-Budget
+  Tuning" (status A, with a new footnote d: space/selection/seeds fixed before the runs,
+  selection on validation at a non-evaluation seed), tables tab:res:tuned and
+  tab:res:tuneddiff, and the policy-flag paragraph. Section V-F gains the shuffled
+  control split by position and the non-replication under tuning. Abstract, introduction,
+  conclusion, VI-A, VI-B, the limitations list and the future-work list were brought in
+  line; "untuned defaults" is replaced by "a ten-epoch training budget". Cross-device
+  caveat stated with the one same-config bridge (validation 0.0451 vs 0.0452; test 0.0417
+  vs 0.0400). Tuned coverage numbers were left out of the paper: untested and at a
+  different operating point. Build: 17 pages, 0 errors, 0 overfull boxes, 0 undefined
+  references.
+
+  PAPER PASS 2, 2026-09-20 (reviewer-proofing brief). Changes:
+  * Detection language. "Headline result is negative/null", "no measurable gain" and
+    "the aggregate answer is negative" replaced throughout by detection claims with the
+    bound attached ("no aggregate improvement is detected ... excludes gains larger than
+    about 2% of SASRec's accuracy"). The central question in Sec. I now carries its
+    answer: not detectably, at either operating point.
+  * H2. Marked "registered, and not tested in this study" at the hypothesis list, the
+    abstract, Sec. I, the status table and the conclusion, each time with the reason
+    (no evaluated profile was LLM-generated). "Untestable" was wrong and is removed:
+    H2 is testable, it was not tested.
+  * Statistics (Reviewer 3). New "Choice of tests" paragraph in Sec. IV-C: user-level
+    pairing is the estimand, seed-level tests and sign counts guard against pooled
+    significance overstating stability, seven seeds bounds a sign test at p=0.016, and
+    a crossed user/seed mixed model was not in the plan. New Table tab:res:seeds gives
+    the per-seed HR@10 of the primary pair: the same pair differs from -1.3% to +2.9%
+    by seed alone (sd 2.6x the mean difference), so one run supports either direction.
+  * Citations (verified on the web 2026-09-20, not from memory): shehzad2023tuning
+    (RecSys 2023, doi 10.1145/3604915.3609488) and rendle2019baselines (arXiv 1905.01395)
+    added to references.bib and cited with the existing dacrema2019worrying in Sec. VI-B.
+  * HGRU4Rec. Sec. IV now states that every HGRU4Rec result is a result for this harness
+    implementation, not for Quadrana et al.'s architecture.
+  Build: 18 pages, 0 errors, 0 overfull boxes, 0 undefined references or citations.
+
+  H2 TEST, decided 2026-09-20: test it rather than only label it. Free API tiers do not
+  fit the volume (Gemini free tier is 250-1,500 requests/day; 22,913 users needed), so
+  generation goes on Modal with vLLM: a 7-8B instruct model on A10G, ~2.5M output tokens,
+  25-45 min, roughly $1-2. Modal headroom checked the same day: $66.11 metered of the
+  $100 limit, $35.14 billed. Then bge-large embedding through the existing profile-cache
+  path, and 4 conditions (LLM profile / template / stand-in / no profile) x 3 ablation
+  seeds, either ~$7 on Modal or ~6 h on the local GPU. Judged on the lowest activity
+  quartile (6,240 users, NDCG@10), Holm within the H2 family. Code not yet written.

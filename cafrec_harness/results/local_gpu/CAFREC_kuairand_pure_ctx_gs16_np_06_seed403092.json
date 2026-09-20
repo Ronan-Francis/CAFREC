@@ -1,0 +1,83 @@
+{
+  "model": "CAFREC",
+  "dataset": "kuairand_pure_ctx",
+  "seed": 403092,
+  "loss_type": "CE",
+  "n_params": 2150465,
+  "timestamp": "20260919-194908",
+  "split_sizes": {
+    "n_users": 22913,
+    "n_items": 7211,
+    "n_train": 582363,
+    "n_valid": 22912,
+    "n_test": 22912
+  },
+  "config": {
+    "train_batch_size": 512,
+    "eval_batch_size": 4096,
+    "epochs": 10,
+    "stopping_step": 3,
+    "learning_rate": 0.003,
+    "weight_decay": 0.0,
+    "loss_type": "CE",
+    "train_neg_sample_args": {
+      "distribution": "none",
+      "sample_num": "none",
+      "alpha": "none",
+      "dynamic": false,
+      "candidate_num": 0
+    },
+    "MAX_ITEM_LIST_LENGTH": 20,
+    "embedding_size": 64,
+    "hidden_size": 64,
+    "inner_size": 256,
+    "n_layers": 4,
+    "num_layers": null,
+    "n_heads": 4,
+    "hidden_dropout_prob": 0.5,
+    "attn_dropout_prob": 0.5,
+    "dropout_prob": null,
+    "valid_metric": "NDCG@10",
+    "eval_args": {
+      "split": {
+        "LS": "valid_and_test"
+      },
+      "order": "TO",
+      "group_by": "user",
+      "mode": {
+        "valid": "full",
+        "test": "full"
+      }
+    },
+    "ablation": "no_profiler",
+    "fusion_mode": null,
+    "profile_dim": 64,
+    "llm_profile_path": null,
+    "context_fields": [
+      "prefix_session_len_log_z",
+      "prefix_dwell_entropy_z",
+      "prefix_category_drift_z",
+      "inter_session_gap_log_z",
+      "prefix_policy_flag",
+      "is_first_session"
+    ],
+    "n_context_features": 6,
+    "history_gate": false,
+    "history_gate_mode": null
+  },
+  "valid_best": {
+    "recall@10": 0.0403,
+    "ndcg@10": 0.0201,
+    "mrr@10": 0.014,
+    "hit@10": 0.0403
+  },
+  "test": {
+    "recall@10": 0.0401,
+    "ndcg@10": 0.0202,
+    "mrr@10": 0.0142,
+    "hit@10": 0.0401
+  },
+  "wall_seconds": 678.7,
+  "device": "local-gpu (NVIDIA GeForce RTX 2060 SUPER)",
+  "ablation": "no_profiler"
+}

@@ -11,18 +11,34 @@ results/modal/ by original user id.
     # the overnight queue (skips jobs whose JSON already exists; logs to results/local/)
     .venv/Scripts/python local_run.py --queue overnight
 
+    # local GPU (2026-09-19): same script from the CUDA venv; results go to
+    # results/local_gpu/ so they never pair with CPU or Modal runs by accident
+    .venv-gpu/Scripts/python local_run.py --queue gpu_grid
+
 Run from cafrec_harness/ (base.yaml's data_path is relative to it).
 """
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 import traceback
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-OUT_DIR = HERE / "results" / "local"
+
+
+def _cuda_name():
+    try:
+        import torch
+        return torch.cuda.get_device_name(0) if torch.cuda.is_available() else None
+    except ImportError:
+        return None
+
+
+GPU_NAME = _cuda_name()
+OUT_DIR = HERE / "results" / ("local_gpu" if GPU_NAME else "local")
 
 # Pure seeds 42/77/123 already have CAFREC-NP (tag noprof_ms) rank dumps on Modal,
 # so every control below pairs user-for-user with an existing run.
@@ -79,6 +95,86 @@ QUEUES = {
     ],
 }
 
+# ---------------------------------------------------------------------------
+# 2026-09-19: tuned SASRec vs tuned CAFREC-NP (TODO S1) and the policy-flag ablation,
+# on the local RTX 2060 SUPER (.venv-gpu). Every arm runs on this one device at batch
+# 512, so nothing here pairs with results/modal/ or results/local/.
+#
+# Equal search budget: one 16-point grid over the shared encoder settings, the same
+# for both models, selected on VALIDATION NDCG@10 at seed 403092 (not an evaluation
+# seed). Point 00 is the RecBole default; point 13 is the config the 64-point RON-31
+# search picked for SASRec (dropout 0.2, 4 layers / 4 heads, lr 1e-3, wd 1e-5).
+# n_heads follows n_layers so that point is inside the grid.
+GRID16 = [dict(hidden_dropout_prob=d, attn_dropout_prob=d, n_layers=L, n_heads=L,
+               learning_rate=lr, weight_decay=wd)
+          for d in (0.5, 0.2) for L in (2, 4) for lr in (1e-3, 3e-3) for wd in (0.0, 1e-5)]
+GRID_SEED = 403092
+HEADLINE_SEEDS = (42, 77, 123, 256, 512, 1024, 2048)
+GRID_ARMS = {   # label -> job fields shared by every point of that model's grid
+    "sasrec": dict(model="SASRec", dataset="kuairand_pure"),
+    "np": dict(model="CAFREC", dataset="kuairand_pure_ctx", ablation="no_profiler"),
+}
+# the six-feature x_ctx without prefix_policy_flag (fires on ~1% of context rows)
+NO_POLICY_FIELDS = ["prefix_session_len_log_z", "prefix_dwell_entropy_z",
+                    "prefix_category_drift_z", "inter_session_gap_log_z", "is_first_session"]
+
+QUEUES["gpu_smoke"] = [
+    dict(**GRID_ARMS[arm], seed=GRID_SEED, train_batch_size=512, epochs=1,
+         tag=f"smoke512_{arm}", dump_topk=False)
+    for arm in GRID_ARMS
+]
+QUEUES["gpu_grid"] = [
+    dict(**GRID_ARMS[arm], seed=GRID_SEED, train_batch_size=512, extra=cfg,
+         tag=f"gs16_{arm}_{i:02d}", dump_ranks=False, dump_topk=False)
+    for i, cfg in enumerate(GRID16) for arm in GRID_ARMS
+]
+
+
+def grid_winner(arm):
+    """(index, config) of the grid point with the best validation NDCG@10."""
+    best = None
+    for i, cfg in enumerate(GRID16):
+        job = dict(**GRID_ARMS[arm], seed=GRID_SEED, tag=f"gs16_{arm}_{i:02d}")
+        path = _out_path(job)
+        if not path.exists():
+            raise FileNotFoundError(f"grid incomplete, run --queue gpu_grid first: {path.name}")
+        score = json.loads(path.read_text())["valid_best"]["ndcg@10"]
+        if best is None or score > best[0]:            # ties keep the lower index
+            best = (score, i, cfg)
+    return best[1], best[2]
+
+
+def _tuned_queue():
+    (i_s, cfg_s), (i_n, cfg_n) = grid_winner("sasrec"), grid_winner("np")
+    print(f"grid winners: SASRec point {i_s:02d} {cfg_s}; CAFREC-NP point {i_n:02d} {cfg_n}")
+    jobs = []
+    for s in HEADLINE_SEEDS:
+        jobs += [
+            dict(**GRID_ARMS["sasrec"], seed=s, train_batch_size=512, extra=cfg_s,
+                 tag=f"tuned16_sasrec_gs{i_s:02d}"),
+            dict(**GRID_ARMS["np"], seed=s, train_batch_size=512, extra=cfg_n,
+                 tag=f"tuned16_np_gs{i_n:02d}"),
+            dict(**GRID_ARMS["np"], seed=s, train_batch_size=512,
+                 extra=dict(cfg_n, context_fields=NO_POLICY_FIELDS, n_context_features=5),
+                 tag=f"tuned16_np_nopolicy_gs{i_n:02d}"),
+        ]
+    return jobs
+
+
+def _converge_queue():
+    """Convergence check for the two winners: 30 epochs, patience 5, grid seed."""
+    jobs = []
+    for arm in GRID_ARMS:
+        i, cfg = grid_winner(arm)
+        jobs.append(dict(**GRID_ARMS[arm], seed=GRID_SEED, train_batch_size=512,
+                         extra=dict(cfg, stopping_step=5), epochs=30,
+                         tag=f"converge30_{arm}_gs{i:02d}", dump_topk=False))
+    return jobs
+
+
+QUEUES["gpu_tuned"] = _tuned_queue          # built from the grid results at run time
+QUEUES["gpu_converge"] = _converge_queue
+
 PROFILE_DIR = HERE.parent / "data" / "profiles"
 
 
@@ -98,7 +194,8 @@ def _out_path(job):
 
 def run_one(model, dataset, seed, ablation=None, tag=None, epochs=None,
             train_batch_size=None, max_seq_len=None,
-            dump_ranks=True, dump_topk=True, llm_profile_path=None, profile_dim=None):
+            dump_ranks=True, dump_topk=True, llm_profile_path=None, profile_dim=None,
+            extra=None):
     from cafrec.runner import run_experiment
 
     overrides = {"seed": seed}
@@ -116,11 +213,17 @@ def run_one(model, dataset, seed, ablation=None, tag=None, epochs=None,
         overrides["llm_profile_path"] = llm_profile_path
     if profile_dim is not None:
         overrides["profile_dim"] = profile_dim
+    # arbitrary RecBole keys (grid points), applied last as in modal_run.train
+    if extra:
+        overrides.update(extra)
+    # RecBole names checkpoints by the second; a folder per process stops two
+    # parallel workers from loading each other's best model at test time
+    overrides.setdefault("checkpoint_dir", str(HERE / "saved" / f"pid{os.getpid()}"))
     t0 = time.time()
     metrics = run_experiment(model, dataset=dataset, config_overrides=overrides,
                              return_ranks=dump_ranks, dump_topk=dump_topk)
     metrics["wall_seconds"] = round(time.time() - t0, 1)
-    metrics["device"] = "local-cpu"
+    metrics["device"] = f"local-gpu ({GPU_NAME})" if GPU_NAME else "local-cpu"
     metrics["ablation"] = ablation
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = _out_path(dict(model=model, dataset=dataset, tag=tag or (ablation or "none"), seed=seed))
@@ -145,23 +248,35 @@ def run_queue(name):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     log = OUT_DIR / f"queue_{name}.log"
     jobs = QUEUES[name]
+    if callable(jobs):
+        jobs = jobs()
+    # Several workers may run the same queue at once (one process each): a job is
+    # claimed by creating <result>.lock exclusively, so no job runs twice.
+    w = f"pid{os.getpid()}"
     for i, job in enumerate(jobs, 1):
         out = _out_path(job)
         if out.exists():
-            _log(log, f"[{i}/{len(jobs)}] SKIP (exists) {out.name}")
+            _log(log, f"[{i}/{len(jobs)}] {w} SKIP (exists) {out.name}")
             continue
-        _log(log, f"[{i}/{len(jobs)}] START {job}")
+        lock = out.with_suffix(".lock")
+        try:
+            os.close(os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+        except FileExistsError:
+            continue                              # another worker has it
+        _log(log, f"[{i}/{len(jobs)}] {w} START {job}")
         try:
             job = dict(job)
             profile = job.pop("profile", None)
             if profile is not None:
                 job["llm_profile_path"], job["profile_dim"] = resolve_profile(profile, job["dataset"])
             m, out = run_one(**job)
-            _log(log, f"[{i}/{len(jobs)}] DONE  {out.name}  test={m['test']}  "
+            _log(log, f"[{i}/{len(jobs)}] {w} DONE  {out.name}  test={m['test']}  "
                       f"wall={m['wall_seconds']}s")
         except Exception:                         # keep going; one failure shouldn't kill the night
-            _log(log, f"[{i}/{len(jobs)}] FAIL  {job}\n{traceback.format_exc()}")
-    _log(log, "QUEUE FINISHED")
+            _log(log, f"[{i}/{len(jobs)}] {w} FAIL  {job}\n{traceback.format_exc()}")
+        finally:
+            lock.unlink(missing_ok=True)
+    _log(log, f"{w} QUEUE FINISHED")
 
 
 def _log(path, msg):

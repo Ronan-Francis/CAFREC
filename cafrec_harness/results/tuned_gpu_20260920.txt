@@ -1,0 +1,61 @@
+Local GPU runs in C:\Users\Ronan\Desktop\THESIS\CAFREC\cafrec_harness\results\local_gpu
+
+== 1. Grid (seed 403092, batch 512; selection on validation NDCG@10) ==
+  arm    pt  dropout  L/H  lr      wd      valid NDCG  test NDCG  wall s
+  sasrec 00  0.5      2/2  0.001   0.0     0.0446      0.0401     1884.4
+  sasrec 01  0.5      2/2  0.001   1e-05   0.0446      0.0396     1904.6
+  sasrec 02  0.5      2/2  0.003   0.0     0.0440      0.0396     1779.4
+  sasrec 03  0.5      2/2  0.003   1e-05   0.0431      0.0384     1633.9
+  sasrec 04  0.5      4/4  0.001   0.0     0.0463      0.0410     5049.2
+  sasrec 05  0.5      4/4  0.001   1e-05   0.0459      0.0409     5121.9
+  sasrec 06  0.5      4/4  0.003   0.0     0.0119      0.0101     2404.0
+  sasrec 07  0.5      4/4  0.003   1e-05   0.0184      0.0177     4891.9
+  sasrec 08  0.2      2/2  0.001   0.0     0.0490      0.0451     2471.9
+  sasrec 09  0.2      2/2  0.001   1e-05   0.0490      0.0449     2405.1
+  sasrec 10  0.2      2/2  0.003   0.0     0.0395      0.0347     2408.1
+  sasrec 11  0.2      2/2  0.003   1e-05   0.0448      0.0403     2413.8
+  sasrec 12  0.2      4/4  0.001   0.0     0.0484      0.0447     4553.9
+  sasrec 13  0.2      4/4  0.001   1e-05   0.0496      0.0459     4603.3 *
+  sasrec 14  0.2      4/4  0.003   0.0     0.0118      0.0099     1758.8
+  sasrec 15  0.2      4/4  0.003   1e-05   0.0227      0.0225     1764.6
+  np     00  0.5      2/2  0.001   0.0     0.0451      0.0417     278.1
+  np     01  0.5      2/2  0.001   1e-05   0.0455      0.0418     279.9
+  np     02  0.5      2/2  0.003   0.0     0.0449      0.0394     1960.5
+  np     03  0.5      2/2  0.003   1e-05   0.0443      0.0383     1857.6
+  np     04  0.5      4/4  0.001   0.0     0.0470      0.0407     774.7
+  np     05  0.5      4/4  0.001   1e-05   0.0470      0.0402     780.5
+  np     06  0.5      4/4  0.003   0.0     0.0201      0.0202     678.7
+  np     07  0.5      4/4  0.003   1e-05   0.0249      0.0237     677.9
+  np     08  0.2      2/2  0.001   0.0     0.0507      0.0462     2154.1 *
+  np     09  0.2      2/2  0.001   1e-05   0.0505      0.0461     2153.3
+  np     10  0.2      2/2  0.003   0.0     0.0473      0.0414     2849.8
+  np     11  0.2      2/2  0.003   1e-05   0.0481      0.0424     2149.8
+  np     12  0.2      4/4  0.001   0.0     0.0496      0.0464     4978.8
+  np     13  0.2      4/4  0.001   1e-05   0.0502      0.0463     4808.9
+  np     14  0.2      4/4  0.003   0.0     0.0218      0.0215     1941.7
+  np     15  0.2      4/4  0.003   1e-05   0.0279      0.0263     2727.5
+
+== 2. Tuned CAFREC-NP vs tuned SASRec (7 headline seeds; Holm over all six tests) ==
+  all                                hit@10   d=+0.00086 (+1.0%) CI[-0.00046,+0.00210] p=0.0795 holm=0.397 sign 5/7 sig 1/7 | seed-level W p=0.688 t p=0.348  (n=22,912)
+  all                                ndcg@10  d=+0.00064 (+1.4%) CI[+0.00003,+0.00127] p=0.495 holm=1 sign 5/7 sig 1/7 | seed-level W p=0.0781 t p=0.0723  (n=22,912)
+  openers                            hit@10   d=+0.00125 (+1.6%) CI[-0.00035,+0.00277] p=0.0566 holm=0.339 sign 6/7 sig 0/7 | seed-level W p=0.219 t p=0.162  (n=15,706)
+  openers                            ndcg@10  d=+0.00078 (+2.1%) CI[+0.00001,+0.00153] p=0.485 holm=1 sign 6/7 sig 1/7 | seed-level W p=0.0312 t p=0.0236  (n=15,706)
+  within session                     hit@10   d=+0.00002 (+0.0%) CI[-0.00240,+0.00232] p=0.724 holm=1 sign 3/7 sig 1/7 | seed-level W p=0.812 t p=0.99  (n=7,206)
+  within session                     ndcg@10  d=+0.00034 (+0.5%) CI[-0.00085,+0.00155] p=0.854 holm=1 sign 5/7 sig 2/7 | seed-level W p=0.688 t p=0.713  (n=7,206)
+  opener-minus-within hit@10   +0.00123 seed-level exact W p=0.375 (same sign 4/7)
+  opener-minus-within ndcg@10  +0.00043 seed-level exact W p=0.578 (same sign 5/7)
+
+== 3. Policy-flag ablation: five-feature x_ctx vs six (tuned CAFREC-NP, 7 seeds) ==
+  all                                hit@10   d=-0.00068 (-0.8%) CI[-0.00171,+0.00032] p=0.359 holm=0.717 sign 5/7 sig 0/7 | seed-level W p=0.375 t p=0.345  (n=22,912)
+  all                                ndcg@10  d=-0.00002 (-0.0%) CI[-0.00053,+0.00046] p=0.832 holm=0.832 sign 4/7 sig 0/7 | seed-level W p=0.938 t p=0.951  (n=22,912)
+  openers                            hit@10   d=-0.00078 (-1.0%) CI[-0.00207,+0.00039] p=0.367 sign 5/7 sig 1/7 | seed-level W p=0.375 t p=0.345  (n=15,706)
+  openers                            ndcg@10  d=-0.00004 (-0.1%) CI[-0.00062,+0.00054] p=0.933 sign 3/7 sig 1/7 | seed-level W p=0.812 t p=0.91  (n=15,706)
+  within session                     hit@10   d=-0.00046 (-0.4%) CI[-0.00244,+0.00153] p=0.753 sign 4/7 sig 0/7 | seed-level W p=0.812 t p=0.724  (n=7,206)
+  within session                     ndcg@10  d=+0.00002 (+0.0%) CI[-0.00091,+0.00094] p=0.819 sign 3/7 sig 0/7 | seed-level W p=1 t p=0.973  (n=7,206)
+
+== 4. Coverage@10, all test users (descriptive) ==
+  SASRec (tuned)     0.337 +- 0.055
+  CAFREC-NP (tuned)  0.366 +- 0.034
+  NP no policy flag  0.373 +- 0.053
+
+wall 6s
