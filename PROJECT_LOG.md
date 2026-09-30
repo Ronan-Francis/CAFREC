@@ -2073,3 +2073,34 @@ RESULTS — TUNED COMPARISON + POLICY-FLAG ABLATION (local GPU, finished 2026-09
   path, and 4 conditions (LLM profile / template / stand-in / no profile) x 3 ablation
   seeds, either ~$7 on Modal or ~6 h on the local GPU. Judged on the lowest activity
   quartile (6,240 users, NDCG@10), Holm within the H2 family. Code not yet written.
+
+  CLAIM AUDIT, 2026-09-20 (audit_paper_claims.py -> results/paper_audit_20260920.txt).
+  Every numeric claim in the paper recomputed from the stored runs: 77 reproduce, 0 differ,
+  2 partial. The two partials are the Cycle-11 tuned figures, for which 9 of 10 seeds are
+  on disk (tuned SASRec @2048 0.0451 vs 0.0455 reported; tuned CAFREC-H over tuned SASRec
+  @512 +3.5% over the 8 shared seeds vs +2.9% reported over 10, so the paper's figure is
+  the conservative one). The audit also confirmed the batch-size claim (SASRec HR@10
+  0.0787 at 2048) and the 84% loss share (83.8%).
+
+  CORRECTION FOUND AND APPLIED. The paper reported the seven-seed shuffled-context control
+  as "-1.5% NDCG@10, p=0.16, lower in five of seven seeds", sourced from the missing
+  analysis_matched_queue.md and paired with a CAFREC-NP reference "retrained for the
+  matched-batch comparison". No such reference exists on this machine or on the
+  cafrec-results volume, and neither available pairing reproduces it: against the Table I
+  runs the control gives -2.1% NDCG@10 (pooled p=0.023, 6/7 seeds, across-seed exact
+  Wilcoxon p=0.078, t p=0.040) and -1.8% HR@10; against the batch-2048 runs it gives +1.9%.
+  The paper now uses the Table I pairing and states the statistic disagreement explicitly.
+  Consequence: the claim "the evidence that the gate uses session-specific information is
+  weak" is withdrawn from the abstract, introduction, Sec. V-C, VI-A and the conclusion.
+  Permuting context costs 2.1% NDCG@10 in aggregate and 5.0% at session openers, so the
+  gate does use the context of the session being scored at the default operating point.
+  Build after the correction: 18 pages, 0 errors, 0 overfull boxes, 0 undefined references.
+
+  ABSTRACT cut 307 -> 247 words on 2026-09-20 for the IEEE limit. Removed: the
+  caption-profile percentages (-5.8%/-22.3%), the fusion-ablation clause, the per-test
+  statistics on the shuffled control, and the 4.6%/-3.0% session-position figures. All
+  remain in Section V. Kept: question, exact-limiting-case design, the null with its 2%
+  bound, the tuning robustness, H2's untested status, the shuffled control, the bounds.
+  Paper is 18 pages. No page requirement is documented anywhere in this repo or TODO.md;
+  the "20+ pages" figure lives only in an earlier session note, so confirm it against the
+  programme handbook before cutting or padding on length grounds.

@@ -1,0 +1,1109 @@
+{
+  "seeds": [
+    2020,
+    2021,
+    403092
+  ],
+  "script": "analyze_h2.py",
+  "date": "2026-09-21",
+  "files": {
+    "LLM": [
+      "CAFREC_kuairand_pure_ctx_h2_llm_plain_s2020_seed2020_20260921-125433.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_plain_s2021_seed2021_20260921-125556.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_plain_s403092_seed403092_20260921-125554.json"
+    ],
+    "Template": [
+      "CAFREC_kuairand_pure_ctx_h2_template_s2020_seed2020_20260921-125555.json",
+      "CAFREC_kuairand_pure_ctx_h2_template_s2021_seed2021_20260921-125457.json",
+      "CAFREC_kuairand_pure_ctx_h2_template_s403092_seed403092_20260921-125509.json"
+    ],
+    "Stand-in": [
+      "CAFREC_kuairand_pure_ctx_h2_standin_s2020_seed2020_20260921-125541.json",
+      "CAFREC_kuairand_pure_ctx_h2_standin_s2021_seed2021_20260921-125521.json",
+      "CAFREC_kuairand_pure_ctx_h2_standin_s403092_seed403092_20260921-125709.json"
+    ],
+    "CAFREC-NP": [
+      "CAFREC_kuairand_pure_ctx_h2_noprof_s2020_seed2020_20260921-125729.json",
+      "CAFREC_kuairand_pure_ctx_h2_noprof_s2021_seed2021_20260921-125748.json",
+      "CAFREC_kuairand_pure_ctx_h2_noprof_s403092_seed403092_20260921-125838.json"
+    ],
+    "Rank-0": [
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank0_s2020_seed2020_20260921-153132.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank0_s2021_seed2021_20260921-153135.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank0_s403092_seed403092_20260921-153138.json"
+    ],
+    "Rank-6": [
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank6_s2020_seed2020_20260921-153129.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank6_s2021_seed2021_20260921-153133.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank6_s403092_seed403092_20260921-153129.json"
+    ],
+    "Rank-64": [
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank64_s2020_seed2020_20260921-153109.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank64_s2021_seed2021_20260921-153134.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank64_s403092_seed403092_20260921-153136.json"
+    ],
+    "Rank-128": [
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank128_s2020_seed2020_20260921-153102.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank128_s2021_seed2021_20260921-153338.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank128_s403092_seed403092_20260921-153354.json"
+    ],
+    "Rank-256": [
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank256_s2020_seed2020_20260921-153327.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank256_s2021_seed2021_20260921-153358.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rank256_s403092_seed403092_20260921-153404.json"
+    ],
+    "Rand-256": [
+      "CAFREC_kuairand_pure_ctx_h2_llm_rand256_s2020_seed2020_20260921-153336.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rand256_s2021_seed2021_20260921-153410.json",
+      "CAFREC_kuairand_pure_ctx_h2_llm_rand256_s403092_seed403092_20260921-153408.json"
+    ],
+    "Hashing": [
+      "CAFREC_kuairand_pure_ctx_h2_hashing_s2020_seed2020_20260921-153412.json",
+      "CAFREC_kuairand_pure_ctx_h2_hashing_s2021_seed2021_20260921-153417.json",
+      "CAFREC_kuairand_pure_ctx_h2_hashing_s403092_seed403092_20260921-153555.json"
+    ]
+  },
+  "profile_coverage": {
+    "LLM": {
+      "all": 1.0,
+      "sparse (<20)": 1.0,
+      "dense (>=20)": 1.0,
+      "Q1 activity": 1.0,
+      "Q2 activity": 1.0,
+      "Q3 activity": 1.0,
+      "Q4 activity": 1.0,
+      "short session": 1.0,
+      "longer session": 1.0,
+      "high drift": 1.0,
+      "low drift": 1.0
+    }
+  },
+  "primary": {
+    "a": "LLM",
+    "b": "Stand-in",
+    "metric": "ndcg@10",
+    "n_users": 6240,
+    "seeds": 3,
+    "delta": -0.0002157733714691447,
+    "rel_pct": -0.41941083773875293,
+    "ci": [
+      -0.003150323021547231,
+      0.002698802941240811
+    ],
+    "p": 0.801941558549647,
+    "sig": 0,
+    "sign": 2,
+    "cohort": "Q1 activity",
+    "p_holm": 0.801941558549647
+  },
+  "verdict": "NOT SUPPORTED",
+  "rank_curve": [
+    {
+      "arm": "Rank-0",
+      "cache": "llm_rank0",
+      "effective_rank": 1.0,
+      "q1_ndcg": 0.05809844861785536,
+      "q1_hr": 0.11132478632478632,
+      "all_ndcg": 0.04054983851343016
+    },
+    {
+      "arm": "Rank-6",
+      "cache": "llm_rank6",
+      "effective_rank": 5.89,
+      "q1_ndcg": 0.05483153215335853,
+      "q1_hr": 0.10662393162393162,
+      "all_ndcg": 0.03815250903807012
+    },
+    {
+      "arm": "Template",
+      "cache": "hf",
+      "effective_rank": 6.5,
+      "q1_ndcg": 0.05714765187339137,
+      "q1_hr": 0.11057692307692307,
+      "all_ndcg": 0.040452222030252186
+    },
+    {
+      "arm": "Hashing",
+      "cache": "hashing",
+      "effective_rank": 35.45,
+      "q1_ndcg": 0.05826675120709679,
+      "q1_hr": 0.11201923076923077,
+      "all_ndcg": 0.040722352992233764
+    },
+    {
+      "arm": "Rank-64",
+      "cache": "llm_rank64",
+      "effective_rank": 39.96,
+      "q1_ndcg": 0.051043102536312945,
+      "q1_hr": 0.10026709401709402,
+      "all_ndcg": 0.03609454635993295
+    },
+    {
+      "arm": "Rank-128",
+      "cache": "llm_rank128",
+      "effective_rank": 58.39,
+      "q1_ndcg": 0.051312569219424335,
+      "q1_hr": 0.10112179487179487,
+      "all_ndcg": 0.03602621584178553
+    },
+    {
+      "arm": "Rand-256",
+      "cache": "llm_rand256",
+      "effective_rank": 76.54,
+      "q1_ndcg": 0.05220977269533746,
+      "q1_hr": 0.10277777777777777,
+      "all_ndcg": 0.03654617641105827
+    },
+    {
+      "arm": "Rank-256",
+      "cache": "llm_rank256",
+      "effective_rank": 77.07,
+      "q1_ndcg": 0.05225477935570647,
+      "q1_hr": 0.10267094017094017,
+      "all_ndcg": 0.036488998974577885
+    },
+    {
+      "arm": "LLM",
+      "cache": "llm_plain",
+      "effective_rank": 94.78,
+      "q1_ndcg": 0.051231006743342265,
+      "q1_hr": 0.10138888888888889,
+      "all_ndcg": 0.03630883088868583
+    }
+  ],
+  "absolute": {
+    "LLM": {
+      "hit@10": 0.10138888888888889,
+      "ndcg@10": 0.051231006743342265,
+      "mrr@10": 0.03617909289784291,
+      "all_users": {
+        "hit@10": 0.07268389199255121,
+        "ndcg@10": 0.03630883088868583,
+        "mrr@10": 0.025421742447755018
+      }
+    },
+    "Template": {
+      "hit@10": 0.11057692307692307,
+      "ndcg@10": 0.05714765187339137,
+      "mrr@10": 0.04116050230633564,
+      "all_users": {
+        "hit@10": 0.07923067970204842,
+        "ndcg@10": 0.040452222030252186,
+        "mrr@10": 0.02887651234259998
+      }
+    },
+    "Stand-in": {
+      "hit@10": 0.10122863247863248,
+      "ndcg@10": 0.05144678011481141,
+      "mrr@10": 0.03651081942748609,
+      "all_users": {
+        "hit@10": 0.07053072625698324,
+        "ndcg@10": 0.034774611822187176,
+        "mrr@10": 0.024095469484348677
+      }
+    },
+    "CAFREC-NP": {
+      "hit@10": 0.11367521367521367,
+      "ndcg@10": 0.05863627387616547,
+      "mrr@10": 0.04206792243250576,
+      "all_users": {
+        "hit@10": 0.0793034217877095,
+        "ndcg@10": 0.04019604360867617,
+        "mrr@10": 0.02848067415979427
+      }
+    },
+    "Rank-0": {
+      "hit@10": 0.11132478632478632,
+      "ndcg@10": 0.05809844861785536,
+      "mrr@10": 0.04216801909510242,
+      "all_users": {
+        "hit@10": 0.07925977653631285,
+        "ndcg@10": 0.04054983851343016,
+        "mrr@10": 0.028992507103322396
+      }
+    },
+    "Rank-6": {
+      "hit@10": 0.10662393162393162,
+      "ndcg@10": 0.05483153215335853,
+      "mrr@10": 0.03937809489892824,
+      "all_users": {
+        "hit@10": 0.07527351024208566,
+        "ndcg@10": 0.03815250903807012,
+        "mrr@10": 0.02708214983114599
+      }
+    },
+    "Rank-64": {
+      "hit@10": 0.10026709401709402,
+      "ndcg@10": 0.051043102536312945,
+      "mrr@10": 0.03626954449871117,
+      "all_users": {
+        "hit@10": 0.07243656890130354,
+        "ndcg@10": 0.03609454635993295,
+        "mrr@10": 0.025235736316174515
+      }
+    },
+    "Rank-128": {
+      "hit@10": 0.10112179487179487,
+      "ndcg@10": 0.051312569219424335,
+      "mrr@10": 0.03636972595305929,
+      "all_users": {
+        "hit@10": 0.07239292364990689,
+        "ndcg@10": 0.03602621584178553,
+        "mrr@10": 0.02516104289519967
+      }
+    },
+    "Rank-256": {
+      "hit@10": 0.10267094017094017,
+      "ndcg@10": 0.05225477935570647,
+      "mrr@10": 0.037130032390449055,
+      "all_users": {
+        "hit@10": 0.07293121508379888,
+        "ndcg@10": 0.036488998974577885,
+        "mrr@10": 0.02557347897453519
+      }
+    },
+    "Rand-256": {
+      "hit@10": 0.10277777777777777,
+      "ndcg@10": 0.05220977269533746,
+      "mrr@10": 0.037031122812372815,
+      "all_users": {
+        "hit@10": 0.0732221834264432,
+        "ndcg@10": 0.03654617641105827,
+        "mrr@10": 0.02559202820637876
+      }
+    },
+    "Hashing": {
+      "hit@10": 0.11201923076923077,
+      "ndcg@10": 0.05826675120709679,
+      "mrr@10": 0.04214900454483787,
+      "all_users": {
+        "hit@10": 0.07952164804469274,
+        "ndcg@10": 0.040722352992233764,
+        "mrr@10": 0.029105603726981174
+      }
+    }
+  },
+  "sections": [
+    {
+      "title": "1. PRIMARY: lowest activity quartile, NDCG@10; Holm over this 4-test REGISTERED family",
+      "family_corrected": true,
+      "rows": [
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.0002157733714691447,
+          "rel_pct": -0.41941083773875293,
+          "ci": [
+            -0.003150323021547231,
+            0.002698802941240811
+          ],
+          "p": 0.801941558549647,
+          "sig": 0,
+          "sign": 2,
+          "cohort": "Q1 activity",
+          "p_holm": 0.801941558549647
+        },
+        {
+          "a": "LLM",
+          "b": "Template",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.005916645130049097,
+          "rel_pct": -10.353260258456846,
+          "ci": [
+            -0.008614623194093885,
+            -0.0031102050413349606
+          ],
+          "p": 0.0002322136200391794,
+          "sig": 2,
+          "sign": 3,
+          "cohort": "Q1 activity",
+          "p_holm": 0.0004644272400783588
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.007405267132823203,
+          "rel_pct": -12.629157078538894,
+          "ci": [
+            -0.010040056024715065,
+            -0.00474804869858096
+          ],
+          "p": 1.552361177056273e-07,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q1 activity",
+          "p_holm": 6.209444708225092e-07
+        },
+        {
+          "a": "Template",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.005700871758579952,
+          "rel_pct": 11.08110506791208,
+          "ci": [
+            0.00298923510034584,
+            0.008428545927620214
+          ],
+          "p": 2.96002437137957e-05,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q1 activity",
+          "p_holm": 8.88007311413871e-05
+        }
+      ]
+    },
+    {
+      "title": "2. Lowest activity quartile, HR@10 and MRR@10 (secondary, no Holm)",
+      "family_corrected": false,
+      "rows": [
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "hit@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.0001602564102564099,
+          "rel_pct": 0.15831134564643765,
+          "ci": [
+            -0.005235042735042735,
+            0.005397970085470071
+          ],
+          "p": 0.9433424667905577,
+          "sig": 0,
+          "sign": 1,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "mrr@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.00033172652964319656,
+          "rel_pct": -0.908570486351413,
+          "ci": [
+            -0.0027756744123931627,
+            0.002124273440679689
+          ],
+          "p": 0.8214517878651446,
+          "sig": 0,
+          "sign": 2,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Template",
+          "metric": "hit@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.009188034188034187,
+          "rel_pct": -8.309178743961352,
+          "ci": [
+            -0.014210737179487181,
+            -0.0041666666666666675
+          ],
+          "p": 2.0046201318774155e-05,
+          "sig": 2,
+          "sign": 3,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Template",
+          "metric": "mrr@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.004981409408492741,
+          "rel_pct": -12.102401888632873,
+          "ci": [
+            -0.007420347688576854,
+            -0.0026223756952923633
+          ],
+          "p": 0.00291570728458312,
+          "sig": 2,
+          "sign": 3,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "hit@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.012286324786324788,
+          "rel_pct": -10.80827067669173,
+          "ci": [
+            -0.0171474358974359,
+            -0.007318376068376069
+          ],
+          "p": 1.5460151159711962e-08,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "mrr@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.005888829534662869,
+          "rel_pct": -13.998384503325477,
+          "ci": [
+            -0.008351119463098631,
+            -0.0035034446649029995
+          ],
+          "p": 3.393954298771088e-06,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q1 activity"
+        }
+      ]
+    },
+    {
+      "title": "3. All users and the other activity quartiles, NDCG@10 (secondary)",
+      "family_corrected": false,
+      "rows": [
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 22912,
+          "seeds": 3,
+          "delta": 0.00153421906649865,
+          "rel_pct": 4.411894155263511,
+          "ci": [
+            0.0002942863035096951,
+            0.0028122668695942403
+          ],
+          "p": 0.021010466371938687,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "all"
+        },
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 5549,
+          "seeds": 3,
+          "delta": 0.0024235157030283593,
+          "rel_pct": 6.238687068562438,
+          "ci": [
+            -0.00035042775301611794,
+            0.005077310293170746
+          ],
+          "p": 0.050987472910203585,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "Q2 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 5442,
+          "seeds": 3,
+          "delta": 0.002897492014541522,
+          "rel_pct": 10.460430196575258,
+          "ci": [
+            0.0004936446217872845,
+            0.005397038375728443
+          ],
+          "p": 0.04336004303294298,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "Q3 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 5681,
+          "seeds": 3,
+          "delta": 0.0012818540592052805,
+          "rel_pct": 6.6548316399382,
+          "ci": [
+            -0.0005734480512877646,
+            0.0030391987439931417
+          ],
+          "p": 0.17436960576909868,
+          "sig": 1,
+          "sign": 2,
+          "cohort": "Q4 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Template",
+          "metric": "ndcg@10",
+          "n_users": 22912,
+          "seeds": 3,
+          "delta": -0.004143391141566349,
+          "rel_pct": -10.242678729657213,
+          "ci": [
+            -0.00540194550733894,
+            -0.0029403423614079937
+          ],
+          "p": 5.896045624762449e-09,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "all"
+        },
+        {
+          "a": "LLM",
+          "b": "Template",
+          "metric": "ndcg@10",
+          "n_users": 5549,
+          "seeds": 3,
+          "delta": -0.004741092187507931,
+          "rel_pct": -10.304219093921507,
+          "ci": [
+            -0.007299123053095903,
+            -0.002136432296281441
+          ],
+          "p": 0.0015052590580320459,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q2 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Template",
+          "metric": "ndcg@10",
+          "n_users": 5442,
+          "seeds": 3,
+          "delta": -0.003461560586695055,
+          "rel_pct": -10.163542829353378,
+          "ci": [
+            -0.006014686342463215,
+            -0.0010416893661517564
+          ],
+          "p": 0.022085189863970147,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "Q3 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "Template",
+          "metric": "ndcg@10",
+          "n_users": 5681,
+          "seeds": 3,
+          "delta": -0.0022649848552694636,
+          "rel_pct": -9.930291864994143,
+          "ci": [
+            -0.004151824015747005,
+            -0.0005198267745111712
+          ],
+          "p": 0.019302351948166985,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "Q4 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 22912,
+          "seeds": 3,
+          "delta": -0.003887212719990342,
+          "rel_pct": -9.670635144677027,
+          "ci": [
+            -0.0050347939969060205,
+            -0.0026942358427198133
+          ],
+          "p": 1.1005827225587453e-08,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "all"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 5549,
+          "seeds": 3,
+          "delta": -0.004430539644415746,
+          "rel_pct": -9.694703251187645,
+          "ci": [
+            -0.0070487628443968295,
+            -0.0018995844869096853
+          ],
+          "p": 0.002626386250979321,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "Q2 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 5442,
+          "seeds": 3,
+          "delta": -0.0014518017276545895,
+          "rel_pct": -4.529966113911023,
+          "ci": [
+            -0.0037627705792127966,
+            0.0007418027178814458
+          ],
+          "p": 0.5117457295165619,
+          "sig": 0,
+          "sign": 3,
+          "cohort": "Q3 activity"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 5681,
+          "seeds": 3,
+          "delta": -0.001825238768322948,
+          "rel_pct": -8.159643780715339,
+          "ci": [
+            -0.00363113628431833,
+            5.461944959417427e-05
+          ],
+          "p": 0.07072650081291372,
+          "sig": 1,
+          "sign": 2,
+          "cohort": "Q4 activity"
+        }
+      ]
+    },
+    {
+      "title": "4. Sparse vs dense and session position, NDCG@10 (secondary)",
+      "family_corrected": false,
+      "rows": [
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 10345,
+          "seeds": 3,
+          "delta": 0.001047388342556483,
+          "rel_pct": 2.2722256426795706,
+          "ci": [
+            -0.0011211821601141256,
+            0.003229419481965323
+          ],
+          "p": 0.3232330681710219,
+          "sig": 0,
+          "sign": 3,
+          "cohort": "sparse (<20)"
+        },
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 12567,
+          "seeds": 3,
+          "delta": 0.001934972137174366,
+          "rel_pct": 7.60136359962312,
+          "ci": [
+            0.000532492312003678,
+            0.0034024246198439924
+          ],
+          "p": 0.016461641639675426,
+          "sig": 2,
+          "sign": 3,
+          "cohort": "dense (>=20)"
+        },
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 15706,
+          "seeds": 3,
+          "delta": 0.0008707207545984075,
+          "rel_pct": 2.7724660254049893,
+          "ci": [
+            -0.0005696725522774809,
+            0.002293274474179388
+          ],
+          "p": 0.24670357662467882,
+          "sig": 1,
+          "sign": 1,
+          "cohort": "short session"
+        },
+        {
+          "a": "LLM",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 7206,
+          "seeds": 3,
+          "delta": 0.0029803617929356754,
+          "rel_pct": 7.0764304157049684,
+          "ci": [
+            0.0005816689059243918,
+            0.0055241810383265845
+          ],
+          "p": 0.01882147000834221,
+          "sig": 2,
+          "sign": 2,
+          "cohort": "longer session"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 10345,
+          "seeds": 3,
+          "delta": -0.006362850577956957,
+          "rel_pct": -11.891956110413854,
+          "ci": [
+            -0.00833144849428239,
+            -0.004466845322242867
+          ],
+          "p": 2.70584621971984e-09,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "sparse (<20)"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 12567,
+          "seeds": 3,
+          "delta": -0.0018492980513610225,
+          "rel_pct": -6.324578454342564,
+          "ci": [
+            -0.0033799345650531915,
+            -0.000463956939165111
+          ],
+          "p": 0.05987207941833228,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "dense (>=20)"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 15706,
+          "seeds": 3,
+          "delta": -0.002905177363911005,
+          "rel_pct": -8.257590684153499,
+          "ci": [
+            -0.004321739154977211,
+            -0.0015155747554889323
+          ],
+          "p": 8.28796788512761e-05,
+          "sig": 2,
+          "sign": 3,
+          "cohort": "short session"
+        },
+        {
+          "a": "LLM",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 7206,
+          "seeds": 3,
+          "delta": -0.006027630053126902,
+          "rel_pct": -11.790047294823987,
+          "ci": [
+            -0.008303628697934166,
+            -0.0038084934603996754
+          ],
+          "p": 1.608180575318878e-05,
+          "sig": 2,
+          "sign": 3,
+          "cohort": "longer session"
+        }
+      ]
+    },
+    {
+      "title": "7a. EXPLORATORY rank sweep, lowest quartile NDCG@10, each arm vs the Stand-in; Holm within the rank set ONLY",
+      "family_corrected": true,
+      "rows": [
+        {
+          "a": "Rank-0",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.006651668503043952,
+          "rel_pct": 12.929222175225991,
+          "ci": [
+            0.003991926111552616,
+            0.00941344908115796
+          ],
+          "p": 3.683368022323673e-06,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q1 activity",
+          "p_holm": 2.241265883634544e-05
+        },
+        {
+          "a": "Rank-6",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.003384752038547114,
+          "rel_pct": 6.579132903932021,
+          "ci": [
+            0.0002956014484982036,
+            0.006498938682712924
+          ],
+          "p": 0.05047044513106378,
+          "sig": 1,
+          "sign": 3,
+          "cohort": "Q1 activity",
+          "p_holm": 0.2523522256553189
+        },
+        {
+          "a": "Rank-64",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.00040367757849846443,
+          "rel_pct": -0.7846508131268775,
+          "ci": [
+            -0.0033896213246005385,
+            0.0023677466902737214
+          ],
+          "p": 0.6864598542984823,
+          "sig": 0,
+          "sign": 2,
+          "cohort": "Q1 activity",
+          "p_holm": 1.0
+        },
+        {
+          "a": "Rank-128",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.00013421089538708184,
+          "rel_pct": -0.260873265707921,
+          "ci": [
+            -0.0031491543593566954,
+            0.002758659634028092
+          ],
+          "p": 0.7581485700557511,
+          "sig": 0,
+          "sign": 1,
+          "cohort": "Q1 activity",
+          "p_holm": 1.0
+        },
+        {
+          "a": "Rank-256",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.0008079992408950604,
+          "rel_pct": 1.5705535683513832,
+          "ci": [
+            -0.0020372572855848767,
+            0.003608740138425878
+          ],
+          "p": 0.5337456790337685,
+          "sig": 0,
+          "sign": 3,
+          "cohort": "Q1 activity",
+          "p_holm": 1.0
+        },
+        {
+          "a": "Rand-256",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.0007629925805260534,
+          "rel_pct": 1.483071591309151,
+          "ci": [
+            -0.0020992318520807423,
+            0.0037092369466629194
+          ],
+          "p": 0.6097420135098901,
+          "sig": 0,
+          "sign": 2,
+          "cohort": "Q1 activity",
+          "p_holm": 1.0
+        },
+        {
+          "a": "Hashing",
+          "b": "Stand-in",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.006819971092285378,
+          "rel_pct": 13.256361383677586,
+          "ci": [
+            0.004145705389433289,
+            0.00928688246386813
+          ],
+          "p": 3.2018084051922056e-06,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q1 activity",
+          "p_holm": 2.241265883634544e-05
+        }
+      ]
+    },
+    {
+      "title": "7b. Rank-sweep controls: do the DIRECTIONS matter (Rank-32 vs Rand-32), and is a CONSTANT profile as good as the template?",
+      "family_corrected": false,
+      "rows": [
+        {
+          "a": "Rank-256",
+          "b": "Rand-256",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 4.5006660369007194e-05,
+          "rel_pct": 0.08620351716839875,
+          "ci": [
+            -0.0009451377370281344,
+            0.0009448241185477149
+          ],
+          "p": 0.6693986597485828,
+          "sig": 0,
+          "sign": 1,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "Rank-0",
+          "b": "Template",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.0009507967444640001,
+          "rel_pct": 1.6637547008413525,
+          "ci": [
+            -0.0005023445934334932,
+            0.0024089224626050584
+          ],
+          "p": 0.2818788544847751,
+          "sig": 0,
+          "sign": 3,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "Rank-0",
+          "b": "LLM",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": 0.006867441874513097,
+          "rel_pct": 13.404854425207166,
+          "ci": [
+            0.004098047928830194,
+            0.00952298067165152
+          ],
+          "p": 2.427471054366344e-06,
+          "sig": 3,
+          "sign": 3,
+          "cohort": "Q1 activity"
+        },
+        {
+          "a": "Rank-0",
+          "b": "CAFREC-NP",
+          "metric": "ndcg@10",
+          "n_users": 6240,
+          "seeds": 3,
+          "delta": -0.0005378252583101059,
+          "rel_pct": -0.9172227748406121,
+          "ci": [
+            -0.002010177857907357,
+            0.0008606210424334339
+          ],
+          "p": 0.4503840213453036,
+          "sig": 0,
+          "sign": 1,
+          "cohort": "Q1 activity"
+        }
+      ]
+    },
+    {
+      "title": "7c. rank vs lowest-quartile accuracy",
+      "rows": [
+        {
+          "arm": "Rank-0",
+          "cache": "llm_rank0",
+          "effective_rank": 1.0,
+          "q1_ndcg": 0.05809844861785536,
+          "q1_hr": 0.11132478632478632,
+          "all_ndcg": 0.04054983851343016
+        },
+        {
+          "arm": "Rank-6",
+          "cache": "llm_rank6",
+          "effective_rank": 5.89,
+          "q1_ndcg": 0.05483153215335853,
+          "q1_hr": 0.10662393162393162,
+          "all_ndcg": 0.03815250903807012
+        },
+        {
+          "arm": "Template",
+          "cache": "hf",
+          "effective_rank": 6.5,
+          "q1_ndcg": 0.05714765187339137,
+          "q1_hr": 0.11057692307692307,
+          "all_ndcg": 0.040452222030252186
+        },
+        {
+          "arm": "Hashing",
+          "cache": "hashing",
+          "effective_rank": 35.45,
+          "q1_ndcg": 0.05826675120709679,
+          "q1_hr": 0.11201923076923077,
+          "all_ndcg": 0.040722352992233764
+        },
+        {
+          "arm": "Rank-64",
+          "cache": "llm_rank64",
+          "effective_rank": 39.96,
+          "q1_ndcg": 0.051043102536312945,
+          "q1_hr": 0.10026709401709402,
+          "all_ndcg": 0.03609454635993295
+        },
+        {
+          "arm": "Rank-128",
+          "cache": "llm_rank128",
+          "effective_rank": 58.39,
+          "q1_ndcg": 0.051312569219424335,
+          "q1_hr": 0.10112179487179487,
+          "all_ndcg": 0.03602621584178553
+        },
+        {
+          "arm": "Rand-256",
+          "cache": "llm_rand256",
+          "effective_rank": 76.54,
+          "q1_ndcg": 0.05220977269533746,
+          "q1_hr": 0.10277777777777777,
+          "all_ndcg": 0.03654617641105827
+        },
+        {
+          "arm": "Rank-256",
+          "cache": "llm_rank256",
+          "effective_rank": 77.07,
+          "q1_ndcg": 0.05225477935570647,
+          "q1_hr": 0.10267094017094017,
+          "all_ndcg": 0.036488998974577885
+        },
+        {
+          "arm": "LLM",
+          "cache": "llm_plain",
+          "effective_rank": 94.78,
+          "q1_ndcg": 0.051231006743342265,
+          "q1_hr": 0.10138888888888889,
+          "all_ndcg": 0.03630883088868583
+        }
+      ]
+    }
+  ]
+}

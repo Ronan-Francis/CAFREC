@@ -346,6 +346,119 @@ def hashsweep(profile: str = HASHING_PROFILE, profile_dim: int = 1024):
               for s in ABLATION_SEEDS])
 
 
+TEMPLATE_PROFILE = "profiles/kuairand_pure_ctx.profiles.hf.d1024.pt"
+H2_PROMPT_VARIANTS = ("plain", "kar", "collab", "support")
+
+
+NAMED_PROFILES = {
+    "template": TEMPLATE_PROFILE,
+    "hashing": "profiles/kuairand_pure_ctx.profiles.hashing.d1024.pt",
+}
+
+
+def _profile_path(name):
+    """Cache name -> path on the cafrec-data volume. Everything except the two
+    legacy names follows `profiles.<name>.d1024.pt`, which covers llm_plain,
+    llm_kar/support and the llm_rank*/llm_rand* sweep caches alike."""
+    return NAMED_PROFILES.get(
+        name, f"profiles/kuairand_pure_ctx.profiles.{name}.d1024.pt")
+
+
+# Rank sweep (2026-09-21, exploratory). H2 came out null AND the LLM profile lost
+# to both the template and no-profile-at-all in the lowest quartile. Measuring the
+# caches showed the template is nearly constant (effective rank 6.5 of 1024) while
+# the LLM cache carries ~15x more per-user variation (94.8) — so the frozen
+# profile's benefit for sparse users may be conditioning, not personalisation.
+# These arms vary ONLY the rank of the LLM cache. rank0 is the constant control;
+# rand32 keeps rank and per-user scores but randomises the directions.
+# Grid chosen 2026-09-21 AFTER measuring where the effect is: Template sits at
+# effective rank 6.50 and Hashing at 35.45 (both fine), the untruncated LLM cache
+# at 94.78 (-12%), so the transition is between 35 and 95. k=0/6/64/128/256 give
+# effective ranks 1.00/5.89/39.96/58.39/77.07 — a constant control, a point
+# rank-matched to the template, and three spanning the transition.
+RANK_ARMS = ("llm_rank0", "llm_rank6", "llm_rank64", "llm_rank128",
+             "llm_rank256", "llm_rand256", "hashing")
+
+
+# The registered arm is llm_plain; llm_kar / llm_collab / llm_support are the
+# exploratory context-engineering arms (see build_h2_prompts.py). histgate
+# re-runs Cycle 10's RON-45 "H2 fix" at batch 512, which it has never been
+# tested at — its original result predates the tiers.py batch-confound fix.
+H2_SPEC = {
+    "llm_plain":   dict(profile="llm_plain"),
+    "llm_kar":     dict(profile="llm_kar"),
+    "llm_collab":  dict(profile="llm_collab"),
+    "llm_support": dict(profile="llm_support"),
+    "template":    dict(profile="template"),
+    "standin":     dict(),                       # trainable per-user embedding
+    "noprof":      dict(ablation="no_profiler"),
+    "histgate":    dict(profile="template", history_gate=True),
+    **{a: dict(profile=a) for a in RANK_ARMS},
+}
+H2_REGISTERED = ("llm_plain", "template", "standin", "noprof")
+
+
+@app.local_entrypoint()
+def h2(conditions: str = ",".join(H2_REGISTERED), profile_dim: int = 1024,
+       seeds: str = None):
+    """Test H2 as registered, plus the exploratory context-engineering arms.
+
+    H2 (Project_Plan_2): LLM-generated temporal profiles beat interaction-derived
+    embeddings for users in the lowest quartile of interaction counts. The paper
+    reports H2 as untested because no evaluated profile was LLM-generated.
+
+    Registered family (the default, 12 jobs, ~$7):
+      llm_plain   CAFREC + the generated profile cache   <- the missing arm
+      template    CAFREC + the templated behavioural profile (bge, d1024)
+      standin     CAFREC with the trainable per-user embedding  <- H2's comparator
+      noprof      CAFREC-NP, no long-term branch at all   <- second reading
+
+    Exploratory arms, each 3 jobs (~$1.80), declared as exploratory in the paper:
+      llm_kar     knowledge-inference prompt, same inputs (KAR, RecSys 2024)
+      llm_collab  + items from the nearest long-history users (CoRAL, KDD 2024)
+      llm_support + those users' category mixes as in-context examples
+      histgate    template profile + the RON-45 history gate, at batch 512
+
+    All conditions share one code path, one batch size (512) and one device, so
+    they are mutually comparable. Judged on the lowest activity quartile by
+    `analyze_h2.py`, which applies Holm within the registered family only.
+
+        modal run modal_run.py::h2
+        modal run modal_run.py::h2 --conditions llm_kar,llm_collab,llm_support
+        modal run modal_run.py::h2 --conditions histgate
+    """
+    picked = [c.strip() for c in conditions.split(",") if c.strip()]
+    unknown = set(picked) - set(H2_SPEC)
+    if unknown:
+        raise SystemExit(f"unknown condition(s) {sorted(unknown)}; "
+                         f"choose from {sorted(H2_SPEC)}")
+    seed_list = ([int(s) for s in seeds.split(",")] if seeds else ABLATION_SEEDS)
+
+    # Fail before spawning (and paying for) anything if a cache is missing.
+    jobs = []
+    for c in picked:
+        spec = dict(H2_SPEC[c])
+        profile = spec.pop("profile", None)
+        if profile is not None:
+            path = _profile_path(profile)
+            parent, _, name = path.rpartition("/")
+            if name not in {e.path.rpartition("/")[2] for e in data_vol.listdir(parent)}:
+                how = ("  modal run modal_rank_profiles.py"
+                       if profile.startswith(("llm_rank", "llm_rand")) else
+                       f"  modal run modal_h2_generate.py --variant "
+                       f"{profile.removeprefix('llm_')}\n"
+                       f"  modal run modal_h2_embed.py --variant "
+                       f"{profile.removeprefix('llm_')}")
+                raise SystemExit(
+                    f"{path} is not on the cafrec-data volume, needed by condition "
+                    f"'{c}'. Build it with:\n{how}")
+            spec.update(llm_profile_path=f"/data/{path}", profile_dim=profile_dim)
+        for s in seed_list:
+            jobs.append(dict(model_key="CAFREC", dataset="kuairand_pure_ctx",
+                             seed=s, tag=f"h2_{c}_s{s}", **spec))
+    _fan_out(jobs)
+
+
 ALL_DATASETS = ["kuairand_pure", "kuairand_1k", "kuairand_27k"]
 
 
