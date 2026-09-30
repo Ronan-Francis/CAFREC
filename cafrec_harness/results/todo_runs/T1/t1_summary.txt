@@ -1,0 +1,1 @@
+T1: B2a mean 4.39% (median 1.20%); MostPop HR@10 full 0.0432, causal 0.0408 (-5.6%); gate FAIL (logged 0.0357, 21957/22912 users same top-10 status)

@@ -1,0 +1,14 @@
+{
+  "rows": 81,
+  "distinct_result_files": 103,
+  "batch_sizes": [
+    "512",
+    "n/a"
+  ],
+  "from_config": 63,
+  "from_launch_code": 40,
+  "untracked_files": [
+    "cafrec_harness/results/todo_runs/MostPop/mostpop_results.json"
+  ],
+  "head": "4841de5ff547bb0708810c7ec1c2821663ae67fd"
+}

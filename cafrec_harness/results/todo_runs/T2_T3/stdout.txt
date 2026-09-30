@@ -1,0 +1,29 @@
+[09:30:53] seed 2020: loading saved/CAFREC-Sep-17-2026_18-48-42.pth
+[09:32:09] seed 2020: gate {'hr10_recomputed': 0.08061277932960893, 'hr10_logged': 0.0806, 'ranks_equal': 22912, 'n_users': 22912, 'passed': True}
+[09:32:11] partition counts {'all': 22912, 'short session': 15706, 'longer session': 7206, 'high drift': 3521, 'low drift': 19391}
+[09:32:13] seed 2020: T2 {'mean': 0.1006106287240982, 'sd': 0.2651887536048889, 'mean_opener': 0.11492802202701569, 'mean_within': 0.069404736161232, 'mean_high_drift': 0.07404500246047974, 'mean_low_drift': 0.1054343655705452, 'share_across_sessions': 0.046187691390514374, 'share_across_dims': 0.641512930393219, 'dim_mean_range': [2.0939551177434623e-05, 0.8510204553604126]}
+[09:32:23] seed 2020: T3 prefix_session_len_log_z mean dNDCG -0.000391
+[09:32:33] seed 2020: T3 prefix_dwell_entropy_z mean dNDCG -0.000045
+[09:32:43] seed 2020: T3 prefix_category_drift_z mean dNDCG -0.000206
+[09:32:54] seed 2020: T3 inter_session_gap_log_z mean dNDCG -0.001014
+[09:33:04] seed 2020: T3 prefix_policy_flag mean dNDCG -0.000338
+[09:33:15] seed 2020: T3 is_first_session mean dNDCG +0.000000
+[09:33:15] seed 2021: loading saved/CAFREC-Sep-17-2026_22-27-03.pth
+[09:34:31] seed 2021: gate {'hr10_recomputed': 0.08013268156424581, 'hr10_logged': 0.0801, 'ranks_equal': 22912, 'n_users': 22912, 'passed': True}
+[09:34:33] seed 2021: T2 {'mean': 0.11303291469812393, 'sd': 0.27233749628067017, 'mean_opener': 0.12702836096286774, 'mean_within': 0.08252880722284317, 'mean_high_drift': 0.08459123224020004, 'mean_low_drift': 0.11819729954004288, 'share_across_sessions': 0.04635460302233696, 'share_across_dims': 0.6341618299484253, 'dim_mean_range': [1.660600901232101e-05, 0.8561747670173645]}
+[09:34:43] seed 2021: T3 prefix_session_len_log_z mean dNDCG -0.000087
+[09:34:53] seed 2021: T3 prefix_dwell_entropy_z mean dNDCG +0.000070
+[09:35:05] seed 2021: T3 prefix_category_drift_z mean dNDCG -0.000130
+[09:35:16] seed 2021: T3 inter_session_gap_log_z mean dNDCG -0.001393
+[09:35:26] seed 2021: T3 prefix_policy_flag mean dNDCG -0.000105
+[09:35:36] seed 2021: T3 is_first_session mean dNDCG +0.000000
+[09:35:36] seed 403092: loading saved/CAFREC-Sep-18-2026_12-18-52.pth
+[09:36:52] seed 403092: gate {'hr10_recomputed': 0.0826641061452514, 'hr10_logged': 0.0827, 'ranks_equal': 22912, 'n_users': 22912, 'passed': True}
+[09:36:54] seed 403092: T2 {'mean': 0.11816231161355972, 'sd': 0.26329800486564636, 'mean_opener': 0.12859874963760376, 'mean_within': 0.09541533142328262, 'mean_high_drift': 0.09527578949928284, 'mean_low_drift': 0.12231797724962234, 'share_across_sessions': 0.02073662169277668, 'share_across_dims': 0.7056636214256287, 'dim_mean_range': [5.8188299590256065e-05, 0.8530200719833374]}
+[09:37:04] seed 403092: T3 prefix_session_len_log_z mean dNDCG -0.000059
+[09:37:13] seed 403092: T3 prefix_dwell_entropy_z mean dNDCG +0.000068
+[09:37:24] seed 403092: T3 prefix_category_drift_z mean dNDCG -0.000037
+[09:37:36] seed 403092: T3 inter_session_gap_log_z mean dNDCG -0.000730
+[09:37:46] seed 403092: T3 prefix_policy_flag mean dNDCG -0.000207
+[09:37:56] seed 403092: T3 is_first_session mean dNDCG +0.000000
+[09:37:59] T2/T3 (3 CPU checkpoints, seeds [2020, 2021, 403092]): gate PASS; g mean 0.111 sd 0.267; opener 0.124 within 0.082; high 0.085 low 0.115; var share sessions 3.8% dims 66.0%; T3 prefix_session_len_log_z -0.44% [-0.81, -0.07], prefix_dwell_entropy_z +0.08% [-0.16, +0.32], prefix_category_drift_z -0.30% [-0.51, -0.11], inter_session_gap_log_z -2.55% [-3.67, -1.47], prefix_policy_flag -0.53% [-1.19, +0.04], is_first_session +0.00% [+0.00, +0.00]

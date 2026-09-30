@@ -1,0 +1,1 @@
+T6: ndcg@10 -1.56% (d=-0.00065, t95 CI [-0.00131,+0.00002] = [-3.17%,+0.05%], exact W p=0.084, 7/10 below zero); hit@10 -1.29% (d=-0.00105, t95 CI [-0.00208,-0.00001] = [-2.57%,-0.02%], exact W p=0.105, 7/10 below zero); gate FAIL; runs {'runs': 20, 'batch_sizes': [512], 'batch_size_recorded': 7, 'devices': ['Modal A10G'], 'same_batch_and_device': True}

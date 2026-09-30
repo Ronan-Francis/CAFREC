@@ -1,0 +1,121 @@
+{
+  "task": "T2",
+  "markers": [
+    "C2a",
+    "C2b",
+    "C2c"
+  ],
+  "gate": {
+    "2020": {
+      "hr10_recomputed": 0.08061277932960893,
+      "hr10_logged": 0.0806,
+      "ranks_equal": 22912,
+      "n_users": 22912,
+      "passed": true
+    },
+    "partition_counts": {
+      "all": 22912,
+      "short session": 15706,
+      "longer session": 7206,
+      "high drift": 3521,
+      "low drift": 19391
+    },
+    "partition_passed": true,
+    "2021": {
+      "hr10_recomputed": 0.08013268156424581,
+      "hr10_logged": 0.0801,
+      "ranks_equal": 22912,
+      "n_users": 22912,
+      "passed": true
+    },
+    "403092": {
+      "hr10_recomputed": 0.0826641061452514,
+      "hr10_logged": 0.0827,
+      "ranks_equal": 22912,
+      "n_users": 22912,
+      "passed": true
+    }
+  },
+  "gate_passed": true,
+  "per_seed": {
+    "2020": {
+      "mean": 0.1006106287240982,
+      "sd": 0.2651887536048889,
+      "mean_opener": 0.11492802202701569,
+      "mean_within": 0.069404736161232,
+      "mean_high_drift": 0.07404500246047974,
+      "mean_low_drift": 0.1054343655705452,
+      "share_across_sessions": 0.046187691390514374,
+      "share_across_dims": 0.641512930393219,
+      "dim_mean_range": [
+        2.0939551177434623e-05,
+        0.8510204553604126
+      ]
+    },
+    "2021": {
+      "mean": 0.11303291469812393,
+      "sd": 0.27233749628067017,
+      "mean_opener": 0.12702836096286774,
+      "mean_within": 0.08252880722284317,
+      "mean_high_drift": 0.08459123224020004,
+      "mean_low_drift": 0.11819729954004288,
+      "share_across_sessions": 0.04635460302233696,
+      "share_across_dims": 0.6341618299484253,
+      "dim_mean_range": [
+        1.660600901232101e-05,
+        0.8561747670173645
+      ]
+    },
+    "403092": {
+      "mean": 0.11816231161355972,
+      "sd": 0.26329800486564636,
+      "mean_opener": 0.12859874963760376,
+      "mean_within": 0.09541533142328262,
+      "mean_high_drift": 0.09527578949928284,
+      "mean_low_drift": 0.12231797724962234,
+      "share_across_sessions": 0.02073662169277668,
+      "share_across_dims": 0.7056636214256287,
+      "dim_mean_range": [
+        5.8188299590256065e-05,
+        0.8530200719833374
+      ]
+    }
+  },
+  "mean_over_seeds": {
+    "mean": 0.11060195167859395,
+    "sd": 0.2669414182504018,
+    "mean_opener": 0.12351837754249573,
+    "mean_within": 0.08244962493578593,
+    "mean_high_drift": 0.08463734139998753,
+    "mean_low_drift": 0.11531654745340347,
+    "share_across_sessions": 0.03775963870187601,
+    "share_across_dims": 0.6604461272557577
+  },
+  "sd_across_seeds": {
+    "mean": 0.009024831243009243,
+    "sd": 0.004767806233509852,
+    "mean_opener": 0.007480787796695517,
+    "mean_within": 0.013005478416709258,
+    "mean_high_drift": 0.010615468624263116,
+    "mean_low_drift": 0.00880273453371028,
+    "share_across_sessions": 0.014742601396709912,
+    "share_across_dims": 0.03933161582860665
+  },
+  "provenance": {
+    "commit": "4841de5ff547bb0708810c7ec1c2821663ae67fd",
+    "device": "labBL6O0K CPU",
+    "modal_run_id": null,
+    "checkpoints": {
+      "2020": "saved/CAFREC-Sep-17-2026_18-48-42.pth",
+      "2021": "saved/CAFREC-Sep-17-2026_22-27-03.pth",
+      "403092": "saved/CAFREC-Sep-18-2026_12-18-52.pth"
+    },
+    "seeds": [
+      2020,
+      2021,
+      403092
+    ],
+    "wall_s": 425.7,
+    "date": "2026-09-30 09:37:59"
+  }
+}

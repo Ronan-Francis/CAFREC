@@ -1,0 +1,160 @@
+[
+  {
+    "a": "CAFREC",
+    "b": "CAFREC-NP",
+    "files_a": [
+      "CAFREC_kuairand_pure_ctx_bge_ms_s42_seed42_20260826-153243.json",
+      "CAFREC_kuairand_pure_ctx_bge_ms_s77_seed77_20260826-153307.json",
+      "CAFREC_kuairand_pure_ctx_bge_ms_s123_seed123_20260826-152635.json",
+      "CAFREC_kuairand_pure_ctx_bge_ms_s256_seed256_20260826-152650.json",
+      "CAFREC_kuairand_pure_ctx_bge_ms_s512_seed512_20260826-152648.json",
+      "CAFREC_kuairand_pure_ctx_bge_ms_s1024_seed1024_20260826-153621.json",
+      "CAFREC_kuairand_pure_ctx_bge_ms_s2048_seed2048_20260826-152956.json"
+    ],
+    "files_b": [
+      "CAFREC_kuairand_pure_ctx_noprof_ms_s42_seed42_20260826-152318.json",
+      "CAFREC_kuairand_pure_ctx_noprof_ms_s77_seed77_20260826-152323.json",
+      "CAFREC_kuairand_pure_ctx_noprof_ms_s123_seed123_20260826-152314.json",
+      "CAFREC_kuairand_pure_ctx_noprof_ms_s256_seed256_20260826-153211.json",
+      "CAFREC_kuairand_pure_ctx_noprof_ms_s512_seed512_20260826-153238.json",
+      "CAFREC_kuairand_pure_ctx_noprof_ms_s1024_seed1024_20260826-153259.json",
+      "CAFREC_kuairand_pure_ctx_noprof_ms_s2048_seed2048_20260826-153316.json"
+    ],
+    "hit@10": {
+      "delta": -0.00059,
+      "ci": [
+        -0.0019,
+        0.00065
+      ],
+      "p": 0.5443620700987405
+    },
+    "ndcg@10": {
+      "delta": -0.00011,
+      "ci": [
+        -0.00078,
+        0.00055
+      ],
+      "p": 0.7780344962675854
+    }
+  },
+  {
+    "a": "7B",
+    "b": "CAFREC [abl]",
+    "files_a": [
+      "CAFREC_kuairand_pure_ctx_prof_7b_seed2020_20260814-105703.json",
+      "CAFREC_kuairand_pure_ctx_prof7b_s2021_seed2021_20260825-140753.json",
+      "CAFREC_kuairand_pure_ctx_prof7b_s403092_seed403092_20260825-140756.json"
+    ],
+    "files_b": [
+      "CAFREC_kuairand_pure_ctx_bge_topk_s2020_seed2020_20260815-161356.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s2021_seed2021_20260815-161340.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s403092_seed403092_20260815-161345.json"
+    ],
+    "hit@10": {
+      "delta": -0.00051,
+      "ci": [
+        -0.00186,
+        0.00077
+      ],
+      "p": 0.22453374369447757
+    },
+    "ndcg@10": {
+      "delta": -0.00046,
+      "ci": [
+        -0.00107,
+        0.00016
+      ],
+      "p": 0.21142289705981082
+    }
+  },
+  {
+    "a": "7B",
+    "b": "bge (prof_bge s2020 + bge_topk)",
+    "files_a": [
+      "CAFREC_kuairand_pure_ctx_prof_7b_seed2020_20260814-105703.json",
+      "CAFREC_kuairand_pure_ctx_prof7b_s2021_seed2021_20260825-140753.json",
+      "CAFREC_kuairand_pure_ctx_prof7b_s403092_seed403092_20260825-140756.json"
+    ],
+    "files_b": [
+      "CAFREC_kuairand_pure_ctx_prof_bge_seed2020_20260814-105649.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s2021_seed2021_20260815-161340.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s403092_seed403092_20260815-161345.json"
+    ],
+    "hit@10": {
+      "delta": -0.00051,
+      "ci": [
+        -0.00186,
+        0.00077
+      ],
+      "p": 0.22453374369447757
+    },
+    "ndcg@10": {
+      "delta": -0.00046,
+      "ci": [
+        -0.00107,
+        0.00016
+      ],
+      "p": 0.21142289705981082
+    }
+  },
+  {
+    "a": "Hashing",
+    "b": "CAFREC [abl]",
+    "files_a": [
+      "CAFREC_kuairand_pure_ctx_hash_s2020_seed2020_20260916-192813.json",
+      "CAFREC_kuairand_pure_ctx_hash_s2021_seed2021_20260916-192806.json",
+      "CAFREC_kuairand_pure_ctx_hash_s403092_seed403092_20260916-192805.json"
+    ],
+    "files_b": [
+      "CAFREC_kuairand_pure_ctx_bge_topk_s2020_seed2020_20260815-161356.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s2021_seed2021_20260815-161340.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s403092_seed403092_20260815-161345.json"
+    ],
+    "hit@10": {
+      "delta": 0.00038,
+      "ci": [
+        -0.001,
+        0.00167
+      ],
+      "p": 0.603263916766839
+    },
+    "ndcg@10": {
+      "delta": 0.00025,
+      "ci": [
+        -0.00036,
+        0.00085
+      ],
+      "p": 0.4613970923131896
+    }
+  },
+  {
+    "a": "CAFREC [abl]",
+    "b": "Stand-in",
+    "files_a": [
+      "CAFREC_kuairand_pure_ctx_bge_topk_s2020_seed2020_20260815-161356.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s2021_seed2021_20260815-161340.json",
+      "CAFREC_kuairand_pure_ctx_bge_topk_s403092_seed403092_20260815-161345.json"
+    ],
+    "files_b": [
+      "CAFREC_kuairand_pure_ctx_standin_seed2020_20260814-105654.json",
+      "CAFREC_kuairand_pure_ctx_standin_s2021_seed2021_20260825-140723.json",
+      "CAFREC_kuairand_pure_ctx_standin_s403092_seed403092_20260825-141014.json"
+    ],
+    "hit@10": {
+      "delta": 0.00765,
+      "ci": [
+        0.0054,
+        0.00984
+      ],
+      "p": 2.3837770337412763e-14
+    },
+    "ndcg@10": {
+      "delta": 0.00542,
+      "ci": [
+        0.00419,
+        0.00663
+      ],
+      "p": 6.491434748191139e-11
+    }
+  }
+]

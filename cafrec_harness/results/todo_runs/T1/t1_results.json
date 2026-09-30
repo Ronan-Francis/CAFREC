@@ -1,0 +1,53 @@
+{
+  "task": "T1",
+  "markers": [
+    "B2a",
+    "B2b"
+  ],
+  "inputs": {
+    "inter": "..\\data\\recbole\\kuairand_pure\\kuairand_pure.inter",
+    "rows": 651099,
+    "users": 22912,
+    "items": 7210,
+    "train_rows": 605275
+  },
+  "B2a": {
+    "mean_share": 0.04392900530499718,
+    "median_share": 0.011986520774847773,
+    "own_rows_after_test_total": 0,
+    "definition": "other users' training rows with time > t_u / other users' training rows"
+  },
+  "B2b": {
+    "hr10_full_strict": 0.04316515363128492,
+    "hr10_full_pessimistic": 0.04316515363128492,
+    "hr10_causal_strict": 0.040764664804469275,
+    "hr10_causal_pessimistic": 0.04067737430167598,
+    "rel_change_causal_vs_full_pct": -5.561172901921133,
+    "causal_rows_used_mean": 578686.5507594274
+  },
+  "optional_item_share_after_test": {
+    "mean": 0.06061853101770721,
+    "median": 0.013333333333333334,
+    "n_test_clicks": 22888
+  },
+  "gate": {
+    "logged_file": "results\\local\\Pop_kuairand_pure_pop_seed2020.json",
+    "logged_test_hit@10": 0.0357,
+    "logged_hr_from_ranks": 0.07777583798882681,
+    "reproduced_hr_strict": 0.04316515363128492,
+    "reproduced_hr_pessimistic": 0.04316515363128492,
+    "users_rank_equal_strict": 625,
+    "users_rank_equal_pessimistic": 576,
+    "users_rank_within_tie_band": 2305,
+    "users_top10_status_equal": 21957,
+    "n_users": 22912,
+    "passed": false
+  },
+  "provenance": {
+    "commit": "4841de5ff547bb0708810c7ec1c2821663ae67fd",
+    "device": "labBL6O0K CPU",
+    "modal_run_id": null,
+    "wall_s": 16.2,
+    "date": "2026-09-30 09:17:00"
+  }
+}

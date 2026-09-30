@@ -1,0 +1,1 @@
+T5: D3a HR@10 -0.8% CI[-0.00171,+0.00032], NDCG@10 -0.0% CI[-0.00053,+0.00046], larger bound 1.93% of ref (hit@10); gate PASS, CIs match log {'hit@10': True, 'ndcg@10': True}. D3b NDCG@10 d=-0.000052 CI[-0.00071,+0.00068] p=0.744; gate PASS

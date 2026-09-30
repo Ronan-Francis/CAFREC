@@ -1,0 +1,102 @@
+{
+  "task": "MostPop true-count row (Table XIII)",
+  "gate": {
+    "logged_reproduced": {
+      "coverage_3dp": 0.004,
+      "items": 28,
+      "ild_first_3dp": 0.958,
+      "top10_share_3dp": 0.879,
+      "hr10": 0.0357,
+      "expected": {
+        "coverage_3dp": 0.004,
+        "items": 28,
+        "ild_first_3dp": 0.958,
+        "top10_share_3dp": 0.879,
+        "hr10": 0.0357
+      }
+    },
+    "true_hr_equals_t1": true,
+    "t1_hr10": 0.04316515363128492,
+    "passed": true
+  },
+  "logged_recbole_pop": {
+    "items": 28,
+    "coverage": 0.003883495145631068,
+    "top10_share": 0.8792641410614526,
+    "ild_first_level": 0.9581423401832581,
+    "nocat_first_level": 0.0,
+    "ild_second_level": 0.9915425181388855,
+    "nocat_second_level": 0.07806826117318436,
+    "ild_kuairand_tag": 0.8673213124275208,
+    "nocat_kuairand_tag": 0.0,
+    "top10_items": [
+      1976,
+      4113,
+      1725,
+      627,
+      3685,
+      6714,
+      4955,
+      4636,
+      3310,
+      2303
+    ],
+    "hr10": 0.0357
+  },
+  "true_count": {
+    "items": 27,
+    "coverage": 0.003744798890429958,
+    "top10_share": 0.8459148044692737,
+    "hr10": 0.04316515363128492,
+    "ild_first_level": 0.9356475472450256,
+    "nocat_first_level": 0.0,
+    "ild_second_level": 0.9911176562309265,
+    "nocat_second_level": 0.253919343575419,
+    "ild_kuairand_tag": 0.8886201977729797,
+    "nocat_kuairand_tag": 0.0,
+    "top10_items": [
+      6989,
+      3587,
+      4644,
+      6504,
+      7136,
+      4636,
+      1868,
+      3310,
+      6921,
+      2303
+    ],
+    "tie_at_tenth_slot_users": 0,
+    "top_counts": [
+      5596,
+      5498,
+      4696,
+      3085,
+      2797,
+      2780,
+      2583,
+      2563,
+      2494,
+      2475,
+      2472,
+      2430,
+      2415,
+      2368,
+      2195
+    ]
+  },
+  "definition": {
+    "popularity": "training-row count per item over all users",
+    "masking": "user's training and validation items; test item kept",
+    "ties": "smaller original item id first",
+    "users": 22912,
+    "train_rows": 605275
+  },
+  "provenance": {
+    "commit": "4841de5ff547bb0708810c7ec1c2821663ae67fd",
+    "device": "labBL6O0K CPU",
+    "modal_run_id": null,
+    "wall_s": 3.7,
+    "date": "2026-09-30 09:45:51"
+  }
+}

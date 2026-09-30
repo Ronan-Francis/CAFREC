@@ -1,0 +1,68 @@
+{
+  "split_check": [
+    {
+      "file": "SASRec_kuairand_pure_bs512_sasrec_seed1024_20260916-062552.json",
+      "users_in_top10": 1808,
+      "test_item_agrees": 1808
+    },
+    {
+      "file": "SASRec_kuairand_pure_bs512_sasrec_seed123_20260916-062558.json",
+      "users_in_top10": 1859,
+      "test_item_agrees": 1859
+    },
+    {
+      "file": "SASRec_kuairand_pure_bs512_sasrec_seed2048_20260916-062603.json",
+      "users_in_top10": 1871,
+      "test_item_agrees": 1871
+    },
+    {
+      "file": "SASRec_kuairand_pure_bs512_sasrec_seed256_20260916-062616.json",
+      "users_in_top10": 1854,
+      "test_item_agrees": 1854
+    },
+    {
+      "file": "SASRec_kuairand_pure_bs512_sasrec_seed42_20260916-062609.json",
+      "users_in_top10": 1915,
+      "test_item_agrees": 1915
+    },
+    {
+      "file": "SASRec_kuairand_pure_bs512_sasrec_seed512_20260916-062617.json",
+      "users_in_top10": 1820,
+      "test_item_agrees": 1820
+    },
+    {
+      "file": "SASRec_kuairand_pure_bs512_sasrec_seed77_20260916-062605.json",
+      "users_in_top10": 1862,
+      "test_item_agrees": 1862
+    }
+  ],
+  "all_agree": true,
+  "train_rows": 605275,
+  "recbole_pop_toy": {
+    "indices": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "resulting_counts": [
+      1,
+      1,
+      0
+    ],
+    "note": "three occurrences of item 0 in one batch add 1, not 3"
+  },
+  "logged_pop_run": {
+    "file": "results\\local\\Pop_kuairand_pure_pop_seed2020.json",
+    "train_batch_size": 2048,
+    "epochs": 1,
+    "batches_per_epoch": 296,
+    "reported_test_hit@10": 0.0357,
+    "ranks_check_from_dump": {
+      "hit@10": 0.07777583798882681,
+      "ndcg@10": 0.07777583798882681,
+      "mrr@10": 0.07777583798882681
+    }
+  },
+  "items_with_more_train_rows_than_batches": 478
+}

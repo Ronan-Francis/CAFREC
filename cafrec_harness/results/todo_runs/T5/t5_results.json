@@ -1,0 +1,148 @@
+{
+  "task": "T5",
+  "markers": [
+    "D3a",
+    "D3b"
+  ],
+  "D3a": {
+    "rows": {
+      "hit@10": {
+        "a": "NP no policy flag",
+        "b": "CAFREC-NP (tuned)",
+        "metric": "hit@10",
+        "n_users": 22912,
+        "seeds": 7,
+        "delta": -0.0006796189146049479,
+        "rel_pct": -0.7649122807017542,
+        "ci": [
+          -0.001714946628092578,
+          0.00032422186751795675
+        ],
+        "p": 0.358714420926615,
+        "sig": 0,
+        "sign": 5,
+        "seed_p_wilcoxon_exact": 0.375,
+        "seed_p_ttest": 0.3445014820846972,
+        "reference_mean": 0.0888492617717478,
+        "larger_abs_bound": 0.001714946628092578,
+        "larger_abs_bound_pct_of_ref": 1.9301754385964913
+      },
+      "ndcg@10": {
+        "a": "NP no policy flag",
+        "b": "CAFREC-NP (tuned)",
+        "metric": "ndcg@10",
+        "n_users": 22912,
+        "seeds": 7,
+        "delta": -1.925299830334492e-05,
+        "rel_pct": -0.04165708543612941,
+        "ci": [
+          -0.0005258573301119626,
+          0.0004622035657812669
+        ],
+        "p": 0.8318834081637642,
+        "sig": 0,
+        "sign": 4,
+        "seed_p_wilcoxon_exact": 0.9375,
+        "seed_p_ttest": 0.9513695242667373,
+        "reference_mean": 0.04621782369499787,
+        "larger_abs_bound": 0.0005258573301119626,
+        "larger_abs_bound_pct_of_ref": 1.1377803801023108
+      }
+    },
+    "gate": {
+      "hr_rel_pct": -0.8,
+      "ndcg_rel_pct": -0.0,
+      "expected": {
+        "hr_rel_pct": -0.8,
+        "ndcg_rel_pct": -0.0
+      },
+      "logged_cis": {
+        "hit@10": [
+          -0.00171,
+          0.00032
+        ],
+        "ndcg@10": [
+          -0.00053,
+          0.00046
+        ]
+      },
+      "ci_matches_logged": {
+        "hit@10": true,
+        "ndcg@10": true
+      },
+      "passed": true
+    },
+    "larger_bound_overall_pct": 1.9301754385964913,
+    "larger_bound_metric": "hit@10",
+    "n_users": 22912,
+    "seeds": [
+      42,
+      77,
+      123,
+      256,
+      512,
+      1024,
+      2048
+    ],
+    "inputs": [
+      "CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed1024.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed123.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed2048.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed256.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed42.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed512.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed77.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed1024.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed123.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed2048.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed256.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed42.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed512.json",
+      "CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed77.json"
+    ],
+    "device": "local-gpu (NVIDIA GeForce RTX 2060 SUPER), per the result files"
+  },
+  "D3b": {
+    "row": {
+      "a": "CAFREC R4 [abl]",
+      "b": "CAFREC [abl]",
+      "metric": "ndcg@10",
+      "n_users": 22912,
+      "seeds": 3,
+      "delta": -5.221531636154168e-05,
+      "rel_pct": -0.12901198157498042,
+      "ci": [
+        -0.0007065038714879339,
+        0.0006804608293848333
+      ],
+      "p": 0.7436086145664824,
+      "sig": 0,
+      "sign": 1
+    },
+    "gate": {
+      "delta": -5.221531636154168e-05,
+      "expected_delta": -5e-05,
+      "passed": true
+    },
+    "n_users": 22912,
+    "seeds": [
+      2020,
+      2021,
+      403092
+    ],
+    "device": "Modal A10G (results/modal)"
+  },
+  "protocol": {
+    "n_boot": 2000,
+    "boot_seed": 20260917,
+    "pairing": "original user id; per-user mean over shared seeds",
+    "p": "two-sided Wilcoxon signed-rank, normal approximation"
+  },
+  "provenance": {
+    "commit": "4841de5ff547bb0708810c7ec1c2821663ae67fd",
+    "device": "labBL6O0K CPU",
+    "modal_run_id": null,
+    "wall_s": 8.5,
+    "date": "2026-09-30 09:19:25"
+  }
+}

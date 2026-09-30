@@ -1,0 +1,10 @@
+SOURCE C:/Users/msc/Desktop/G00403092/JournalPaper
+  marker calls or red colour commands: 0
+  macro definitions (print nothing unless called): 3
+    main.tex:19: \newcommand{\todocite}[1]{\textcolor{red}{[CITE: #1]}}
+    main.tex:20: \newcommand{\todonum}[1]{}
+    main.tex:21: \newcommand{\todores}[1]{\textcolor{red}{[RESULT: #1]}}
+PDF {'errors': 0, 'undefined': 0, 'pages': 19} {'streams_scanned': 73, 'red_colour_operators': 0, 'text_hits': []}
+POSITIVE CONTROL C:/Users/msc/Desktop/G00403092/JournalPaper_backup_2026-09-30_results
+  source marker calls 27; PDF {'errors': 0, 'undefined': 0, 'pages': 19} {'streams_scanned': 73, 'red_colour_operators': 54, 'text_hits': ['page 8: [RESULT:', 'page 10: [RESULT:', 'page 11: [RESULT:', 'page 13: [RESULT:', 'page 15: [RESULT:', 'page 16: [RESULT:', 'page 17: [RESULT:']}
+RESULT: NO RED TEXT
