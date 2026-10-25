@@ -2,7 +2,20 @@
 
 **Context-Adaptive Fusion for Long- and Short-Term Video Recommendation**
 
-CAFREC is a sequential recommender that combines a short-term self-attentive encoder with a frozen long-term user profile. A gate driven by session context sets the weight of each. This repository contains the model, the RecBole-based experiment harness, the analysis scripts, and the stored results behind the accompanying MSc thesis paper (Atlantic Technological University, 2026).
+**Documentation:** **Project README** · [Harness README](cafrec_harness/README.md) · [Data README](data/README.md) · [H2 runbook](cafrec_harness/H2_RUNBOOK.md)
+
+CAFREC is a sequential recommender that combines a short-term self-attentive encoder with a frozen long-term user profile. A gate driven by session context sets the weight of each. This repository contains the model, the RecBole-based experiment harness, the analysis scripts, and the stored results behind the accompanying MSc thesis, *What Evidence Should a Recommender Change Require? A Controlled Study of Session-Context Gating* (Atlantic Technological University, 2026).
+
+## Submission contents
+
+| Item | Location |
+|---|---|
+| Masters thesis (PDF) | [`G00403092.pdf`](G00403092.pdf) |
+| Screencast of the application running | [`G00403092_Screencast.mp4`](G00403092_Screencast.mp4) |
+| Source code | [`cafrec_harness/`](cafrec_harness/) (harness, models, analysis) and [`Foundation/`](Foundation/) (data preparation notebooks) |
+| Data instructions and figures | [`data/README.md`](data/README.md) and [`images/`](images/) |
+| Stored results of every run | [`cafrec_harness/results/`](cafrec_harness/results/) |
+| Dated log of decisions and results | [`PROJECT_LOG.md`](PROJECT_LOG.md) |
 
 ## Overview
 
@@ -15,6 +28,22 @@ z = g(x_ctx) * z_long + (1 - g(x_ctx)) * z_short
 ```
 
 Setting `z_long = 0` gives **CAFREC-NP** (context-gated SASRec). As `g -> 0` the model reduces to SASRec. All experiments use [KuaiRand-Pure](https://kuairand.com/) with per-user leave-one-out splitting and full-catalogue ranking. Every model is compared against a SASRec trained with the same loss, batch size (512) and schedule.
+
+## Features
+
+1. **One entry point for every model.** `run.py` trains and evaluates CAFREC and the baselines (SASRec, HGN, U-GRU and MostPop) through the same RecBole pipeline. Adding a model is one line in `cafrec/registry.py`.
+2. **The CAFREC model and its ablations**, selected by the `ablation` config key on one class.
+3. **Causal session-context features**, computed from the session history before each row only, with tests that guard against leakage.
+4. **Frozen long-term profiles**: templated, hashing, content-bearing and LLM-generated (Qwen2.5-7B-Instruct), each stored as a validated profile cache.
+5. **Full-catalogue evaluation** under a leave-one-out split, with per-user ranks and top-10 lists stored for every run.
+6. **Statistics**: paired bootstrap intervals, Wilcoxon tests, Holm correction and per-seed tests.
+7. **Beyond-accuracy metrics**: catalogue coverage and intra-list diversity (ILD).
+8. **Local and cloud execution**: local CPU and GPU job queues, and full-scale runs on Modal A10G GPUs.
+9. **Claim audit**: `audit_paper_claims.py` recomputes the thesis's numbers from the stored runs and flags any that differ.
+10. **Per-user demo**: `demo_recommend.py` shows, for individual users, the context the gate reads, the held-out item, where each model ranked it, and each model's top 10.
+11. **Test suite**: 70 pytest tests (see [Tests](#tests)).
+
+[Components](#components) lists the files behind each feature.
 
 ## Results
 
@@ -46,8 +75,8 @@ RecBole 1.2.1 provides the data loader, trainer, SASRec and HGN. The components 
 ```bash
 cd cafrec_harness
 python -m venv .venv                 # Python 3.11 used; the Modal image uses torch 2.8
-.venv/Scripts/activate               # Windows (source .venv/bin/activate on Linux/macOS)
-pip install -e .[dev]                # recbole==1.2.1, torch, numpy<2, scipy, pytest
+.venv\Scripts\Activate.ps1           # Windows PowerShell (Git Bash: source .venv/Scripts/activate; Linux/macOS: source .venv/bin/activate)
+pip install -e ".[dev]"              # recbole==1.2.1, torch, numpy<2, scipy, pytest
 ```
 
 - **Local GPU runs:** `gpu_chain.py` expects a CUDA-enabled environment at `cafrec_harness/.venv-gpu`.
@@ -55,7 +84,7 @@ pip install -e .[dev]                # recbole==1.2.1, torch, numpy<2, scipy, py
 
 ## Data
 
-`data/` is git-ignored apart from `ctx_scaler_params.json`.
+`data/` is git-ignored apart from `ctx_scaler_params.json` and its README. The [data README](data/README.md) lists the sources and licence, shows the dataset's exploratory figures (stored in [`images/`](images/)) and describes each rebuild step in more detail. In short:
 
 1. Download **KuaiRand-Pure** from Zenodo. Run `Foundation/CAFREC_T1_1_KuaiRand_Preparation.ipynb`, then `Foundation/CAFREC_Dataset_Builder_KuaiRand_inter.ipynb`. This writes `data/recbole/kuairand_pure/kuairand_pure.inter`.
 2. Build the context-feature dataset:
@@ -71,9 +100,10 @@ pip install -e .[dev]                # recbole==1.2.1, torch, numpy<2, scipy, py
 python run.py --list                                         # registered models
 python run.py --models SASRec HGN --dataset kuairand_pure    # baselines
 python run.py --models CAFREC --dataset kuairand_pure_ctx    # CAFREC
+python demo_recommend.py                                     # per-user demo, CPU only, a few seconds
 ```
 
-Each run writes `results/<model>_<dataset>_seed<seed>_<ts>.json` and appends a row to `results/summary.csv`. The `ablation` config key selects an ablation. See [`cafrec_harness/README.md`](cafrec_harness/README.md) for adding models and the profile cache format.
+Run these from `cafrec_harness/`. The demo reads the stored runs in `results/modal/` and the `kuairand_pure_ctx` dataset. Each run writes `results/<model>_<dataset>_seed<seed>_<ts>.json` and appends a row to `results/summary.csv`. The `ablation` config key selects an ablation. See [`cafrec_harness/README.md`](cafrec_harness/README.md) for adding models and the profile cache format.
 
 ## Tests
 
@@ -118,7 +148,7 @@ python analyze_tuned_gpu.py       # Table V tuned rows and the equal-budget sear
 
 The scripts need `kuairand_pure.inter` to build the cohorts. The table means use only the rank dumps.
 
-- **Audit labels:** the audit output uses an older numbering. Table V's default rows appear as `Table I`, its tuned rows as `Table VI`, and Table VI's tests as `Table II`. Latest run: `results/paper_audit_20261003.txt` (77 reproduce, 0 differ, 2 partial).
+- **Audit labels:** the audit output uses an older numbering. Table V's default rows appear as `Table I`, its tuned rows as `Table VI`, and Table VI's tests as `Table II`. Latest run: `results/paper_audit_20261025.txt` (77 reproduce, 0 differ, 2 partial).
 - **Holm adjustment:** `analyze_paper_512.py` applies Holm over nine tests, three of them CAFREC-H. For Table VI's six tests the adjusted values equal a six-test Holm, because the CAFREC-H p-values are the smallest. Reference output: `results/paper_512_20260916.txt`.
 
 ### From scratch
@@ -185,17 +215,20 @@ Analyses are classified by when they were specified, relative to the project pla
 ## Repository layout
 
 ```
-Foundation/          KuaiRand preparation, session segmentation, .inter builder (notebooks)
-cafrec_harness/      RecBole-based harness
-  cafrec/            package: registry, runner, tiers, models/, features/, data/, eval/
-  configs/base.yaml  shared RecBole config
-  results/           per-run JSON (modal/, local/, local_gpu/), analysis outputs, MANIFEST.csv
-  tests/             pytest suite
-  H2_RUNBOOK.md      construction and runs of the LLM-profile (H2) experiment
-PROJECT_LOG.md       dated decision and results log
-data/                local only, not committed
+G00403092.pdf              the thesis
+G00403092_Screencast.mp4   the screencast
+Foundation/                KuaiRand preparation, session segmentation, .inter builder (notebooks)
+cafrec_harness/            RecBole-based harness
+  cafrec/                  package: registry, runner, tiers, models/, features/, data/, eval/
+  configs/base.yaml        shared RecBole config
+  results/                 per-run JSON (modal/, local/, local_gpu/), analysis outputs, MANIFEST.csv
+  tests/                   pytest suite
+  H2_RUNBOOK.md            construction and runs of the LLM-profile (H2) experiment
+PROJECT_LOG.md             dated decision and results log
+data/                      dataset files, rebuilt locally (see data/README.md)
+images/                    exploratory figures of the dataset
 ```
 
 ## Author
 
-Ronan Francis MSc in Computing, Atlantic Technological University, 2026. *Supervisor: Michael Duignan*
+Ronan Francis, MSc in Computing, Atlantic Technological University, Galway, 2026. Supervisor: Michael Duignan.

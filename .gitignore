@@ -28,6 +28,7 @@ data/*.bin
 
 # Keep the data/ directory itself in the repo
 !data/.gitkeep
+!data/README.md
 
 # -----------------------------------------------------------------------------
 # Model checkpoints and training outputs
@@ -124,6 +125,8 @@ desktop.ini
 # Keep deliberately committed PDFs (e.g. submitted reports)
 !reports/**/*.pdf
 !dissertation/**/*.pdf
+# The submitted thesis is part of the repository (submission requirement)
+!/G00403092.pdf
 # Thesis and paper drafts are never committed (author rule, 2026-09-17)
 Thesis/
 JournalPaper/

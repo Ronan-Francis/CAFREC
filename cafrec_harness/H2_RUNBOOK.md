@@ -1,5 +1,9 @@
 # Testing H2 as registered — runbook (2026-09-21)
 
+**Documentation:** [Project README](../README.md) · [Harness README](README.md) · [Data README](../data/README.md) · **H2 runbook**
+
+> This is the working runbook written while the experiment was being built, so it describes the state of the paper at that date. The final H2 outcome (inconclusive) is in the thesis, Section VI-C3, and in the [project README](../README.md#results).
+
 **H2.** *LLM-generated temporal user profiles will achieve higher NDCG@10 than
 interaction-derived embeddings for users in the lowest quartile of interaction
 counts.* The paper currently reports H2 as registered but **not tested**, because

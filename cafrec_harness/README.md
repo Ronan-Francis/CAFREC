@@ -1,90 +1,85 @@
 # CAFREC harness
 
-A thin, expandable wrapper around RecBole. Built-in baselines and your own
-CAFREC model run through the **same** entry point — the only variable that
-changes is a registry key.
+**Documentation:** [Project README](../README.md) · **Harness README** · [Data README](../data/README.md) · [H2 runbook](H2_RUNBOOK.md)
+
+A thin, extensible wrapper around RecBole. The built-in baselines and the CAFREC model run through the **same** entry point. The only thing that changes between them is a registry key.
 
 ## Setup
 
 ```bash
-conda activate recbole
-pip install -e .          # add [dev] for pytest, [wandb] for W&B
+conda activate recbole    # or activate the .venv described in the project README
+pip install -e .          # add [dev] for pytest, [wandb] for Weights & Biases
 ```
 
 ## Run
 
 ```bash
-python run.py --models SASRec HGN --dataset ml-100k   # baselines
-python run.py --models CAFREC --dataset ml-100k       # your model
-python run.py --list                                  # see registered keys
+python run.py --list                                         # registered keys
+python run.py --models SASRec HGN --dataset kuairand_pure    # baselines
+python run.py --models CAFREC --dataset kuairand_pure_ctx    # CAFREC
 ```
 
-Each run writes `results/<model>_<dataset>_seed<seed>_<ts>.json` and appends a
-row to `results/summary.csv`, so models are diffable at a glance.
+`--dataset` defaults to `ml-100k`, the MovieLens-100K example bundled with RecBole. Each run writes `results/<model>_<dataset>_seed<seed>_<ts>.json` and appends a row to `results/summary.csv`, so models can be compared at a glance.
 
 ## Smoke test
 
 ```bash
-pytest -q          # 1-epoch ml-100k run per model, asserts metrics come back
+pytest -q          # one-epoch ml-100k run per model, asserting that metrics come back
 ```
 
 ## Adding a model
 
-Everything lives in `cafrec/registry.py`. One line each.
+Everything lives in `cafrec/registry.py`, with one line per model.
 
-A **built-in** RecBole model — point at its name and pick the training contract
-(`CE` = no negative sampling, `BPR` = uniform negatives):
+A **built-in** RecBole model points at its name and picks a training contract (`CE` = no negative sampling, `BPR` = uniform negatives):
 
 ```python
 "SHAN": ModelSpec(model="SHAN", contract=BPR),
 ```
 
-**Your own** model — point at the class instead of a name. Same spec shape:
+A **custom** model points at its class instead of a name. The spec has the same shape:
 
 ```python
 "CAFREC": ModelSpec(model=CAFREC, contract=CE, config={"hidden_size": 64}),
 ```
 
-The runner branches on whether `model` is a `str` or a class; nothing else
-differs. That branch is the whole trick that lets CAFREC sit next to the
-baselines.
+The runner branches on whether `model` is a `str` or a class, and nothing else differs. That one branch is what lets CAFREC run alongside the baselines.
 
 ## CAFREC model
 
-`cafrec/models/cafrec.py` is the full architecture: a SASRec-style short-term
-encoder (`z_short`), a frozen precomputed LLM profile (`z_long`), a
-context-adaptive gating MLP over session-context features (`g`), and the fusion
-`z = g * z_long + (1 - g) * z_short`. Ablations (`none | no_profiler |
-static_gate | concat`) are selected by the `ablation` config key.
+`cafrec/models/cafrec.py` holds the full architecture: a SASRec-style short-term encoder (`z_short`), a frozen precomputed long-term profile (`z_long`), a context-adaptive gating MLP over session-context features (`g`), and the fusion `z = g * z_long + (1 - g) * z_short`. Ablations are selected by the `ablation` config key: `none`, `no_profiler`, `static_gate`, `concat`, `np_shuffled_ctx` and `np_vector_gate`. The model's docstring describes each one.
 
-## Context-feature runs (RON-16/17/18)
+## Context-feature runs
 
-The plain `<dataset>.inter` has only (user, item, timestamp) — enough for the
-baselines. CAFREC's gate additionally needs causal session-context features, so
-build a feature-augmented sibling dataset and point CAFREC at it:
+The plain `<dataset>.inter` holds only (user, item, timestamp), which is enough for the baselines. CAFREC's gate also needs causal session-context features, so build a feature-augmented sibling dataset and point CAFREC at it:
 
 ```bash
 # 1. Build data/recbole/kuairand_pure_ctx/kuairand_pure_ctx.inter
-#    (same rows as the base .inter + session_len/dwell_entropy/cat_drift columns)
-python -m cafrec.features.build_context_inter --tier light   # or medium/heavy
+#    (the same rows as the base .inter, plus the context columns)
+python -m cafrec.features.build_context_inter --tier light   # or medium / heavy
 
-# 2. Run CAFREC on the _ctx dataset with the extra columns loaded:
-python run.py --models CAFREC --dataset kuairand_pure_ctx \
-  # (pass load_col + context_fields overrides; see cafrec.features.context.CTX_FIELDS)
+# 2. Run CAFREC on the _ctx dataset
+python run.py --models CAFREC --dataset kuairand_pure_ctx
 ```
 
-Features are computed CAUSALLY (each row summarises only its session history
-*before* it), so nothing leaks from the held-out target — see
-`tests/test_features.py`.
+For a dataset whose name ends in `_ctx`, the runner loads the context columns automatically (see `cafrec.features.context.CTX_FIELDS`).
 
-## LLM profile cache (RON-25)
+Features are computed **causally**: each row summarises only the session history *before* it, so nothing leaks from the held-out target. `tests/test_features.py` checks this.
 
-`cafrec/features/profiles.py` defines the frozen `[n_users, profile_dim]` cache
-CAFREC loads via `llm_profile_path`, with shape/NaN/sparse-user validation.
-`build_placeholder_profiles(...)` gives a synthetic cache so the profile path can
-be exercised before the real profiler (RON-24) exists.
+## Long-term profile cache
 
-## What's deliberately NOT here
+`cafrec/features/profiles.py` defines the frozen `[n_users, profile_dim]` cache that CAFREC loads through `llm_profile_path`, with shape, NaN and sparse-user validation. `cafrec/features/build_profiles.py` builds a real cache from each user's training history. `build_placeholder_profiles(...)` gives a synthetic cache for exercising the profile path in tests.
 
-Full-data cloud runs (Modal, see `modal_run.py`) and the reasoning-model /
-profiler *inference* pipelines are separate, credential/compute-gated tickets.
+## Scripts in this folder
+
+| Script | Purpose |
+|---|---|
+| `run.py` | Train and evaluate any registered model |
+| `local_run.py`, `gpu_chain.py` | Queue runs on a local CPU or GPU; results go to `results/local/` and `results/local_gpu/` |
+| `modal_run.py`, `modal_*.py` | Cloud runs, profile generation and embedding on Modal |
+| `analyze_*.py` | Paired tests and tables for each hypothesis, ablation and control |
+| `audit_paper_claims.py` | Recompute the thesis's numbers from the stored runs |
+| `demo_recommend.py` | Per-user demo: context, held-out item, ranks and top-10 lists |
+| `build_*.py` | Build datasets, prompts and profiles |
+
+Data preparation, including the KuaiRand download and the exploratory figures, is described in the [data README](../data/README.md). The LLM-profile experiment is described in the [H2 runbook](H2_RUNBOOK.md).
