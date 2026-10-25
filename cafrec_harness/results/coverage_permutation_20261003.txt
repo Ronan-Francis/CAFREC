@@ -1,0 +1,15 @@
+Paired permutation test of coverage@10 margins, 2,000 permutations (numpy seed 20261003); seeds [2020, 2021, 403092]; catalogue 7,210 items; stratum samples n=3,521 (default_rng(7), as analyze_plan_hypotheses.py)
+
+== all (n=22,912 users per seed) ==
+  CAFREC [abl] - Static gate: observed +206.3 items (+0.0286); per seed +177, +301, +141; permuted |diff| max 42.3, 95th pct 20.7; count >= observed 0; two-sided p = 0.00050
+  CAFREC [abl] - Concatenation: observed +314.0 items (+0.0436); per seed +393, +282, +267; permuted |diff| max 36.7, 95th pct 22.3; count >= observed 0; two-sided p = 0.00050
+
+== high drift (n=3,521 users per seed) ==
+  CAFREC [abl] - Static gate: observed +131.0 items (+0.0182); per seed +111, +207, +75; permuted |diff| max 38.7, 95th pct 19.0; count >= observed 0; two-sided p = 0.00050
+  CAFREC [abl] - Concatenation: observed +163.7 items (+0.0227); per seed +232, +112, +147; permuted |diff| max 36.7, 95th pct 20.3; count >= observed 0; two-sided p = 0.00050
+
+== low drift (n=3,521 users per seed) ==
+  CAFREC [abl] - Static gate: observed +120.3 items (+0.0167); per seed +107, +192, +62; permuted |diff| max 34.0, 95th pct 19.0; count >= observed 0; two-sided p = 0.00050
+  CAFREC [abl] - Concatenation: observed +176.7 items (+0.0245); per seed +246, +125, +159; permuted |diff| max 36.7, 95th pct 20.0; count >= observed 0; two-sided p = 0.00050
+
+wall 19s

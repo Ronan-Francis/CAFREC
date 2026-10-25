@@ -1,0 +1,28 @@
+Paired user bootstrap of coverage@10 differences, 2000 resamples (numpy seed 20261002); catalogue 7,210 items; three ablation seeds [2020, 2021, 403092]; n per drift stratum 3,521
+
+== all (n=22,912 users per seed) ==
+  coverage@10, mean over seeds [per seed]: CAFREC [abl] 0.2294 [0.2257, 0.2411, 0.2214]; Static gate 0.2007 [0.2011, 0.1993, 0.2018]; Concatenation 0.1858 [0.1712, 0.2019, 0.1843]
+  CAFREC [abl] - Static gate: observed +0.0286 (+206 items); 95% CI [+0.0238, +0.0277] ([+171, +200] items); bootstrap mean +0.0258, SD 0.0010; share <= 0: 0.0000; per-seed +0.0245, +0.0417, +0.0196 (SD 0.0116, same sign 3/3)
+  CAFREC [abl] - Concatenation: observed +0.0436 (+314 items); 95% CI [+0.0366, +0.0410] ([+264, +295] items); bootstrap mean +0.0388, SD 0.0011; share <= 0: 0.0000; per-seed +0.0545, +0.0391, +0.0370 (SD 0.0095, same sign 3/3)
+
+== high drift (n=3,521 users per seed) ==
+  coverage@10, mean over seeds [per seed]: CAFREC [abl] 0.1582 [0.1566, 0.1659, 0.1521]; Static gate 0.1400 [0.1412, 0.1372, 0.1417]; Concatenation 0.1355 [0.1244, 0.1503, 0.1318]
+  CAFREC [abl] - Static gate: observed +0.0182 (+131 items); 95% CI [+0.0145, +0.0178] ([+105, +128] items); bootstrap mean +0.0161, SD 0.0009; share <= 0: 0.0000; per-seed +0.0154, +0.0287, +0.0104 (SD 0.0095, same sign 3/3)
+  CAFREC [abl] - Concatenation: observed +0.0227 (+164 items); 95% CI [+0.0182, +0.0216] ([+131, +156] items); bootstrap mean +0.0199, SD 0.0009; share <= 0: 0.0000; per-seed +0.0322, +0.0155, +0.0204 (SD 0.0086, same sign 3/3)
+
+== low drift (n=3,521 users per seed) ==
+  coverage@10, mean over seeds [per seed]: CAFREC [abl] 0.1580 [0.1559, 0.1666, 0.1516]; Static gate 0.1413 [0.1411, 0.1399, 0.1430]; Concatenation 0.1335 [0.1218, 0.1492, 0.1295]
+  CAFREC [abl] - Static gate: observed +0.0167 (+120 items); 95% CI [+0.0133, +0.0166] ([+96, +120] items); bootstrap mean +0.0149, SD 0.0008; share <= 0: 0.0000; per-seed +0.0148, +0.0266, +0.0086 (SD 0.0092, same sign 3/3)
+  CAFREC [abl] - Concatenation: observed +0.0245 (+177 items); 95% CI [+0.0187, +0.0221] ([+135, +160] items); bootstrap mean +0.0204, SD 0.0009; share <= 0: 0.0000; per-seed +0.0341, +0.0173, +0.0221 (SD 0.0087, same sign 3/3)
+
+== low drift (one shared sample) (n=3,521 users per seed) ==
+  coverage@10, mean over seeds [per seed]: CAFREC [abl] 0.1578 [0.1559, 0.1638, 0.1538]; Static gate 0.1406 [0.1411, 0.1377, 0.1430]; Concatenation 0.1317 [0.1218, 0.1462, 0.1272]
+  CAFREC [abl] - Static gate: observed +0.0172 (+124 items); 95% CI [+0.0134, +0.0170] ([+96, +122] items); bootstrap mean +0.0152, SD 0.0009; share <= 0: 0.0000; per-seed +0.0148, +0.0261, +0.0108 (SD 0.0079, same sign 3/3)
+  CAFREC [abl] - Concatenation: observed +0.0261 (+188 items); 95% CI [+0.0194, +0.0233] ([+140, +168] items); bootstrap mean +0.0214, SD 0.0010; share <= 0: 0.0000; per-seed +0.0341, +0.0176, +0.0266 (SD 0.0083, same sign 3/3)
+
+== Supplementary: CAFREC-NP (3 ablation seeds) - SASRec (7 headline seeds), all users, users paired, seeds NOT paired ==
+  CAFREC-NP 0.2336 [0.2275, 0.2373, 0.2361] (SD 0.0054, 39 items)
+  SASRec    0.2277 [0.2460, 0.2272, 0.2454, 0.1951, 0.2444, 0.1902, 0.2454] (SD 0.0249, 179 items)
+  difference +0.0060 (+43 items); user-bootstrap 95% CI [+0.0028, +0.0064] ([+20, +46] items); bootstrap mean +0.0045
+
+wall 74s

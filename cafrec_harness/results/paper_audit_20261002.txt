@@ -1,0 +1,84 @@
+Paper claim audit, 2026-10-02
+77 reproduce, 0 differ, 2 partial (fewer seeds on disk than the paper reports), 0 cannot be checked
+
+  PARTIAL  Sec. V-F, grid search          tuned SASRec NDCG@10 at 2048 (paper: 10 seeds, on disk: 9) paper 0.0455, recomputed 0.0451
+  PARTIAL  Sec. V-F, grid search          tuned CAFREC-H over tuned SASRec at batch 512 (paper: 10 seeds, on disk: 8) paper +2.9%, recomputed +3.5%, higher in 8/8 seeds
+  OK       Sec. IV-E, batch size          SASRec HR@10 at batch 2048                           paper +0.0787, recomputed +0.0787, diff -0.00005
+  OK       Sec. V-C text                  shuffled vs CAFREC-NP NDCG delta                     paper -0.0009, recomputed -0.0009, diff +0.00001
+  OK       Sec. V-C text                  shuffled vs CAFREC-NP NDCG p                         paper 0.023, recomputed 0.0228
+  OK       Sec. V-F, grid search          tuned CAFREC-H NDCG@10 at 512 (paper: 10 seeds, on disk: 9) paper 0.0468, recomputed 0.0469
+  OK       Sec. V-F, grid search          tuned CAFREC-H over tuned SASRec at batch 2048 (paper: 10 seeds, on disk: 9) paper +2.0%, recomputed +2.1%, higher in 8/9 seeds
+  OK       Sec. VI-B                      loss share of SASRec's lead over HGN (BPR)           paper 84%, recomputed 83.8%
+  OK       Table I                        SASRec hit@10                                        paper +0.0810, recomputed +0.0810, diff -0.00001
+  OK       Table I                        SASRec ndcg@10                                       paper +0.0411, recomputed +0.0410, diff -0.00006
+  OK       Table I                        SASRec mrr@10                                        paper +0.0291, recomputed +0.0291, diff +0.00001
+  OK       Table I                        CAFREC-NP hit@10                                     paper +0.0816, recomputed +0.0816, diff -0.00001
+  OK       Table I                        CAFREC-NP ndcg@10                                    paper +0.0416, recomputed +0.0416, diff +0.00003
+  OK       Table I                        CAFREC-NP mrr@10                                     paper +0.0297, recomputed +0.0297, diff -0.00003
+  OK       Table I                        CAFREC hit@10                                        paper +0.0810, recomputed +0.0810, diff -0.00000
+  OK       Table I                        CAFREC ndcg@10                                       paper +0.0415, recomputed +0.0415, diff +0.00001
+  OK       Table I                        CAFREC mrr@10                                        paper +0.0297, recomputed +0.0297, diff +0.00001
+  OK       Table I                        HGN (CE) hit@10                                      paper +0.0717, recomputed +0.0717, diff -0.00002
+  OK       Table I                        HGN (CE) ndcg@10                                     paper +0.0340, recomputed +0.0340, diff -0.00003
+  OK       Table I                        HGN (CE) mrr@10                                      paper +0.0227, recomputed +0.0227, diff +0.00002
+  OK       Table I                        HGRU4Rec (CE) hit@10                                 paper +0.0668, recomputed +0.0668, diff -0.00000
+  OK       Table I                        HGRU4Rec (CE) ndcg@10                                paper +0.0314, recomputed +0.0314, diff +0.00001
+  OK       Table I                        HGRU4Rec (CE) mrr@10                                 paper +0.0209, recomputed +0.0209, diff -0.00003
+  OK       Table I                        HGN (BPR) hit@10                                     paper +0.0235, recomputed +0.0235, diff -0.00003
+  OK       Table I                        HGN (BPR) ndcg@10                                    paper +0.0112, recomputed +0.0112, diff +0.00002
+  OK       Table I                        HGN (BPR) mrr@10                                     paper +0.0074, recomputed +0.0074, diff +0.00004
+  OK       Table I                        HGRU4Rec (BPR) hit@10                                paper +0.0554, recomputed +0.0555, diff +0.00005
+  OK       Table I                        HGRU4Rec (BPR) ndcg@10                               paper +0.0278, recomputed +0.0278, diff -0.00002
+  OK       Table I                        HGRU4Rec (BPR) mrr@10                                paper +0.0195, recomputed +0.0195, diff -0.00001
+  OK       Table II                       CAFREC-NP vs SASRec hit@10 delta                     paper +0.0006, recomputed +0.0006, diff -0.00000
+  OK       Table II                       CAFREC-NP vs SASRec hit@10 p                         paper 0.45, recomputed 0.451
+  OK       Table II                       CAFREC-NP vs SASRec ndcg@10 delta                    paper +0.0006, recomputed +0.0006, diff -0.00001
+  OK       Table II                       CAFREC-NP vs SASRec ndcg@10 p                        paper 0.11, recomputed 0.108
+  OK       Table II                       CAFREC-NP vs SASRec mrr@10 delta                     paper +0.0006, recomputed +0.0006, diff -0.00004
+  OK       Table II                       CAFREC-NP vs SASRec mrr@10 p                         paper 0.045, recomputed 0.0447
+  OK       Table II                       CAFREC vs SASRec hit@10 delta                        paper +0.0000, recomputed +0.0000, diff +0.00001
+  OK       Table II                       CAFREC vs SASRec hit@10 p                            paper 0.9, recomputed 0.898
+  OK       Table II                       CAFREC vs SASRec ndcg@10 delta                       paper +0.0005, recomputed +0.0005, diff -0.00002
+  OK       Table II                       CAFREC vs SASRec ndcg@10 p                           paper 0.34, recomputed 0.337
+  OK       Table II                       CAFREC vs SASRec mrr@10 delta                        paper +0.0006, recomputed +0.0006, diff -0.00000
+  OK       Table II                       CAFREC vs SASRec mrr@10 p                            paper 0.23, recomputed 0.228
+  OK       Table IV                       CAFREC [abl] hit@10                                  paper +0.0791, recomputed +0.0791, diff +0.00004
+  OK       Table IV                       CAFREC [abl] ndcg@10                                 paper +0.0405, recomputed +0.0405, diff -0.00003
+  OK       Table IV                       Static gate hit@10                                   paper +0.0764, recomputed +0.0764, diff +0.00004
+  OK       Table IV                       Static gate ndcg@10                                  paper +0.0385, recomputed +0.0386, diff +0.00007
+  OK       Table IV                       Static gate vs CAFREC [abl] NDCG delta               paper -0.0019, recomputed -0.0019, diff -0.00000
+  OK       Table IV                       Static gate vs CAFREC [abl] NDCG p                   paper 6.3e-06, recomputed 6.31e-06
+  OK       Table IV                       Concatenation hit@10                                 paper +0.0722, recomputed +0.0722, diff -0.00004
+  OK       Table IV                       Concatenation ndcg@10                                paper +0.0351, recomputed +0.0351, diff -0.00003
+  OK       Table IV                       Concatenation vs CAFREC [abl] NDCG delta             paper -0.0054, recomputed -0.0054, diff -0.00001
+  OK       Table IV                       Concatenation vs CAFREC [abl] NDCG p                 paper 7.4e-19, recomputed 7.45e-19
+  OK       Table IV                       CAFREC-NP [abl] hit@10                               paper +0.0799, recomputed +0.0799, diff -0.00001
+  OK       Table IV                       CAFREC-NP [abl] ndcg@10                              paper +0.0406, recomputed +0.0406, diff +0.00004
+  OK       Table IV                       Vector gate hit@10                                   paper +0.0770, recomputed +0.0769, diff -0.00005
+  OK       Table IV                       Vector gate ndcg@10                                  paper +0.0385, recomputed +0.0385, diff -0.00002
+  OK       Table IV                       Vector gate vs CAFREC-NP [abl] NDCG delta            paper -0.0022, recomputed -0.0022, diff +0.00004
+  OK       Table IV                       Vector gate vs CAFREC-NP [abl] NDCG p                paper 2.8e-09, recomputed 2.83e-09
+  OK       Table IV                       Shuffled ctx hit@10                                  paper +0.0798, recomputed +0.0797, diff -0.00006
+  OK       Table IV                       Shuffled ctx ndcg@10                                 paper +0.0406, recomputed +0.0406, diff -0.00003
+  OK       Table IV                       Shuffled ctx vs CAFREC-NP [abl] NDCG delta           paper -0.0001, recomputed -0.0001, diff +0.00004
+  OK       Table IV                       Shuffled ctx vs CAFREC-NP [abl] NDCG p               paper 0.93, recomputed 0.926
+  OK       Table VI                       SASRec (tuned) hit@10                                paper +0.0880, recomputed +0.0880, diff -0.00001
+  OK       Table VI                       SASRec (tuned) ndcg@10                               paper +0.0456, recomputed +0.0456, diff -0.00002
+  OK       Table VI                       SASRec (tuned) mrr@10                                paper +0.0329, recomputed +0.0329, diff +0.00001
+  OK       Table VI                       CAFREC-NP (tuned) hit@10                             paper +0.0888, recomputed +0.0888, diff +0.00005
+  OK       Table VI                       CAFREC-NP (tuned) ndcg@10                            paper +0.0462, recomputed +0.0462, diff +0.00002
+  OK       Table VI                       CAFREC-NP (tuned) mrr@10                             paper +0.0335, recomputed +0.0335, diff -0.00002
+  OK       Table VIII                     CAFREC-NP vs SASRec opener delta                     paper +0.0016, recomputed +0.0016, diff +0.00001
+  OK       Table VIII                     CAFREC-NP vs SASRec opener p                         paper 0.00024, recomputed 0.000244
+  OK       Table VIII                     CAFREC-NP vs SASRec within delta                     paper -0.0016, recomputed -0.0016, diff -0.00003
+  OK       Table VIII                     CAFREC-NP vs SASRec within p                         paper 0.021, recomputed 0.0213
+  OK       Table VIII                     CAFREC vs SASRec opener delta                        paper +0.0010, recomputed +0.0010, diff +0.00003
+  OK       Table VIII                     CAFREC vs SASRec opener p                            paper 0.088, recomputed 0.0881
+  OK       Table VIII                     CAFREC vs SASRec within delta                        paper -0.0007, recomputed -0.0007, diff -0.00003
+  OK       Table VIII                     CAFREC vs SASRec within p                            paper 0.47, recomputed 0.468
+  OK       Table VIII                     CAFREC-NP @2048 vs SASRec @2048 opener delta         paper +0.0007, recomputed +0.0007, diff +0.00001
+  OK       Table VIII                     CAFREC-NP @2048 vs SASRec @2048 opener p             paper 0.0087, recomputed 0.00872
+  OK       Table VIII                     CAFREC-NP @2048 vs SASRec @2048 within delta         paper -0.0009, recomputed -0.0009, diff -0.00001
+  OK       Table VIII                     CAFREC-NP @2048 vs SASRec @2048 within p             paper 0.037, recomputed 0.0365
+
+wall 14s

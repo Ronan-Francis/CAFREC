@@ -1,0 +1,95 @@
+Best validation epoch (1-based) from saved checkpoints, 2026-10-02 12:09
+checkpoints read: 77; result JSONs with config: 69; matched uniquely: 56
+
+CAFREC_kuairand_pure_ctx_capall512_seed2020.json               best_epoch=None  valid_ndcg=0.0353  n_ckpt=0
+CAFREC_kuairand_pure_ctx_capall512_seed2021.json               best_epoch=None  valid_ndcg=0.0353  n_ckpt=0
+CAFREC_kuairand_pure_ctx_capall512_seed403092.json             best_epoch=None  valid_ndcg=0.0352  n_ckpt=0
+CAFREC_kuairand_pure_ctx_capbeyond512_seed2020.json            best_epoch=None  valid_ndcg=0.0438  n_ckpt=0
+CAFREC_kuairand_pure_ctx_capbeyond512_seed2021.json            best_epoch=None  valid_ndcg=0.0445  n_ckpt=0
+CAFREC_kuairand_pure_ctx_capbeyond512_seed403092.json          best_epoch=None  valid_ndcg=0.0455  n_ckpt=0
+CAFREC_kuairand_pure_ctx_catbeyond512_seed2020.json            best_epoch=None  valid_ndcg=0.0437  n_ckpt=0
+CAFREC_kuairand_pure_ctx_catbeyond512_seed2021.json            best_epoch=None  valid_ndcg=0.0455  n_ckpt=0
+CAFREC_kuairand_pure_ctx_catbeyond512_seed403092.json          best_epoch=None  valid_ndcg=0.0450  n_ckpt=0
+CAFREC_kuairand_pure_ctx_np512_seed2020.json                   best_epoch=None  valid_ndcg=0.0448  n_ckpt=0
+CAFREC_kuairand_pure_ctx_np512_seed2021.json                   best_epoch=None  valid_ndcg=0.0448  n_ckpt=0
+CAFREC_kuairand_pure_ctx_np512_seed403092.json                 best_epoch=None  valid_ndcg=0.0461  n_ckpt=0
+CAFREC_kuairand_pure_ctx_smoke_capbeyond512_seed2020.json      best_epoch=None  valid_ndcg=0.0324  n_ckpt=0
+Pop_kuairand_pure_pop_seed2020.json                            best_epoch=   1  valid_ndcg=0.0176  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_00_seed403092.json            best_epoch=  10  valid_ndcg=0.0451  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_01_seed403092.json            best_epoch=  10  valid_ndcg=0.0455  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_02_seed403092.json            best_epoch=   9  valid_ndcg=0.0449  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_03_seed403092.json            best_epoch=   9  valid_ndcg=0.0443  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_04_seed403092.json            best_epoch=   9  valid_ndcg=0.0470  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_05_seed403092.json            best_epoch=   9  valid_ndcg=0.0470  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_06_seed403092.json            best_epoch=   8  valid_ndcg=0.0201  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_07_seed403092.json            best_epoch=  10  valid_ndcg=0.0249  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_08_seed403092.json            best_epoch=   9  valid_ndcg=0.0507  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_09_seed403092.json            best_epoch=   9  valid_ndcg=0.0505  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_10_seed403092.json            best_epoch=   9  valid_ndcg=0.0473  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_11_seed403092.json            best_epoch=   9  valid_ndcg=0.0481  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_12_seed403092.json            best_epoch=   9  valid_ndcg=0.0496  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_13_seed403092.json            best_epoch=   9  valid_ndcg=0.0502  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_14_seed403092.json            best_epoch=   1  valid_ndcg=0.0218  n_ckpt=1
+CAFREC_kuairand_pure_ctx_gs16_np_15_seed403092.json            best_epoch=   9  valid_ndcg=0.0279  n_ckpt=1
+CAFREC_kuairand_pure_ctx_smoke512_np_seed403092.json           best_epoch=   1  valid_ndcg=0.0335  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed1024.json         best_epoch=   7  valid_ndcg=0.0500  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed123.json          best_epoch=  10  valid_ndcg=0.0501  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed2048.json         best_epoch=   7  valid_ndcg=0.0503  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed256.json          best_epoch=   7  valid_ndcg=0.0504  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed42.json           best_epoch=   9  valid_ndcg=0.0497  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed512.json          best_epoch=   8  valid_ndcg=0.0495  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_gs08_seed77.json           best_epoch=   9  valid_ndcg=0.0493  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed1024.json best_epoch=   7  valid_ndcg=0.0495  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed123.json best_epoch=  10  valid_ndcg=0.0502  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed2048.json best_epoch=  10  valid_ndcg=0.0504  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed256.json best_epoch=   7  valid_ndcg=0.0498  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed42.json  best_epoch=  10  valid_ndcg=0.0493  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed512.json best_epoch=   6  valid_ndcg=0.0495  n_ckpt=1
+CAFREC_kuairand_pure_ctx_tuned16_np_nopolicy_gs08_seed77.json  best_epoch=   8  valid_ndcg=0.0501  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_00_seed403092.json            best_epoch=  10  valid_ndcg=0.0446  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_01_seed403092.json            best_epoch=  10  valid_ndcg=0.0446  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_02_seed403092.json            best_epoch=   9  valid_ndcg=0.0440  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_03_seed403092.json            best_epoch=   9  valid_ndcg=0.0431  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_04_seed403092.json            best_epoch=   9  valid_ndcg=0.0463  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_05_seed403092.json            best_epoch=   9  valid_ndcg=0.0459  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_06_seed403092.json            best_epoch=   1  valid_ndcg=0.0119  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_07_seed403092.json            best_epoch=   9  valid_ndcg=0.0184  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_08_seed403092.json            best_epoch=   9  valid_ndcg=0.0490  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_09_seed403092.json            best_epoch=   9  valid_ndcg=0.0490  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_10_seed403092.json            best_epoch=   9  valid_ndcg=0.0395  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_11_seed403092.json            best_epoch=   9  valid_ndcg=0.0448  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_12_seed403092.json            best_epoch=   9  valid_ndcg=0.0484  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_13_seed403092.json            best_epoch=   9  valid_ndcg=0.0496  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_14_seed403092.json            best_epoch=   1  valid_ndcg=0.0118  n_ckpt=1
+SASRec_kuairand_pure_gs16_sasrec_15_seed403092.json            best_epoch=   1  valid_ndcg=0.0227  n_ckpt=1
+SASRec_kuairand_pure_smoke512_sasrec_seed403092.json           best_epoch=   1  valid_ndcg=0.0337  n_ckpt=1
+SASRec_kuairand_pure_tuned16_sasrec_gs13_seed1024.json         best_epoch=   7  valid_ndcg=0.0497  n_ckpt=1
+SASRec_kuairand_pure_tuned16_sasrec_gs13_seed123.json          best_epoch=  10  valid_ndcg=0.0490  n_ckpt=1
+SASRec_kuairand_pure_tuned16_sasrec_gs13_seed2048.json         best_epoch=   7  valid_ndcg=0.0498  n_ckpt=1
+SASRec_kuairand_pure_tuned16_sasrec_gs13_seed256.json          best_epoch=   7  valid_ndcg=0.0498  n_ckpt=1
+SASRec_kuairand_pure_tuned16_sasrec_gs13_seed42.json           best_epoch=   5  valid_ndcg=0.0491  n_ckpt=1
+SASRec_kuairand_pure_tuned16_sasrec_gs13_seed512.json          best_epoch=  10  valid_ndcg=0.0485  n_ckpt=1
+SASRec_kuairand_pure_tuned16_sasrec_gs13_seed77.json           best_epoch=   5  valid_ndcg=0.0486  n_ckpt=1
+
+checkpoints with no unique result JSON: 21
+  saved/CAFREC-Sep-15-2026_21-58-03.pth: CAFREC ml-100k seed 2020 bs 2048 epoch 1 valid 0.0155
+  saved/CAFREC-Sep-15-2026_21-59-38.pth: CAFREC kuairand_pure_ctx seed 42 bs 2048 epoch 1 valid 0.0217
+  saved/CAFREC-Sep-15-2026_22-03-50.pth: CAFREC kuairand_pure_ctx seed 42 bs 2048 epoch 1 valid 0.0246
+  saved/CAFREC-Sep-15-2026_22-08-38.pth: CAFREC kuairand_pure_ctx seed 42 bs 2048 epoch 10 valid 0.0452
+  saved/CAFREC-Sep-15-2026_22-44-57.pth: CAFREC kuairand_pure_ctx seed 42 bs 2048 epoch 10 valid 0.0425
+  saved/CAFREC-Sep-15-2026_23-20-56.pth: CAFREC kuairand_pure_ctx seed 42 bs 2048 epoch 10 valid 0.0434
+  saved/CAFREC-Sep-15-2026_23-56-37.pth: CAFREC kuairand_pure_ctx seed 77 bs 2048 epoch 9 valid 0.0418
+  saved/CAFREC-Sep-16-2026_00-31-59.pth: CAFREC kuairand_pure_ctx seed 77 bs 2048 epoch 9 valid 0.0432
+  saved/CAFREC-Sep-16-2026_01-07-42.pth: CAFREC kuairand_pure_ctx seed 123 bs 2048 epoch 10 valid 0.0427
+  saved/CAFREC-Sep-16-2026_01-43-17.pth: CAFREC kuairand_pure_ctx seed 123 bs 2048 epoch 10 valid 0.0444
+  saved/CAFREC-Sep-16-2026_06-19-14.pth: CAFREC kuairand_pure_ctx seed 77 bs 2048 epoch 1 valid 0.0249
+  saved/CAFREC-Sep-16-2026_06-26-37.pth: CAFREC kuairand_pure_ctx seed 77 bs 2048 epoch 7 valid 0.0429
+  saved/CAFREC-Sep-19-2026_16-21-13.pth: CAFREC ml-100k seed 2020 bs 2048 epoch 1 valid 0.0155
+  saved/HGN-Sep-15-2026_21-57-30.pth: HGN ml-100k seed 2020 bs 2048 epoch 1 valid 0.032
+  saved/HGN-Sep-19-2026_16-20-39.pth: HGN ml-100k seed 2020 bs 2048 epoch 1 valid 0.032
+  saved/HGRU4Rec-Sep-15-2026_21-57-38.pth: HGRU4Rec ml-100k seed 2020 bs 2048 epoch 1 valid 0.0217
+  saved/HGRU4Rec-Sep-19-2026_16-20-48.pth: HGRU4Rec ml-100k seed 2020 bs 2048 epoch 1 valid 0.0217
+  saved/SASRec-Sep-15-2026_21-17-37.pth: SASRec kuairand_pure seed 2020 bs 2048 epoch 1 valid 0.0244
+  saved/SASRec-Sep-15-2026_21-56-42.pth: SASRec ml-100k seed 2020 bs 2048 epoch 1 valid 0.0156
+  saved/SASRec-Sep-17-2026_17-35-49.pth: SASRec kuairand_pure seed 2020 bs 512 epoch 4 valid 0.0401
+  saved/SASRec-Sep-19-2026_16-19-51.pth: SASRec ml-100k seed 2020 bs 2048 epoch 1 valid 0.0156

@@ -1,0 +1,116 @@
+{
+ "meta": {
+  "n_perm": 2000,
+  "perm_seed": 20261003,
+  "seeds": [
+   2020,
+   2021,
+   403092
+  ],
+  "n_catalog": 7210
+ },
+ "results": [
+  {
+   "cohort": "all",
+   "a": "CAFREC [abl]",
+   "b": "Static gate",
+   "n_users": 22912,
+   "observed_items": 206.33333333333334,
+   "observed_frac": 0.02861766065649561,
+   "per_seed_items": [
+    177,
+    301,
+    141
+   ],
+   "perm_abs_max": 42.333333333333336,
+   "perm_abs_q95": 20.666666666666668,
+   "count_ge_observed": 0,
+   "p_two_sided": 0.0004997501249375312
+  },
+  {
+   "cohort": "all",
+   "a": "CAFREC [abl]",
+   "b": "Concatenation",
+   "n_users": 22912,
+   "observed_items": 314.0,
+   "observed_frac": 0.043550624133148405,
+   "per_seed_items": [
+    393,
+    282,
+    267
+   ],
+   "perm_abs_max": 36.666666666666664,
+   "perm_abs_q95": 22.349999999999987,
+   "count_ge_observed": 0,
+   "p_two_sided": 0.0004997501249375312
+  },
+  {
+   "cohort": "high drift",
+   "a": "CAFREC [abl]",
+   "b": "Static gate",
+   "n_users": 3521,
+   "observed_items": 131.0,
+   "observed_frac": 0.018169209431345354,
+   "per_seed_items": [
+    111,
+    207,
+    75
+   ],
+   "perm_abs_max": 38.66666666666667,
+   "perm_abs_q95": 19.0,
+   "count_ge_observed": 0,
+   "p_two_sided": 0.0004997501249375312
+  },
+  {
+   "cohort": "high drift",
+   "a": "CAFREC [abl]",
+   "b": "Concatenation",
+   "n_users": 3521,
+   "observed_items": 163.66666666666666,
+   "observed_frac": 0.02269995376791493,
+   "per_seed_items": [
+    232,
+    112,
+    147
+   ],
+   "perm_abs_max": 36.666666666666664,
+   "perm_abs_q95": 20.333333333333332,
+   "count_ge_observed": 0,
+   "p_two_sided": 0.0004997501249375312
+  },
+  {
+   "cohort": "low drift",
+   "a": "CAFREC [abl]",
+   "b": "Static gate",
+   "n_users": 3521,
+   "observed_items": 120.33333333333333,
+   "observed_frac": 0.016689782709200185,
+   "per_seed_items": [
+    107,
+    192,
+    62
+   ],
+   "perm_abs_max": 34.0,
+   "perm_abs_q95": 19.0,
+   "count_ge_observed": 0,
+   "p_two_sided": 0.0004997501249375312
+  },
+  {
+   "cohort": "low drift",
+   "a": "CAFREC [abl]",
+   "b": "Concatenation",
+   "n_users": 3521,
+   "observed_items": 176.66666666666666,
+   "observed_frac": 0.024503005085529356,
+   "per_seed_items": [
+    246,
+    125,
+    159
+   ],
+   "perm_abs_max": 36.666666666666664,
+   "perm_abs_q95": 20.000000000000004,
+   "count_ge_observed": 0,
+   "p_two_sided": 0.0004997501249375312
+  }
+ ]
+}
