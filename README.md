@@ -2,7 +2,7 @@
 
 **Context-Adaptive Fusion for Long- and Short-Term Video Recommendation**
 
-**Documentation:** **Project README** · [Harness README](cafrec_harness/README.md) · [Data README](data/README.md) · [H2 runbook](cafrec_harness/H2_RUNBOOK.md)
+**Documentation:** **Project README** · [Harness README](cafrec_harness/README.md) · [Data README](data/README.md) 
 
 CAFREC is a sequential recommender that combines a short-term self-attentive encoder with a frozen long-term user profile. A gate driven by session context sets the weight of each. This repository contains the model, the RecBole-based experiment harness, the analysis scripts, and the stored results behind the accompanying MSc thesis, *What Evidence Should a Recommender Change Require? A Controlled Study of Session-Context Gating* (Atlantic Technological University, 2026).
 
