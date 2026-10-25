@@ -1,6 +1,6 @@
 # CAFREC harness
 
-**Documentation:** [Project README](../README.md) · **Harness README** · [Data README](../data/README.md) · [H2 runbook](H2_RUNBOOK.md)
+**Documentation:** [Project README](../README.md) · **Harness README** · [Data README](../data/README.md)
 
 A thin, extensible wrapper around RecBole. The built-in baselines and the CAFREC model run through the **same** entry point. The only thing that changes between them is a registry key.
 
@@ -82,4 +82,4 @@ Features are computed **causally**: each row summarises only the session history
 | `demo_recommend.py` | Per-user demo: context, held-out item, ranks and top-10 lists |
 | `build_*.py` | Build datasets, prompts and profiles |
 
-Data preparation, including the KuaiRand download and the exploratory figures, is described in the [data README](../data/README.md). The LLM-profile experiment is described in the [H2 runbook](H2_RUNBOOK.md).
+Data preparation, including the KuaiRand download and the exploratory figures, is described in the [data README](../data/README.md).

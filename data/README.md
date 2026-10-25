@@ -1,6 +1,6 @@
 # CAFREC data
 
-**Documentation:** [Project README](../README.md) · [Harness README](../cafrec_harness/README.md) · **Data README** · [H2 runbook](../cafrec_harness/H2_RUNBOOK.md)
+**Documentation:** [Project README](../README.md) · [Harness README](../cafrec_harness/README.md) · **Data README**
 
 This folder holds every dataset file the experiments read. Only this README and `ctx_scaler_params.json` are committed. The data files are large (about 1.3 GB in total) and are released by their owners under their own licence, so they are rebuilt locally from the public sources below.
 
@@ -67,6 +67,6 @@ Run these steps in order. All the commands after step 2 run from `cafrec_harness
 
    This writes `recbole/kuairand_pure_ctx/kuairand_pure_ctx.inter` and `ctx_scaler_params.json`. Each feature is computed causally, from the session history before the row only. `tests/test_features.py` checks this.
 4. **Category and caption subsets** (needed for the content profiles, ILD and H2 only): `modal_content_fetch.py` downloads the supplementary files on Modal and checks their MD5 sums, and `audit_content_data.py` writes the Pure subsets to `content_pure/`.
-5. **Profiles** (needed only for the profile experiments): `cafrec.features.build_profiles` renders each user's training history as text and embeds it. Run locally with `--backend hashing` it builds the hashing control. The templated bge-large profile uses the same module on a Modal GPU, through `modal_profiles.py`. `build_content_profiles.py` builds the content-bearing profiles. The LLM-generated profile is produced on Modal by `build_h2_prompts.py`, `modal_h2_generate.py` and `modal_h2_embed.py`, as described in the [H2 runbook](../cafrec_harness/H2_RUNBOOK.md).
+5. **Profiles** (needed only for the profile experiments): `cafrec.features.build_profiles` renders each user's training history as text and embeds it. Run locally with `--backend hashing` it builds the hashing control. The templated bge-large profile uses the same module on a Modal GPU, through `modal_profiles.py`. `build_content_profiles.py` builds the content-bearing profiles. The LLM-generated profile is produced on Modal by `build_h2_prompts.py`, `modal_h2_generate.py` and `modal_h2_embed.py`.
 
 The baselines and the main CAFREC comparison need only steps 1 to 3.

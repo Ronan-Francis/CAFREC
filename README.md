@@ -65,7 +65,7 @@ RecBole 1.2.1 provides the data loader, trainer, SASRec and HGN. The components 
 | Model | `cafrec/models/cafrec.py`: CAFREC and its ablations (`no_profiler`, `static_gate`, `concat`, vector gate, shuffled context, history gate) as config switches on one class. `cafrec/models/hgru4rec.py`: U-GRU, a user-seeded GRU that approximates HGRU4Rec. |
 | Harness | `cafrec/registry.py` (one spec per model), `cafrec/runner.py`, `cafrec/tiers.py` (batch size by catalogue tier) |
 | Data and features | `Foundation/` notebooks (KuaiRand preparation, 30-minute session cutting, `.inter` builder). `cafrec/features/context.py` and `build_context_inter.py`: causal prefix features, scaler fitted on training rows only. `cafrec/data/leave_one_out.py`. |
-| Profiles | `cafrec/features/profiles.py` and `build_profiles.py` (profile cache with shape, NaN and row checks). `build_content_profiles.py`. `build_h2_prompts.py`, `modal_h2_generate.py` and `modal_h2_embed.py` (Qwen2.5-7B generated profiles; see `H2_RUNBOOK.md`). |
+| Profiles | `cafrec/features/profiles.py` and `build_profiles.py` (profile cache with shape, NaN and row checks). `build_content_profiles.py`. `build_h2_prompts.py`, `modal_h2_generate.py` and `modal_h2_embed.py` (Qwen2.5-7B generated profiles). |
 | Evaluation | `cafrec/eval/full_rank.py` (per-user rank and top-10 dumps keyed by original user ID). `metrics.py`, `diversity.py` (coverage, ILD), `significance.py` (paired bootstrap, Wilcoxon, Holm, per-seed tests). |
 | Launchers | `modal_run.py` (Modal A10G), `local_run.py` and `gpu_chain.py` (local CPU/GPU queues), `run_*.py` sweeps |
 | Analysis and provenance | `analyze_*.py`, `audit_paper_claims.py`, `extract_best_epochs.py`, `results/MANIFEST.csv` |
@@ -223,7 +223,6 @@ cafrec_harness/            RecBole-based harness
   configs/base.yaml        shared RecBole config
   results/                 per-run JSON (modal/, local/, local_gpu/), analysis outputs, MANIFEST.csv
   tests/                   pytest suite
-  H2_RUNBOOK.md            construction and runs of the LLM-profile (H2) experiment
 PROJECT_LOG.md             dated decision and results log
 data/                      dataset files, rebuilt locally (see data/README.md)
 images/                    exploratory figures of the dataset
